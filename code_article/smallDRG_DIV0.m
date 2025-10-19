@@ -24,6 +24,7 @@ ELeak = -62.5; % [mV] mean RMP of DIV0 neurons = -62.5196 after JP correction(+1
 
 
 %**** BASELINE: rheo = 17pA
+
 gLeak = 0.025; %(1/Rr)/CellArea*(10^2); % [mS/cm2] normalized by cell area
 gAHP =  2.5; 
 gKm = 0.05;

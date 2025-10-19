@@ -1,4 +1,4 @@
-include("Ploting.jl")
+include("equations.jl")
 
 function main()
 
