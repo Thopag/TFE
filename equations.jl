@@ -1,4 +1,4 @@
-# --------------------------- Common to Na_V 1.7, Na_V 1.3, Na_V 1.8, K_dr --------------------------- #
+# --------------------------- Common to Na_V 1.7, Na_V 1.3, Na_V 1.8 --------------------------- #
 
 function dot_m(V, m, alpha, beta)
     return alpha(V)*(1-m) - m*beta(V)
@@ -92,6 +92,14 @@ end
 
 function beta_l_K_dr(V)
     return exp( - 2e-3 * (V+32) * 9.648e4 ) / 2562.35
+end
+
+function dot_n_K_dr(V, n)
+    return alpha_n_K_dr(V)*(1-n) - n*beta_n_K_dr(V)
+end
+
+function dot_l_K_dr(V, l)
+    return alpha_l_K_dr(V)*(1-l) - l*beta_l_K_dr(V)
 end
 
 # --------------------------- AHP --------------------------- #
