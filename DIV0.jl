@@ -48,7 +48,7 @@ function smallDRG_DIV0(amp, duration, stim_on, stim_length)
     # --- Stimulus parameters --- #
 
     dt = 0.01                           # time step for forward euler method
-    loop  = duration/dt                 # no. of iterations of euler
+    loop  = Int(duration/dt)            # no. of iterations of euler
     stim_off = stim_on + stim_length    # [ms]
 
     # --- Noise parameters --- #
@@ -171,7 +171,7 @@ function smallDRG_DIV0(amp, duration, stim_on, stim_length)
             Inoise[step+1] = 0
         end
 
-        spike[step] = Int(V[step] > 0) * Int(!ref[step])
+        spike[step] = Int(V[step] > 0) * Int(!Bool(ref[step]))
         ref[step+1] = (V[step] > 0)
 
     end
@@ -180,3 +180,5 @@ function smallDRG_DIV0(amp, duration, stim_on, stim_length)
 
     return spike, V
 end
+
+spike, V = smallDRG_DIV0(17,1500,500,1000)
