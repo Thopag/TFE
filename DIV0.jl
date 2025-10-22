@@ -1,4 +1,4 @@
-include("equations.jl")
+include("equations_code.jl")
 
 function smallDRG_DIV0(amp, duration, stim_on, stim_length)
 
@@ -105,6 +105,8 @@ function smallDRG_DIV0(amp, duration, stim_on, stim_length)
 
     # --- Run simulation --- #
 
+    print("--------------- Start Simulation ---------------\n")
+
     Istim[Int(stim_on/dt):Int(stim_off/dt)] .+= (amp * (10^-6)) / (CellArea * (10^-8))
 
     # Euler method
@@ -112,8 +114,20 @@ function smallDRG_DIV0(amp, duration, stim_on, stim_length)
 
         # --- Voltage Calculation --- #
 
-        dV_dt = (Istim[step] + Inoise[step] - INaV1p3[step] - INaV1p7[step] - INaV1p8[step]-IKdr[step]-IKm[step]-ILeak[step]-IAHP[step])/C
+        dV_dt = (Istim[step]+Inoise[step]-INaV1p3[step]-INaV1p7[step]-INaV1p8[step]-IKdr[step]-IKm[step]-ILeak[step]-IAHP[step])/C
         V[step+1] = V[step] + dV_dt*dt
+
+        # print(" V[step] $(V[step]) \n")
+        # print(" Istim[step] $(Istim[step]) \n")
+        # print(" Inoise[step] $(Inoise[step]) \n")
+        # print(" INaV1p3[step] $(INaV1p3[step]) \n")
+        # print(" INaV1p7[step] $(INaV1p7[step]) \n")
+        # print(" INaV1p8[step] $(INaV1p8[step]) \n")
+        # print(" IKdr[step] $(IKdr[step]) \n")
+        # print(" IKm[step] $(IKm[step]) \n")
+        # print(" ILeak[step] $(ILeak[step]) \n")
+        # print(" IAHP[step] $(IAHP[step]) \n \n")
+
 
         # --- Current Equations --- #
 
