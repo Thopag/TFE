@@ -1,4 +1,5 @@
 using Plots
+using ColorSchemes
 include("equations_code.jl")
 
 function smallDRG_DIV0(amp, duration, stim_on, stim_length)
@@ -194,17 +195,98 @@ function smallDRG_DIV0(amp, duration, stim_on, stim_length)
 
     end
 
-    # NEED TO ADD PLOTS
-
     t = 0:dt:(duration-dt)
 
-    p1 = plot(t, V)
-    display(p1)
-    savefig("plots/p1.pdf")
+    plot(t, V, color= :black, label="")
+    xlims!((400, 1700))
+    ylims!((-100, 0))
+    xlabel!("Time (ms)")
+    ylabel!("Voltage (mV)")
 
-    p2 = plot(t, spike)
-    display(p2)
-    savefig("plots/p2.pdf")
+    savefig("plots/plot_1.pdf")
+
+    plot(V, m7.^3 .* h7 .* 100, color=:green, label="NaV1p7")
+    plot!(V, m8.^3 .* h8 .* 100, color=:blue, label="NaV1p8")
+    ylabel!("Availability (%)")
+    xlabel!("Voltage (mV)")
+    plot!(aspect_ratio = 1)
+
+    savefig("plots/plot_2.pdf")
+
+    p = plot(layout = (2, 1))
+    x_range = (450, 600)
+
+    plot!(p[1], t, V)
+    xlims!(p[1], x_range)
+    ylims!(p[1], (-100, 50))
+    xlabel!(p[1], "Time (ms)")
+    ylabel!(p[1], "Voltage (mV)")
+
+    plot!(p[2], t, INaV1p3 .+ INaV1p7 .+ INaV1p8, color=:red, label="Sodium", legend = :topleft)
+    plot!(p[2], t, IKdr .+ IKm .+ IAHP, color=:blue , label="Potassium")
+    xlims!(p[2], x_range)
+    ylims!(p[2], (-250, 250))
+    xlabel!(p[2], "Time (ms)")
+    ylabel!(p[2], "Current (uA/cm2)")
+
+    savefig(p, "plots/plot_3.pdf")
+
+    y_range = (519, 625)
+    x_range = (-100, 60)
+
+    idx = Int(y_range[1]/dt):Int(y_range[2]/dt)
+    N = length(idx)
+    V_color = get.(Ref(ColorSchemes.jet), range(0, stop=1, length=N))
+
+    p = plot(layout = (3, 1)) #, size = (500,1000))
+
+    # - 1 - #
+
+    plot!(p[1], V[idx], y_range[1]:dt:y_range[2], label="")
+    xlims!(p[1], x_range)
+    ylims!(p[1], y_range)
+    xlabel!(p[1], "Voltage (mV)")
+    ylabel!(p[1], "Time (ms)")
+    #plot!(p[1], aspect_ratio = 1)
+
+    # - 2 - #
+
+    v = collect(x_range[1]:1:x_range[2])
+
+    malpha = alpha_m_1_8.(v)
+    mbeta  = beta_m_1_8.(v)
+    halpha = alpha_h_1_8.(v)
+    hbeta  = beta_h_1_8.(v)
+
+    m = malpha ./ (malpha .+ mbeta)
+    h = halpha ./ (halpha .+ hbeta)
+
+    m = m.^3
+
+    plot!(p[2], v , m, color=:blue, label="m")
+    xlabel!(p[2], "Voltage (mV)")
+    ylabel!(p[2], "Activation (%)")
+    xlims!(p[2], x_range)
+    ylims!(p[2], (0,1))
+    #plot!(p[2], aspect_ratio = 1)
+
+    # - 3 - #
+
+    plot!(p[3], V[idx], m7[idx].^3 .*h7[idx] .* 100, color=:green, label = "")
+
+    X = V[idx]
+    Y = (m8[idx] .^3 .* h8[idx]) .* 100
+
+    for i in 1:(length(X)-1)
+        plot!(p[3], X[i:i+1], Y[i:i+1], color = V_color[i], label = "")
+    end
+
+    xlims!(p[3], x_range)
+    xlabel!(p[3], "Voltage (mV)")
+    ylabel!(p[3], "Availability  (%)")
+    #plot!(p[3], aspect_ratio = 1)
+
+    savefig(p, "plots/plot_4.pdf")
 
     return spike, V
 end

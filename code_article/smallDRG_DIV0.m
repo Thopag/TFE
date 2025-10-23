@@ -224,8 +224,6 @@ xlim(x_range); ylim([-250 250])
 set(gcf,'position',[ 680   312   370   666])
 
 
-
-
 figure
 % y_range = [450 600]; % default
 % y_range = [490 520]; % 1st spike
