@@ -1,3 +1,4 @@
+using Plots
 include("equations_code.jl")
 
 function smallDRG_DIV0(amp, duration, stim_on, stim_length)
@@ -117,18 +118,6 @@ function smallDRG_DIV0(amp, duration, stim_on, stim_length)
         dV_dt = (Istim[step]+Inoise[step]-INaV1p3[step]-INaV1p7[step]-INaV1p8[step]-IKdr[step]-IKm[step]-ILeak[step]-IAHP[step])/C
         V[step+1] = V[step] + dV_dt*dt
 
-        # print(" V[step] $(V[step]) \n")
-        # print(" Istim[step] $(Istim[step]) \n")
-        # print(" Inoise[step] $(Inoise[step]) \n")
-        # print(" INaV1p3[step] $(INaV1p3[step]) \n")
-        # print(" INaV1p7[step] $(INaV1p7[step]) \n")
-        # print(" INaV1p8[step] $(INaV1p8[step]) \n")
-        # print(" IKdr[step] $(IKdr[step]) \n")
-        # print(" IKm[step] $(IKm[step]) \n")
-        # print(" ILeak[step] $(ILeak[step]) \n")
-        # print(" IAHP[step] $(IAHP[step]) \n \n")
-
-
         # --- Current Equations --- #
 
         # -- Sodium currents -- #
@@ -155,10 +144,25 @@ function smallDRG_DIV0(amp, duration, stim_on, stim_length)
 
         # - Kdr - activation(n), inactivation(l) - #
 
-        ###### DIFFERENTE IN CODE AND IN ARTICLE ######
+        ###### CODE VERSION ######
 
-        ndr[step+1] = ndr[step] + dt*dot_n_K_dr(V[step], ndr[step])
-        ldr[step+1] = ldr[step] + dt*dot_l_K_dr(V[step], ldr[step])
+        q10=3^((25-30)/10)
+        ninf = 1/(1+alpha_n_K_dr(V[step]))
+        taun = beta_n_K_dr(V[step])/(q10*0.03*(1+alpha_n_K_dr(V[step])))
+        linf = 1/(1+alpha_l_K_dr(V[step]))
+        taul = beta_l_K_dr(V[step])/(q10*0.001*(1 + alpha_l_K_dr(V[step])))
+
+        dndr_dt = (ninf - ndr[step])/taun
+        ndr[step+1] = ndr[step] + dndr_dt*dt
+        dldr_dt = (linf - ldr[step])/taul
+        ldr[step+1] = ldr[step] + dldr_dt*dt
+        
+        ###### ARTICLE VERSION ######
+        # (Don't work)
+
+        # ndr[step+1] = ndr[step] + dt*dot_n_K_dr(V[step], ndr[step])
+        # ldr[step+1] = ldr[step] + dt*dot_l_K_dr(V[step], ldr[step])
+
         IKdr[step+1] = gKdr * (ndr[step]^3) * ldr[step] * (V[step]-Ek)
 
         # - Km - #
@@ -191,6 +195,16 @@ function smallDRG_DIV0(amp, duration, stim_on, stim_length)
     end
 
     # NEED TO ADD PLOTS
+
+    t = 0:dt:(duration-dt)
+
+    p1 = plot(t, V)
+    display(p1)
+    savefig("plots/p1.pdf")
+
+    p2 = plot(t, spike)
+    display(p2)
+    savefig("plots/p2.pdf")
 
     return spike, V
 end
