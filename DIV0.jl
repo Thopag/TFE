@@ -264,6 +264,7 @@ function smallDRG_DIV0(amp, duration, stim_on, stim_length)
     m = m.^3
 
     plot!(p[2], v , m, color=:blue, label="m")
+    plot!(p[2], v , h, color=:orange, label="h")
     xlabel!(p[2], "Voltage (mV)")
     ylabel!(p[2], "Activation (%)")
     xlims!(p[2], x_range)
