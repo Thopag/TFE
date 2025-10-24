@@ -195,6 +195,8 @@ function smallDRG_DIV0(amp, duration, stim_on, stim_length)
 
     end
 
+    # Figure 2D
+
     t = 0:dt:(duration-dt)
 
     plot(t, V, color= :black, label="")
