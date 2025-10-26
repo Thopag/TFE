@@ -139,4 +139,7 @@ function smallDRG_DIV0(amp, duration, stim_on, stim_length)
     return
 end
 
-smallDRG_DIV0(17,1500,500,1000)
+if abspath(PROGRAM_FILE) == @__FILE__
+    smallDRG_DIV0(17,1500,500,1000)
+end
+
