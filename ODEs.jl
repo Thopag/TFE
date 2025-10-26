@@ -115,3 +115,127 @@ end
 function dot_z_AHP(V, z)
     return ( 1 / ( 1 + exp( 5 - (V/4) ) ) ) - ( z/100 )
 end
+
+# --------------------------- Simulation function --------------------------- #
+
+function ODE_system(du,u,p,t)
+
+    # --- parameters --- #
+    Iext = p[1](t)
+    C = p[2]
+
+    g_nav1p3 = p[3]
+    g_nav1p7 = p[4]
+    g_nav1p8 = p[5]
+    E_Na = p[6]
+
+    g_Kdr = p[7]
+    g_Km = p[8]
+    g_AHP = p[9]
+    E_k = p[10]
+
+    g_Leak = p[11]
+    E_Leak = p[12]
+
+    sigma_noise = p[13]
+    mu_noise = p[14]
+    tau_noise = p[15]
+
+    with_noise = p[16]
+
+    # --- variables --- #
+
+    V = u[1]
+
+    m3 = u[2]
+    h3 = u[3]
+
+    m7 = u[4]
+    h7 = u[5]
+
+    m8 = u[6]
+    h8 = u[7]
+
+    ndr = u[8]
+    ldr = u[9]
+
+    nm = u[10]
+
+    z_AHP = u[11]
+
+    Inoise = u[12]
+
+    # --- currents --- #
+
+    INaV1p3 = g_nav1p3 * (m3^3) * h3 * (V-E_Na)
+    INaV1p7 = g_nav1p7 * (m7^3) * h7 * (V-E_Na)
+    INaV1p8 = g_nav1p8 * (m8^3) * h8 * (V-E_Na)
+    IKdr = g_Kdr * (ndr^3) * ldr * (V-E_k)
+    IKm = g_Km*nm * (V-E_k)
+    IAHP = g_AHP * (z_AHP^1) * (V-E_k)
+    ILeak = g_Leak * (V-E_Leak)
+    
+    if with_noise
+        du[12] = - ( Inoise - mu_noise) / tau_noise
+    else
+        du[12] = 0
+    end
+
+    # --- ODE --- #
+
+    du[1] = (Iext+Inoise-INaV1p3-INaV1p7-INaV1p8-IKdr-IKm-ILeak-IAHP)/C
+
+    du[2] = dot_m(V, m3, alpha_m_1_3, beta_m_1_3)
+    du[3] = dot_h(V, h3, alpha_h_1_3, beta_h_1_3)
+
+    du[4] = dot_m(V, m7, alpha_m_1_7, beta_m_1_7)
+    du[5] = dot_h(V, h7, alpha_h_1_7, beta_h_1_7)
+
+    du[6] = dot_m(V, m8, alpha_m_1_8, beta_m_1_8)
+    du[7] = dot_h(V, h8, alpha_h_1_8, beta_h_1_8)
+    
+    q10=3^((25-30)/10)
+    ninf = 1/(1+alpha_n_K_dr(V))
+    taun = beta_n_K_dr(V)/(q10*0.03*(1+alpha_n_K_dr(V)))
+    linf = 1/(1+alpha_l_K_dr(V))
+    taul = beta_l_K_dr(V)/(q10*0.001*(1 + alpha_l_K_dr(V)))
+
+    du[8] = (ninf - ndr)/taun
+    du[9] = (linf - ldr)/taul
+    
+    du[10] = dot_n_K_M(V, nm)
+
+    du[11] = dot_z_AHP(V, z_AHP)
+
+    return
+
+end
+
+function stochastic_part(du,u,p,t)
+
+    sigma_noise = p[13]
+    mu_noise = p[14]
+    tau_noise = p[15]
+    with_noise = p[16]
+
+    du[1] = 0
+    du[2] = 0
+    du[3] = 0
+    du[4] = 0
+    du[5] = 0
+    du[6] = 0
+    du[7] = 0
+    du[8] = 0
+    du[9] = 0
+    du[10] = 0
+    du[11] = 0
+
+    if with_noise
+        du[12] = sigma_noise * sqrt(2 / tau_noise)
+    else
+        du[12] = 0
+    end
+
+    return
+
+end
