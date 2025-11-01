@@ -121,7 +121,7 @@ end
 function ODE_system(du,u,p,t)
 
     # --- parameters --- #
-    Iext = p[1](t)
+    I_ext = p[1](t)
     C = p[2]
 
     g_nav1p3 = p[3]
@@ -163,27 +163,27 @@ function ODE_system(du,u,p,t)
 
     z_AHP = u[11]
 
-    Inoise = u[12]
+    I_noise = u[12]
 
     # --- currents --- #
 
-    INaV1p3 = g_nav1p3 * (m3^3) * h3 * (V-E_Na)
-    INaV1p7 = g_nav1p7 * (m7^3) * h7 * (V-E_Na)
-    INaV1p8 = g_nav1p8 * (m8^3) * h8 * (V-E_Na)
-    IKdr = g_Kdr * (ndr^3) * ldr * (V-E_k)
-    IKm = g_Km*nm * (V-E_k)
-    IAHP = g_AHP * (z_AHP^1) * (V-E_k)
-    ILeak = g_Leak * (V-E_Leak)
+    I_NaV1p3 = g_nav1p3 * (m3^3) * h3 * (V-E_Na)
+    I_NaV1p7 = g_nav1p7 * (m7^3) * h7 * (V-E_Na)
+    I_NaV1p8 = g_nav1p8 * (m8^3) * h8 * (V-E_Na)
+    I_Kdr = g_Kdr * (ndr^3) * ldr * (V-E_k)
+    I_Km = g_Km*nm * (V-E_k)
+    I_AHP = g_AHP * (z_AHP^1) * (V-E_k)
+    I_Leak = g_Leak * (V-E_Leak)
     
     if with_noise
-        du[12] = - ( Inoise - mu_noise) / tau_noise
+        du[12] = - ( I_noise - mu_noise) / tau_noise
     else
         du[12] = 0
     end
 
     # --- ODE --- #
 
-    du[1] = (Iext+Inoise-INaV1p3-INaV1p7-INaV1p8-IKdr-IKm-ILeak-IAHP)/C
+    du[1] = (I_ext+I_noise-I_NaV1p3-I_NaV1p7-I_NaV1p8-I_Kdr-I_Km-I_Leak-I_AHP)/C
 
     du[2] = dot_m(V, m3, alpha_m_1_3, beta_m_1_3)
     du[3] = dot_h(V, h3, alpha_h_1_3, beta_h_1_3)
@@ -194,18 +194,32 @@ function ODE_system(du,u,p,t)
     du[6] = dot_m(V, m8, alpha_m_1_8, beta_m_1_8)
     du[7] = dot_h(V, h8, alpha_h_1_8, beta_h_1_8)
     
+    ##################
     q10=3^((25-30)/10)
     ninf = 1/(1+alpha_n_K_dr(V))
     taun = beta_n_K_dr(V)/(q10*0.03*(1+alpha_n_K_dr(V)))
     linf = 1/(1+alpha_l_K_dr(V))
     taul = beta_l_K_dr(V)/(q10*0.001*(1 + alpha_l_K_dr(V)))
 
-    du[8] = (ninf - ndr)/taun
-    du[9] = (linf - ldr)/taul
+    du[8] = (ninf - u[8])/taun
+    du[9] = (linf - u[9])/taul
+    ##################
     
     du[10] = dot_n_K_M(V, nm)
 
     du[11] = dot_z_AHP(V, z_AHP)
+
+    ##################
+    q10=3^((25-30)/10)
+    ninf = alpha_n_K_dr(V)/(beta_n_K_dr(V)+alpha_n_K_dr(V))
+    taun = 1/(q10*0.03*(beta_n_K_dr(V)+alpha_n_K_dr(V)))
+
+    linf = alpha_l_K_dr(V)/(beta_l_K_dr(V)+alpha_l_K_dr(V))
+    taul = 1/(q10*0.001*(beta_l_K_dr(V)+alpha_l_K_dr(V)))
+
+    du[13] = (ninf - u[13])/taun
+    du[14] = (linf - u[14])/taul
+    ##################
 
     return
 
@@ -229,6 +243,8 @@ function stochastic_part(du,u,p,t)
     du[9] = 0
     du[10] = 0
     du[11] = 0
+    du[13] = 0
+    du[14] = 0
 
     if with_noise
         du[12] = sigma_noise * sqrt(2 / tau_noise)

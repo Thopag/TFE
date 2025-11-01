@@ -56,7 +56,7 @@ function smallDRG_DIV0(amp, duration, stim_on, stim_length)
     Ihold = -3
     I0 = (Ihold*(10^-6))/(CellArea*(10^-8))
 
-    Iext(t) = I0 +  pulse(t,stim_on,stim_off)* ((amp * (10^-6)) / (CellArea * (10^-8)))
+    I_ext(t) = I0 +  pulse(t,stim_on,stim_off)* ((amp * (10^-6)) / (CellArea * (10^-8)))
 
     # --- Noise parameters --- #
 
@@ -66,7 +66,7 @@ function smallDRG_DIV0(amp, duration, stim_on, stim_length)
 
     # --- Set initial values --- #
 
-    u0 = zeros(12)
+    u0 = zeros(14)
 
     u0[1] = -69.5
     u0[2] = 0
@@ -80,10 +80,12 @@ function smallDRG_DIV0(amp, duration, stim_on, stim_length)
     u0[10] = 0.0014 
     u0[11] = 0
     u0[12] = 0
+    u0[13] = 0
+    u0[14] = 0.6487 
 
     # --- Run simulation --- #
 
-    p = (Iext, C, 
+    p = (I_ext, C, 
         g_nav1p3, g_nav1p7, g_nav1p8, E_Na,
         g_Kdr, g_Km, g_AHP, E_k,
         g_Leak, E_Leak,
@@ -92,23 +94,22 @@ function smallDRG_DIV0(amp, duration, stim_on, stim_length)
 
     print("--------------- Start Simulation ---------------\n")
 
-    t,V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP,Inoise = simulation(u0, tspan, p)
+    t,V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP,Inoise,n_test,l_test = simulation(u0, tspan, p)
 
-    INaV1p3, INaV1p7, INaV1p8, IKdr, IKm, IAHP, ILeak = give_currents(V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP, p)
+    I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, I_Leak = give_currents(V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP, p)
 
     print("--------------- End Simulation ---------------\n")
 
     # --- Plots --- #
 
-    p = plot(t, V, color= :black, label="")
+    plot(t, V, color= :black, label="")
     xlims!((400, 1700))
     ylims!((-100, 0))
     xlabel!("Time (ms)")
     ylabel!("Voltage (mV)")
 
-    display(p)
-
     savefig("plots/plot_1.pdf")
+    print("plot 1\n")
 
     plot(V, m7.^3 .* h7 .* 100, color=:green, label="NaV1p7")
     plot!(V, m8.^3 .* h8 .* 100, color=:blue, label="NaV1p8")
@@ -117,6 +118,7 @@ function smallDRG_DIV0(amp, duration, stim_on, stim_length)
     plot!(aspect_ratio = 1)
 
     savefig("plots/plot_2.pdf")
+    print("plot 2\n")
 
     p = plot(layout = (2, 1))
     x_range = (450, 600)
@@ -127,14 +129,54 @@ function smallDRG_DIV0(amp, duration, stim_on, stim_length)
     xlabel!(p[1], "Time (ms)")
     ylabel!(p[1], "Voltage (mV)")
 
-    plot!(p[2], t, INaV1p3 .+ INaV1p7 .+ INaV1p8, color=:red, label="Sodium", legend = :topleft)
-    plot!(p[2], t, IKdr .+ IKm .+ IAHP, color=:blue , label="Potassium")
+    plot!(p[2], t, I_NaV1p3 .+ I_NaV1p7 .+ I_NaV1p8, color=:red, label="Sodium", legend = :topleft)
+    plot!(p[2], t, I_Kdr .+ I_Km .+ I_AHP, color=:blue , label="Potassium")
     xlims!(p[2], x_range)
     ylims!(p[2], (-250, 250))
     xlabel!(p[2], "Time (ms)")
     ylabel!(p[2], "Current (uA/cm2)")
 
     savefig(p, "plots/plot_3.pdf")
+    print("plot 3\n")
+    
+
+    p = plot(layout = (2, 1))
+    plot!(p[1], t, m3, label="m3")
+    plot!(p[1], t, h3, label="h3")
+    plot!(p[1], t, m7, label="m7")
+    plot!(p[1], t, h7, label="h7")
+    plot!(p[1], t, m8, label="m8")
+    plot!(p[1], t, h8, label="h8")
+    plot!(p[1], t, ndr, label="ndr")
+    plot!(p[1], t, ldr, label="ldr")
+    plot!(p[1], t, nm, label="nm")
+    plot!(p[1], t, z_AHP, label="z_AHP")
+    plot!(legendfontsize=6, legend=:topleft)
+    xlabel!(p[1], "Time (ms)")
+    ylabel!(p[1], "(-)")
+
+    plot!(p[2], t, V, label="V")
+    xlabel!(p[2], "Time (ms)")
+    ylabel!(p[2], "Voltage (mV)")
+    savefig(p, "plots/plot_channels.pdf")
+    print("plot channels\n")
+
+    p = plot(layout = (2, 1))
+    plot!(p[1], t, ndr, label="ndr")
+    plot!(p[2], t, ldr, label="ldr")
+    plot!(p[1], t, n_test, label="n_test")
+    plot!(p[2], t, l_test, label="l_test")
+    plot!(legendfontsize=4, legend=:topleft)
+    xlabel!(p[1], "Time (ms)")
+    ylabel!(p[1], "(-)")
+
+    """
+    plot!(p[2], t, V, label="V")
+    xlabel!(p[2], "Time (ms)")
+    ylabel!(p[2], "Voltage (mV)")
+    """
+    savefig(p, "plots/plot_l_n_test.pdf")
+    print("plot_l_n_test\n")
 
     return
 end

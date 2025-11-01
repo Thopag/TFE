@@ -46,8 +46,10 @@ function simulation(u0, tspan, p)
     nm     = sol[10, :]
     z_AHP  = sol[11, :]
     Inoise = sol[12, :]
+    n_test  = sol[13, :]
+    l_test = sol[14, :]
 
-    return t,V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP,Inoise
+    return t,V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP,Inoise,n_test,l_test
 end
 
 function give_currents(V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP, p)
