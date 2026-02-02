@@ -1,5 +1,5 @@
 using Plots
-pyplot()
+#pyplot()
 using ColorSchemes
 
 include("utils.jl")
@@ -139,8 +139,8 @@ function smallDRG_DIV0(amp, duration, stim_on, stim_length)
 
     savefig(p, "plots/plot_3.pdf")
     print("plot 3\n")
-    gui()
-    readline()
+    # gui()
+    # readline()
     
     p = plot(layout = (2, 1))
     plot!(p[1], t, m3, label="m3")
@@ -162,8 +162,8 @@ function smallDRG_DIV0(amp, duration, stim_on, stim_length)
     ylabel!(p[2], "Voltage (mV)")
     savefig(p, "plots/plot_channels.pdf")
     print("plot channels\n")
-    gui()
-    readline()
+    # gui()
+    # readline()
 
     p = plot(layout = (2, 1))
     plot!(p[1], t, ndr, label="ndr")
@@ -181,8 +181,8 @@ function smallDRG_DIV0(amp, duration, stim_on, stim_length)
     """
     savefig(p, "plots/plot_l_n_test.pdf")
     print("plot_l_n_test\n")
-    gui()
-    readline()
+    # gui()
+    # readline()
 
     return
 end
