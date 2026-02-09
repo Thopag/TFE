@@ -21,8 +21,8 @@ function smallDRG_DIV0(amp, duration, stim_on, stim_length)
     C = (Cr/CellArea)*100               # [µF/cm^2]
 
     # Cell Resistance:
-    # Rr = 2.5                          # real cell resistance in [GOhms]
-    # R = (Rr * CellArea)*10            # model cell resistance in [Ohms*cm^2]
+    #Rr = 2.5                          # real cell resistance in [GOhms]
+    #R = (Rr * CellArea)*10            # model cell resistance in [Ohms*cm^2]
 
     # Reversal Potential 
     E_Na = 50                            # [mV]
@@ -30,13 +30,10 @@ function smallDRG_DIV0(amp, duration, stim_on, stim_length)
     E_Leak = -62.5                       # [mV] mean RMP of DIV0 neurons = -62.5196 after JP correction(+15mV)
 
     # **** BASELINE: rheo = 17pA
-    g_Leak = 0.025                       #(1/Rr)/CellArea*(10^2); # [mS/cm2] normalized by cell area
-    g_AHP =  2.5 
+    g_Leak = 0.025                       # (1/Rr)/CellArea*(10^2); # [mS/cm2] normalized by cell area
+    g_AHP =  3.5 # init code : 2.5 
     g_Km = 0.05
-    g_Kdr = 3.5 
-    beta_z_AHP = 5                      # [mV]
-    gamma_z =  4                        # [mV] - same for gAHP and gM
-    tau_z = 100
+    g_Kdr = 3 # init code : 3.5 
 
     # ** Na conductances
     g_nav1p3 = 0 
@@ -56,33 +53,36 @@ function smallDRG_DIV0(amp, duration, stim_on, stim_length)
 
     Ihold = -3
     I0 = (Ihold*(10^-6))/(CellArea*(10^-8))
+    Excitation = ((amp * (10^-6)) / (CellArea * (10^-8)))
 
-    I_ext(t) = I0 +  pulse(t,stim_on,stim_off)* ((amp * (10^-6)) / (CellArea * (10^-8)))
+    I_ext(t) =  I0 +  pulse(t,stim_on,stim_off) * Excitation * 3
+    #I_ext(t) = I0 +  pulse(t,500,600) * Excitation + pulse(t,1100,1200) * Excitation
 
     # --- Noise parameters --- #
 
     mu_noise = 0
-    tau_noise = 5                       #(ms)
+    tau_noise = 5                       # (ms)
     sigma_noise = 0.05                  # 0.1 # !sigma(noise) !0.5 uA/cm2
 
     # --- Set initial values --- #
 
     u0 = zeros(14)
 
-    u0[1] = -69.5
-    u0[2] = 0
-    u0[3] = 0
-    u0[4] = 0
-    u0[5] = 0
-    u0[6] = 0
-    u0[7] = 0.9952
-    u0[8] = 0
-    u0[9] = 0.6487
-    u0[10] = 0.0014 
-    u0[11] = 0
-    u0[12] = 0
-    u0[13] = 0
-    u0[14] = 0.6487 
+    u0[1] = -69.5       # V
+    u0[2] = 0           # m3
+    u0[3] = 0           # h3
+    u0[4] = 0           # m7
+    u0[5] = 0           # h7
+    u0[6] = 0           # m8
+    u0[7] = 0.9952      # h8
+    u0[8] = 0           # ndr
+    u0[9] = 0.6487      # ldr
+    u0[10] = 0.0014     # nm 
+    u0[11] = 0          # z_AHP
+    u0[12] = 0          # Inoise
+
+    u0[13] = 0          # n_test
+    u0[14] = 0.6487     # l_test
 
     # --- Run simulation --- #
 
@@ -103,16 +103,17 @@ function smallDRG_DIV0(amp, duration, stim_on, stim_length)
 
     # --- Plots --- #
 
-    plot(t, V, color= :black, label="")
-    xlims!((400, 1700))
+    p = plot(t, V, color= :black, label="")
+    #xlims!((400, 1700))
     ylims!((-100, 0))
     xlabel!("Time (ms)")
     ylabel!("Voltage (mV)")
 
     savefig("plots/plot_1.pdf")
     print("plot 1\n")
+    #display(p)
 
-    plot(V, m7.^3 .* h7 .* 100, color=:green, label="NaV1p7")
+    p = plot(V, m7.^3 .* h7 .* 100, color=:green, label="NaV1p7")
     plot!(V, m8.^3 .* h8 .* 100, color=:blue, label="NaV1p8")
     ylabel!("Availability (%)")
     xlabel!("Voltage (mV)")
@@ -120,6 +121,7 @@ function smallDRG_DIV0(amp, duration, stim_on, stim_length)
 
     savefig("plots/plot_2.pdf")
     print("plot 2\n")
+    #display(p)
 
     p = plot(layout = (2, 1))
     x_range = (450, 600)
@@ -133,12 +135,13 @@ function smallDRG_DIV0(amp, duration, stim_on, stim_length)
     plot!(p[2], t, I_NaV1p3 .+ I_NaV1p7 .+ I_NaV1p8, color=:red, label="Sodium", legend = :topleft)
     plot!(p[2], t, I_Kdr .+ I_Km .+ I_AHP, color=:blue , label="Potassium")
     xlims!(p[2], x_range)
-    ylims!(p[2], (-250, 250))
+    #ylims!(p[2], (-250, 250))
     xlabel!(p[2], "Time (ms)")
     ylabel!(p[2], "Current (uA/cm2)")
 
     savefig(p, "plots/plot_3.pdf")
     print("plot 3\n")
+    # display(p)
     # gui()
     # readline()
     
@@ -162,6 +165,7 @@ function smallDRG_DIV0(amp, duration, stim_on, stim_length)
     ylabel!(p[2], "Voltage (mV)")
     savefig(p, "plots/plot_channels.pdf")
     print("plot channels\n")
+    display(p)
     # gui()
     # readline()
 
@@ -187,6 +191,6 @@ function smallDRG_DIV0(amp, duration, stim_on, stim_length)
     return
 end
 
-if abspath(PROGRAM_FILE) == @__FILE__
-    smallDRG_DIV0(17,1500,500,1000)
-end
+#if abspath(PROGRAM_FILE) == @__FILE__
+smallDRG_DIV0(17,3000,500,2500)
+#end

@@ -1,6 +1,6 @@
 using Plots
 using ColorSchemes
-include("equations_code.jl")
+include("equations_article.jl")
 
 function smallDRG_DIV0(amp, duration, stim_on, stim_length)
 

@@ -113,7 +113,10 @@ end
 # --------------------------- AHP --------------------------- #
 
 function dot_z_AHP(V, z)
-    return ( 1 / ( 1 + exp( 5 - (V/4) ) ) ) - ( z/100 )
+    beta_z_AHP = 5
+    gamma_z =  4
+    tau_z = 100
+    return ( 1 / ( 1 + exp( beta_z_AHP - (V/gamma_z) ) ) ) - ( z/tau_z )
 end
 
 # --------------------------- Simulation function --------------------------- #
