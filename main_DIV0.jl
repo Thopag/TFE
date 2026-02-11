@@ -55,7 +55,7 @@ function smallDRG_DIV0(amp, duration, stim_on, stim_length)
     I0 = (Ihold*(10^-6))/(CellArea*(10^-8))
     Excitation = ((amp * (10^-6)) / (CellArea * (10^-8)))
 
-    I_ext(t) =  I0 +  pulse(t,stim_on,stim_off) * Excitation * 3
+    I_ext(t) =  I0 +  pulse(t,stim_on,stim_off) * Excitation
     #I_ext(t) = I0 +  pulse(t,500,600) * Excitation + pulse(t,1100,1200) * Excitation
 
     # --- Noise parameters --- #

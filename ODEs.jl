@@ -8,24 +8,6 @@ function dot_h(V, h, alpha, beta)
     return alpha(V)*(1-h) - h*beta(V)
 end
 
-# --------------------------- Na_V 1.7 --------------------------- #
-
-function alpha_m_1_7(V)
-    return 10.22/(1+exp((V-(-7.19-4.2))/-15.43))
-end
-
-function alpha_h_1_7(V)
-    return 0.0744/(1+exp((V-(-99.76-4.2))/11.07))
-end
-
-function beta_m_1_7(V)
-    return 23.76/(1+exp((V-(-70.37-4.2))/14.53))
-end
-
-function beta_h_1_7(V)
-    return 2.54/(1+exp((V-(-7.8-4.2))/-10.68))
-end
-
 # --------------------------- Na_V 1.3 --------------------------- #
 
 function alpha_m_1_3(V)
@@ -47,6 +29,25 @@ function beta_h_1_3(V)
     jp = 4.2
     return 2.54/(1+exp((V-(-7.8-jp))/-10.68))
 end
+
+# --------------------------- Na_V 1.7 --------------------------- #
+
+function alpha_m_1_7(V)
+    return 10.22/(1+exp((V-(-7.19-4.2))/-15.43))
+end
+
+function alpha_h_1_7(V)
+    return 0.0744/(1+exp((V-(-99.76-4.2))/11.07))
+end
+
+function beta_m_1_7(V)
+    return 23.76/(1+exp((V-(-70.37-4.2))/14.53))
+end
+
+function beta_h_1_7(V)
+    return 2.54/(1+exp((V-(-7.8-4.2))/-10.68))
+end
+
 
 # --------------------------- Na_V 1.8 --------------------------- #
 
