@@ -21,7 +21,7 @@ function smallDRG_DIV7(amp, duration, stim_on, stim_length)
     C = (Cr/CellArea)*100               # [µF/cm^2]
 
     # Cell Resistance:
-    #Rr = 0.7                          # real cell resistance in [GOhms]
+    Rr = 0.7                          # real cell resistance in [GOhms]
     #R = (Rr * CellArea)*10            # model cell resistance in [Ohms*cm^2]
 
     # Reversal Potential 
@@ -29,7 +29,7 @@ function smallDRG_DIV7(amp, duration, stim_on, stim_length)
     E_k = -90                            # [mV]
     E_Leak = -70                         # [mV] mean RMP of DIV0 neurons = -62.5196 after JP correction(+15mV)
 
-    # **** BASELINE: rheo = 17pA
+    # **** BASELINE: rheo = 12pA
     g_Leak = 0.035                       # (1/Rr)/CellArea*(10^2); # [mS/cm2] normalized by cell area
     g_AHP =  2.5 
     g_Km = 0.5
@@ -42,7 +42,7 @@ function smallDRG_DIV7(amp, duration, stim_on, stim_length)
     # g_nav1p9 = 0
 
     # **** PHARMACOLOGY
-    # g_nav1p3 = 0.035                      # 90% block - rheo = 21pA
+    g_nav1p3 = 0.035                      # 90% block - rheo = 21pA
     # g_nav1p7 = 10.5                       # 70% block - rheo = 16pA
 
     # **** DYNAMIC CLAMP EXPERIMENT
@@ -198,5 +198,5 @@ function smallDRG_DIV7(amp, duration, stim_on, stim_length)
 end
 
 #if abspath(PROGRAM_FILE) == @__FILE__
-smallDRG_DIV7(17,3000,500,2500)
+smallDRG_DIV7(21*3,2250,500,1500)
 #end
