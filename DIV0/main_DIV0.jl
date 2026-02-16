@@ -1,8 +1,7 @@
-using Plots
-#pyplot()
 using ColorSchemes
 
 include("utils.jl")
+include("Ploting.jl")
 
 function smallDRG_DIV0(amp, duration, stim_on, stim_length)
 
@@ -31,9 +30,9 @@ function smallDRG_DIV0(amp, duration, stim_on, stim_length)
 
     # **** BASELINE: rheo = 17pA
     g_Leak = 0.025                       # (1/Rr)/CellArea*(10^2); # [mS/cm2] normalized by cell area
-    g_AHP =  3.5 # init code : 2.5 
+    g_AHP = 2.5 
     g_Km = 0.05
-    g_Kdr = 3 # init code : 3.5 
+    g_Kdr = 3.5 
 
     # ** Na conductances
     g_nav1p3 = 0 
@@ -42,7 +41,7 @@ function smallDRG_DIV0(amp, duration, stim_on, stim_length)
     # g_nav1p9 = 0
 
     # **** PHARMACOLOGY
-    #g_nav1p8 = 4                      # 90% block - rheo = 17pA
+    # g_nav1p8 = 4                      # 90% block - rheo = 17pA
 
     # **** DYNAMIC CLAMP EXPERIMENT
     # g_nav1p7 = 40                     # rheo = 6 pA
@@ -102,95 +101,12 @@ function smallDRG_DIV0(amp, duration, stim_on, stim_length)
     print("--------------- End Simulation ---------------\n")
 
     # --- Plots --- #
-
-    p = plot(t, V, color= :black, label="")
-    #xlims!((400, 1700))
-    ylims!((-100, 0))
-    xlabel!("Time (ms)")
-    ylabel!("Voltage (mV)")
-
-    savefig("plots/plot_1.pdf")
-    print("plot 1\n")
-    #display(p)
-
-    p = plot(V, m7.^3 .* h7 .* 100, color=:green, label="NaV1p7")
-    plot!(V, m8.^3 .* h8 .* 100, color=:blue, label="NaV1p8")
-    ylabel!("Availability (%)")
-    xlabel!("Voltage (mV)")
-    plot!(aspect_ratio = 1)
-
-    savefig("plots/plot_2.pdf")
-    print("plot 2\n")
-    #display(p)
-
-    p = plot(layout = (2, 1))
-    x_range = (450, 600)
-
-    plot!(p[1], t, V)
-    xlims!(p[1], x_range)
-    ylims!(p[1], (-100, 50))
-    xlabel!(p[1], "Time (ms)")
-    ylabel!(p[1], "Voltage (mV)")
-
-    plot!(p[2], t, I_NaV1p3 .+ I_NaV1p7 .+ I_NaV1p8, color=:red, label="Sodium", legend = :topleft)
-    plot!(p[2], t, I_Kdr .+ I_Km .+ I_AHP, color=:blue , label="Potassium")
-    xlims!(p[2], x_range)
-    #ylims!(p[2], (-250, 250))
-    xlabel!(p[2], "Time (ms)")
-    ylabel!(p[2], "Current (uA/cm2)")
-
-    savefig(p, "plots/plot_3.pdf")
-    print("plot 3\n")
-    # display(p)
-    # gui()
-    # readline()
     
-    p = plot(layout = (2, 1))
-    plot!(p[1], t, m3, label="m3")
-    plot!(p[1], t, h3, label="h3")
-    plot!(p[1], t, m7, label="m7")
-    plot!(p[1], t, h7, label="h7")
-    plot!(p[1], t, m8, label="m8")
-    plot!(p[1], t, h8, label="h8")
-    plot!(p[1], t, ndr, label="ndr")
-    plot!(p[1], t, ldr, label="ldr")
-    plot!(p[1], t, nm, label="nm")
-    plot!(p[1], t, z_AHP, label="z_AHP")
-    plot!(legendfontsize=6, legend=:topleft)
-    xlabel!(p[1], "Time (ms)")
-    ylabel!(p[1], "(-)")
-
-    plot!(p[2], t, V, label="V")
-    xlabel!(p[2], "Time (ms)")
-    ylabel!(p[2], "Voltage (mV)")
-    savefig(p, "plots/plot_channels.pdf")
-    print("plot channels\n")
-    display(p)
-    # gui()
-    # readline()
-
-    p = plot(layout = (2, 1))
-    plot!(p[1], t, ndr, label="ndr")
-    plot!(p[2], t, ldr, label="ldr")
-    plot!(p[1], t, n_test, label="n_test")
-    plot!(p[2], t, l_test, label="l_test")
-    plot!(legendfontsize=4, legend=:topleft)
-    xlabel!(p[1], "Time (ms)")
-    ylabel!(p[1], "(-)")
-
-    """
-    plot!(p[2], t, V, label="V")
-    xlabel!(p[2], "Time (ms)")
-    ylabel!(p[2], "Voltage (mV)")
-    """
-    savefig(p, "plots/plot_l_n_test.pdf")
-    print("plot_l_n_test\n")
-    # gui()
-    # readline()
+    plot_channels(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp)
 
     return
 end
 
 #if abspath(PROGRAM_FILE) == @__FILE__
-smallDRG_DIV0(17,3000,500,1500)
+smallDRG_DIV0(17,1700,500,1000)
 #end
