@@ -1,37 +1,35 @@
 using Plots, LaTeXStrings
-#pyplot()
 
-function figure()
+# 400 1700
+# 545 565
+xlimits = (400, 1700)
 
-    fig1 = plot(V, S.(V), label= L"S(V)")
-    plot!(V, [f_µP0.(V, 1.8) f_µP0.(V, 2.5) f_µP0.(V, 3.2)], label=[ L"µ P_{0} = 1.8" L"µ P_{0} = 2.5" L"µ P_{0} = 3.2"])
+function plot_voltage(t, V, amp)
 
-    xlims!(0, 6)
-    ylims!(0, 1.5)
+    p = plot(t, V, label=L"%$amp pA", color= :black, xlims=xlimits)
+    xlabel!(p, "Time (ms)")
+    ylabel!(p, "Voltage (mV)")
 
-    xlabel!(L"V")
-    ylabel!(" ")
-    title!("Figure 1")
+    savefig(p, "plots/plot_voltage.pdf")
+    print("plot voltage\n")
+    display(p)
 
-    display(fig1)
-    savefig(fig1, "fig1.pdf")
 end
 
+function plot_variables(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp)
 
-function plot_channels(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp)
-
-    p = plot(layout = (2, 1), xlims=(400, 1700))
-    plot!(p[1], t, m3, label=L"m_{3}")
-    plot!(p[1], t, h3, label=L"h_{3}")
-    plot!(p[1], t, m7, label=L"m_{7}")
-    plot!(p[1], t, h7, label=L"h_{7}")
-    plot!(p[1], t, m8, label=L"m_{8}")
-    plot!(p[1], t, h8, label=L"h_{8}")
-    plot!(p[1], t, ndr, label=L"n_{dr}")
-    plot!(p[1], t, ldr, label=L"l_{dr}")
-    plot!(p[1], t, nm, label=L"n_{m}")
-    plot!(p[1], t, z_AHP, label=L"z_{AHP}")
-    plot!(p[1], legendfontsize=6, legend=:topleft)
+    p = plot(layout = (2, 1), xlims=xlimits)
+    plot!(p[1], t, m3, label=L"m_{3}", linestyle = :solid, color=:blue)
+    plot!(p[1], t, h3, label=L"h_{3}", linestyle = :dash, color=:blue)
+    plot!(p[1], t, m7, label=L"m_{7}", linestyle = :solid, color=:red)
+    plot!(p[1], t, h7, label=L"h_{7}", linestyle = :dash, color=:red)
+    plot!(p[1], t, m8, label=L"m_{8}", linestyle = :solid, color=:green)
+    plot!(p[1], t, h8, label=L"h_{8}", linestyle = :dash, color=:green)
+    plot!(p[1], t, ndr, label=L"n_{dr}", linestyle = :solid, color=:orange)
+    plot!(p[1], t, ldr, label=L"l_{dr}", linestyle = :dash, color=:orange)
+    plot!(p[1], t, nm, label=L"n_{m}", linestyle = :solid, color=:purple)
+    plot!(p[1], t, z_AHP, label=L"z_{AHP}", linestyle = :solid, color=:brown)
+    plot!(p[1], legendfontsize=6, legend=:topright)
     xlabel!(p[1], "Time (ms)")
     ylabel!(p[1], "(-)")
 
@@ -39,10 +37,32 @@ function plot_channels(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp)
     xlabel!(p[2], "Time (ms)")
     ylabel!(p[2], "Voltage (mV)")
 
+    savefig(p, "plots/plot_variables.pdf")
+    print("plot variables\n")
+    #display(p)
+
+end
+
+function plot_channels(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp)
+
+    p = plot(layout = (2, 1), xlims=xlimits)
+
+    plot!(p[1], t, m7.^3 .* h7 .* 100, color=:red, label=L"NaV_{1.7}")
+    plot!(p[1], t, m8.^3 .* h8 .* 100, color=:green, label=L"NaV_{1.8}")
+    plot!(p[1], t, m3.^3 .* h3 .* 100, color=:blue, label=L"NaV_{1.3}")
+
+    plot!(p[1], t, ndr.^3 .* ldr .* 100, color=:orange, label=L"K_{dr}")
+    plot!(p[1], t, nm .* 100, color=:purple, label=L"K_{m}")
+    plot!(p[1], t, z_AHP .* 100, color=:brown, label=L"AHP")
+    ylabel!(p[1], "Availability (%)")
+    xlabel!(p[1], "Voltage (mV)")
+
+    plot!(p[2], t, V, label=L"%$amp pA", color= :black)
+    xlabel!(p[2], "Time (ms)")
+    ylabel!(p[2], "Voltage (mV)")
+
     savefig(p, "plots/plot_channels.pdf")
     print("plot channels\n")
-    display(p)
-    # gui()
-    # readline()
+    #display(p)
 
 end

@@ -1,6 +1,3 @@
-#pyplot()
-using ColorSchemes
-
 include("utils.jl")
 include("Ploting.jl")
 
@@ -43,10 +40,10 @@ function smallDRG_DIV7(amp, duration, stim_on, stim_length)
 
     # **** PHARMACOLOGY
     # g_nav1p3 = 0.035                      # 90% block - rheo = 21pA
-    g_nav1p7 = 10.5                       # 70% block - rheo = 16pA
+    # g_nav1p7 = 10.5                       # 70% block - rheo = 16pA
 
     # **** DYNAMIC CLAMP EXPERIMENT
-    g_nav1p8 = 40                         # dynamic clamp  48 pA
+    # g_nav1p8 = 40                         # dynamic clamp  48 pA
 
     # **** INTERCHANGEABILITY
     # g_nav1p7 = 60                         # rheo = 15pA
@@ -109,11 +106,13 @@ function smallDRG_DIV7(amp, duration, stim_on, stim_length)
 
     # --- Plots --- #
 
+    plot_voltage(t, V, amp)
+    plot_variables(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp)
     plot_channels(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp)
 
     return
 end
 
 #if abspath(PROGRAM_FILE) == @__FILE__
-smallDRG_DIV7(15*6,1700,500,1000)
+smallDRG_DIV7(12,1700,500,1000)
 #end

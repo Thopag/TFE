@@ -1,5 +1,3 @@
-using ColorSchemes
-
 include("utils.jl")
 include("Ploting.jl")
 
@@ -101,7 +99,9 @@ function smallDRG_DIV0(amp, duration, stim_on, stim_length)
     print("--------------- End Simulation ---------------\n")
 
     # --- Plots --- #
-    
+
+    plot_voltage(t, V, amp)
+    plot_variables(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp)
     plot_channels(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp)
 
     return
