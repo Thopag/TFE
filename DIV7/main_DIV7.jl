@@ -40,10 +40,10 @@ function smallDRG_DIV7(amp, duration, stim_on, stim_length)
 
     # **** PHARMACOLOGY
     # g_nav1p3 = 0.035                      # 90% block - rheo = 21pA
-    # g_nav1p7 = 10.5                       # 70% block - rheo = 16pA
+    g_nav1p7 = 10.5                       # 70% block - rheo = 16pA
 
     # **** DYNAMIC CLAMP EXPERIMENT
-    # g_nav1p8 = 40                         # dynamic clamp  48 pA
+    g_nav1p8 = 40                         # dynamic clamp  48 pA
 
     # **** INTERCHANGEABILITY
     # g_nav1p7 = 60                         # rheo = 15pA
@@ -114,5 +114,5 @@ function smallDRG_DIV7(amp, duration, stim_on, stim_length)
 end
 
 #if abspath(PROGRAM_FILE) == @__FILE__
-smallDRG_DIV7(12,1700,500,1000)
+smallDRG_DIV7(15*3,1700,500,1000)
 #end
