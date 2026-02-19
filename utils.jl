@@ -1,5 +1,4 @@
 using DifferentialEquations
-include("ODEs.jl")
 
 ## Functions useful for defining variations in the external current 
 function heaviside(t)

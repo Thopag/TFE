@@ -1,5 +1,3 @@
-include("utils.jl")
-include("Ploting.jl")
 
 function smallDRG_DIV0(amp, duration, stim_on, stim_length)
 
@@ -83,7 +81,7 @@ function smallDRG_DIV0(amp, duration, stim_on, stim_length)
 
     # --- Run simulation --- #
 
-    p = (I_ext, C, 
+    parameters = (I_ext, C, 
         g_nav1p3, g_nav1p7, g_nav1p8, E_Na,
         g_Kdr, g_Km, g_AHP, E_k,
         g_Leak, E_Leak,
@@ -92,21 +90,9 @@ function smallDRG_DIV0(amp, duration, stim_on, stim_length)
 
     print("--------------- Start Simulation ---------------\n")
 
-    t,V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP,Inoise,n_test,l_test = simulation(u0, tspan, p)
-
-    I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, I_Leak = give_currents(V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP, p)
+    t,V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP,Inoise,n_test,l_test = simulation(u0, tspan, parameters)
 
     print("--------------- End Simulation ---------------\n")
 
-    # --- Plots --- #
-
-    plot_voltage(t, V, amp)
-    plot_variables(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp)
-    plot_channels(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp)
-
-    return
+    return t,V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP,Inoise,n_test,l_test, parameters
 end
-
-#if abspath(PROGRAM_FILE) == @__FILE__
-smallDRG_DIV0(17,1700,500,1000)
-#end
