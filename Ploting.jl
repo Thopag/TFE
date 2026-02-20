@@ -66,3 +66,44 @@ function plot_channels(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp)
     #display(p)
 
 end
+
+function plot_currents(t, V, I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, amp)
+
+    x_range = (450, 600)
+
+    p = plot(layout = (2, 1), xlims=x_range)
+    
+    plot!(p[1], t, V, color= :black, label=L"%$amp pA")
+    ylims!(p[1], (-100, 50))
+    xlabel!(p[1], "Time (ms)")
+    ylabel!(p[1], "Voltage (mV)")
+
+    plot!(p[2], t, I_NaV1p3 .+ I_NaV1p7 .+ I_NaV1p8, color=:red, label="Sodium", legend = :topleft)
+    plot!(p[2], t, I_Kdr .+ I_Km .+ I_AHP, color=:blue , label="Potassium")
+    #ylims!(p[2], (-250, 250))
+    xlabel!(p[2], "Time (ms)")
+    ylabel!(p[2], "Current (uA/cm2)")
+
+    savefig(p, "plots/plot_currents.pdf")
+    print("plot currents\n")
+end
+
+function plot_test(t, V, ndr, ldr, n_test, l_test, amp)
+
+    p = plot(layout = (2, 1))
+
+    plot!(p[1], t, ndr, label="ndr")
+    plot!(p[1], t, ldr, label="ldr")
+    plot!(p[1], t, n_test, label="n_test")
+    plot!(p[1], t, l_test, label="l_test")
+    plot!(legendfontsize=4, legend=:topleft)
+    xlabel!(p[1], "Time (ms)")
+    ylabel!(p[1], "(-)")
+
+    plot!(p[2], t, V, color= :black, label=L"%$amp pA")
+    xlabel!(p[2], "Time (ms)")
+    ylabel!(p[2], "Voltage (mV)")
+
+    savefig(p, "plots/plot_l_n_test.pdf")
+    print("plot_l_n_test\n")
+end
