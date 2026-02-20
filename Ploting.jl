@@ -107,3 +107,15 @@ function plot_test(t, V, ndr, ldr, n_test, l_test, amp)
     savefig(p, "plots/plot_l_n_test.pdf")
     print("plot_l_n_test\n")
 end
+
+function plot_availability_voltage(t, V, m7, h7, m8, h8)
+
+    p = plot(V, m7.^3 .* h7 .* 100, color=:green, label="NaV1p7")
+    plot!(V, m8.^3 .* h8 .* 100, color=:blue, label="NaV1p8")
+    ylabel!("Availability (%)")
+    xlabel!("Voltage (mV)")
+    plot!(aspect_ratio = 1)
+
+    savefig("plots/plot_availability_voltage.pdf")
+    print("plot availability voltage\n")
+end
