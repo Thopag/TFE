@@ -1,34 +1,44 @@
-include("Ploting.jl")
-include("utils.jl")
+include("DIV0/params.jl")
+include("DIV7/params.jl")
 
 folder = "DIV0"
 
 if folder == "DIV0"
-    include("DIV0/ODEs.jl")
-    include("DIV0/launch_DIV0.jl")
-    launch_function = smallDRG_DIV0
+    launch_simulation = ODE_DIV0.simulation
+    get_param = DIV0_parameter
+    get_u0 = DIV0_u0
 elseif folder == "DIV7"
-    include("DIV7/ODEs.jl")
-    include("DIV7/launch_DIV7.jl")
-    launch_function = smallDRG_DIV7
+    launch_simulation = ODE_DIV7.simulation
+    get_param = DIV7_parameter
+    get_u0 = DIV7_u0
 end
 
-amp = 17                    # pA
-duration = 1700             # ms
-stim_on = 500               # ms 
-stim_length = 1000          # ms
+function main()
 
-print("folder: $folder with amp = $amp pA\n")
+    amp = 51                      # pA
+    duration = 1700.0             # ms
+    stim_on = 500.0               # ms 
+    stim_length = 1000.0          # ms
 
-t,V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP,Inoise,n_test,l_test, parameters = launch_function(amp, duration, stim_on, stim_length)
+    p = get_param(amp, stim_on, stim_length)
+    u0 = get_u0()
 
-I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, I_Leak = give_currents(V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP, parameters)
+    print("folder: $folder with amp = $amp pA\n")
 
-# --- Plots --- #
+    print("--------------- Start Simulation ---------------\n")
+    t,V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP,Inoise,n_test,l_test = launch_simulation(u0, (0.0, duration), p)
+    print("--------------- End Simulation ---------------\n")
 
-plot_voltage(t, V, amp)
-plot_variables(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp)
-plot_channels(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp)
-plot_currents(t, V, I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, amp)
-plot_test(t, V, ndr, ldr, n_test, l_test, amp)
-plot_availability_voltage(t, V, m7, h7, m8, h8)
+    I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, I_Leak = give_currents(V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP, p)
+
+    # --- Plots --- #
+
+    plot_voltage(t, V, amp)
+    # plot_variables(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp)
+    # plot_channels(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp)
+    # plot_currents(t, V, I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, amp)
+    # plot_test(t, V, ndr, ldr, n_test, l_test, amp)
+    # plot_availability_voltage(t, V, m7, h7, m8, h8)
+end
+
+main()

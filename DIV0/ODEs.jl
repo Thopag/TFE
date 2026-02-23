@@ -1,3 +1,10 @@
+module ODE_DIV0
+
+using DifferentialEquations
+using ..Utils
+
+export simulation, ODE_system, stochastic_part
+
 # --------------------------- Common to Na_V 1.7, Na_V 1.3, Na_V 1.8 --------------------------- #
 
 function dot_m(V, m, alpha, beta)
@@ -74,7 +81,7 @@ function n_inf_K_M(V)
 end
 
 function tau_n_K_M(V)
-    celsius = 25
+    celsius = 25.0
     tadj = 3^((celsius-23.5)/10)
     return 1000.0/(3.3*(exp((V-(-35))/10)+exp(-(V+35)/10))) / tadj
 end
@@ -122,30 +129,35 @@ end
 
 # --------------------------- Simulation function --------------------------- #
 
+function pulse(t, ti, tf)
+    return (ti <= t <= tf) ? 1.0 : 0.0
+end
+
 function ODE_system(du,u,p,t)
 
     # --- parameters --- #
-    I_ext = p[1](t)
-    C = p[2]
 
-    g_nav1p3 = p[3]
-    g_nav1p7 = p[4]
-    g_nav1p8 = p[5]
-    E_Na = p[6]
+    I_ext = p.I0 + pulse(t, p.stim_on, p.stim_off) * p.Excitation
+    C = p.C
 
-    g_Kdr = p[7]
-    g_Km = p[8]
-    g_AHP = p[9]
-    E_k = p[10]
+    g_nav1p3 = p.g_nav1p3
+    g_nav1p7 = p.g_nav1p7
+    g_nav1p8 = p.g_nav1p8
+    E_Na = p.E_Na
 
-    g_Leak = p[11]
-    E_Leak = p[12]
+    g_Kdr = p.g_Kdr
+    g_Km = p.g_Km
+    g_AHP = p.g_AHP
+    E_k = p.E_k
 
-    sigma_noise = p[13]
-    mu_noise = p[14]
-    tau_noise = p[15]
+    g_Leak = p.g_Leak
+    E_Leak = p.E_Leak
 
-    with_noise = p[16]
+    sigma_noise = p.sigma_noise
+    mu_noise = p.mu_noise
+    tau_noise = p.tau_noise
+
+    with_noise = p.with_noise
 
     # --- variables --- #
 
@@ -231,10 +243,10 @@ end
 
 function stochastic_part(du,u,p,t)
 
-    sigma_noise = p[13]
-    mu_noise = p[14]
-    tau_noise = p[15]
-    with_noise = p[16]
+    sigma_noise = p.sigma_noise
+    mu_noise = p.mu_noise
+    tau_noise = p.tau_noise
+    with_noise = p.with_noise
 
     du[1] = 0
     du[2] = 0
@@ -257,5 +269,36 @@ function stochastic_part(du,u,p,t)
     end
 
     return
+
+end
+
+function simulation(u0, tspan, p)
+
+    # -- SDE Simulation -- #
+    prob = SDEProblem(ODE_system, stochastic_part, u0, tspan, p) 
+    sol = solve(prob,dtmax=0.01)
+    #roda5
+
+    # -- Simulation results -- #
+    t = sol.t
+    V      = sol[1, :]
+    m3     = sol[2, :]
+    h3     = sol[3, :]
+    m7     = sol[4, :]
+    h7     = sol[5, :]
+    m8     = sol[6, :]
+    h8     = sol[7, :]
+    ndr    = sol[8, :]
+    ldr    = sol[9, :]
+    nm     = sol[10, :]
+    z_AHP  = sol[11, :]
+    Inoise = sol[12, :]
+    n_test  = sol[13, :]
+    l_test = sol[14, :]
+
+    return t,V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP,Inoise,n_test,l_test
+end
+
+precompile(simulation, (Vector{Float64}, Tuple{Float64, Float64}, Parameters{Float64}))
 
 end

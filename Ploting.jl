@@ -1,4 +1,9 @@
+__precompile__(true)
+module Ploting
+
 using Plots, LaTeXStrings
+
+export plot_voltage, plot_variables, plot_channels, plot_currents, plot_test, plot_availability_voltage
 
 # 400 1700
 # 545 565
@@ -13,7 +18,6 @@ function plot_voltage(t, V, amp)
     savefig(p, "plots/plot_voltage.pdf")
     print("plot voltage\n")
     display(p)
-
 end
 
 function plot_variables(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp)
@@ -118,4 +122,6 @@ function plot_availability_voltage(t, V, m7, h7, m8, h8)
 
     savefig("plots/plot_availability_voltage.pdf")
     print("plot availability voltage\n")
+end
+
 end

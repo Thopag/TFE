@@ -1,71 +1,45 @@
-using DifferentialEquations
+module Utils
 
-## Functions useful for defining variations in the external current 
-function heaviside(t)
-     ###############################################################
-        ########## This function defines a heaviside  ############
+export Parameters, give_currents
 
-        # --> returns 1 if t>=0 and 0 otherwise
-        ## Arguments 
-        # t : time variable
-    ###############################################################
-    return 0*(t<0) + 1*(t>=0)
-end
+# --------------------------- Parameters struct --------------------------- #
 
-function pulse(t,ti,tf)
-     ###############################################################
-        ############# This function defines a pulse  ###############
-
-        # --> returns 1 if ti <= t < tf and 0 otherwise
-        ## Arguments 
-        # t : time variable
-        # ti : time at which the pulse starts
-        # tf : time at which the pulse ends
-    ###############################################################
-    return heaviside(t-ti)-heaviside(t-tf)
-end
-
-function simulation(u0, tspan, p)
-
-    # -- SDE Simulation -- #
-    prob = SDEProblem(ODE_system, stochastic_part, u0, tspan, p) 
-    sol = solve(prob,dtmax=0.01);
-    #roda5
-
-    # -- Simulation results -- #
-    t = sol.t
-    V      = sol[1, :]
-    m3     = sol[2, :]
-    h3     = sol[3, :]
-    m7     = sol[4, :]
-    h7     = sol[5, :]
-    m8     = sol[6, :]
-    h8     = sol[7, :]
-    ndr    = sol[8, :]
-    ldr    = sol[9, :]
-    nm     = sol[10, :]
-    z_AHP  = sol[11, :]
-    Inoise = sol[12, :]
-    n_test  = sol[13, :]
-    l_test = sol[14, :]
-
-    return t,V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP,Inoise,n_test,l_test
+struct Parameters{T}
+    I0::T
+    stim_on::T
+    stim_off::T
+    Excitation::T
+    C::T
+    g_nav1p3::T
+    g_nav1p7::T
+    g_nav1p8::T
+    E_Na::T
+    g_Kdr::T
+    g_Km::T
+    g_AHP::T
+    E_k::T
+    g_Leak::T
+    E_Leak::T
+    sigma_noise::T
+    mu_noise::T
+    tau_noise::T
+    with_noise::Bool
 end
 
 function give_currents(V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP, p)
 
-    g_nav1p3 = p[3]
-    g_nav1p7 = p[4]
-    g_nav1p8 = p[5]
-    E_Na = p[6]
+    g_nav1p3 = p.g_nav1p3
+    g_nav1p7 = p.g_nav1p7
+    g_nav1p8 = p.g_nav1p8
+    E_Na = p.E_Na
 
-    g_Kdr = p[7]
-    g_Km = p[8]
-    g_AHP = p[9]
-    E_k = p[10]
+    g_Kdr = p.g_Kdr
+    g_Km = p.g_Km
+    g_AHP = p.g_AHP
+    E_k = p.E_k
 
-    g_Leak = p[11]
-    E_Leak = p[12]
+    g_Leak = p.g_Leak
+    E_Leak = p.E_Leak
 
     INaV1p3 = g_nav1p3 .* (m3.^3) .* h3 .* (V .- E_Na)
     INaV1p7 = g_nav1p7 .* (m7.^3) .* h7 .* (V .- E_Na)
@@ -77,4 +51,6 @@ function give_currents(V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP, p)
 
     return INaV1p3, INaV1p7, INaV1p8, IKdr, IKm, IAHP, ILeak
     
+end
+
 end
