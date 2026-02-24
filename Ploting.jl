@@ -9,9 +9,10 @@ export plot_voltage, plot_variables, plot_channels, plot_currents, plot_test, pl
 # 545 565
 xlimits = (400, 1700)
 
-function plot_voltage(t, V, amp)
+function plot_voltage(t, V, amp, peaks_idx)
 
     p = plot(t, V, label=L"%$amp pA", color= :black, xlims=xlimits)
+    scatter!(t[peaks_idx], V[peaks_idx], label="", markersize=3, color=:red, xlims=xlimits)
     xlabel!(p, "Time (ms)")
     ylabel!(p, "Voltage (mV)")
 

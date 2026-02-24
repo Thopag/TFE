@@ -1,6 +1,8 @@
 module Utils
 
-export Parameters, give_currents
+using Peaks
+
+export Parameters, give_currents, get_peaks
 
 # --------------------------- Parameters struct --------------------------- #
 
@@ -51,6 +53,21 @@ function give_currents(V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP, p)
 
     return INaV1p3, INaV1p7, INaV1p8, IKdr, IKm, IAHP, ILeak
     
+end
+
+function get_peaks(t, x, min_h, min_proms, max_w)
+
+    peaks_idx, h, data, proms, w, edges = findpeaks(x; heights=(;min=min_h), proms=(;min=min_proms))
+
+    right = last.(edges)
+    left = first.(edges)
+    right = Int.(trunc.(right))
+    left = Int.(trunc.(left))
+
+    w = t[right] .- t[left]
+    peaks_idx = peaks_idx[w .< max_w]
+
+    return peaks_idx
 end
 
 end

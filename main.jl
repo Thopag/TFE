@@ -17,7 +17,7 @@ function main()
 
     amp = 51                      # pA
     duration = 1700.0             # ms
-    stim_on = 500.0               # ms 
+    stim_on = 500.0               # ms
     stim_length = 1000.0          # ms
 
     p = get_param(amp, stim_on, stim_length)
@@ -30,10 +30,11 @@ function main()
     print("--------------- End Simulation ---------------\n")
 
     I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, I_Leak = give_currents(V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP, p)
+    peaks_idx = get_peaks(t, V, -60, 5, 15)
 
     # --- Plots --- #
 
-    plot_voltage(t, V, amp)
+    plot_voltage(t, V, amp, peaks_idx)
     # plot_variables(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp)
     # plot_channels(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp)
     # plot_currents(t, V, I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, amp)

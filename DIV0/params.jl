@@ -49,7 +49,7 @@ function DIV0_parameter(amp, stim_on, stim_length)
 
     # --- Noise parameters --- #
 
-    with_noise = true
+    with_noise = false
 
     mu_noise = 0.0
     tau_noise = 5.0                       # (ms)
