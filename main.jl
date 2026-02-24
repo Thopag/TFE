@@ -13,9 +13,46 @@ elseif folder == "DIV7"
     get_u0 = DIV7_u0
 end
 
+function parameter_analyses()
+
+    println("------ Start parameter analyses ------")
+    duration = 1700.0             # ms
+    stim_on = 500.0               # ms
+    stim_length = 1000.0          # ms
+    u0 = get_u0()
+
+    params = Vector{Parameters}()
+    amps = 0:50:2500
+    for amp in amps
+        param = get_param(amp, stim_on, stim_length)
+        push!(params, param)
+    end
+
+    p_volt = empty_voltage_plot()
+    L = length(params)
+    peaks_count = Vector{Int}()
+
+    for ((i,param), amp) in zip(enumerate(params), amps)
+        print("\rProgress: $(round((i/L*100), digits=2)) %")
+
+        t,V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP,Inoise,n_test,l_test = launch_simulation(u0, (0.0, duration), param)
+        #plot!(p_volt, t, V, label=L"%$amp pA", alpha= 0.5)
+
+        peaks_idx, n_peak = get_peaks(t, V;  min_h=-60, min_proms=5, max_w=15)
+        push!(peaks_count, n_peak)
+    end
+    println("\n------ Plots ------")
+    #display(p_volt)
+
+    p_peaks = plot(amps, peaks_count, xlabel="--- (--)", ylabel= "Peaks count (-)")
+    display(p_peaks)
+
+    println("------ End parameter analyses ------")
+end
+
 function main()
 
-    amp = 20                      # pA
+    amp = 2000                    # pA
     duration = 1700.0             # ms
     stim_on = 500.0               # ms
     stim_length = 1000.0          # ms
@@ -43,7 +80,7 @@ function main()
     print("--------------- End Simulation ---------------\n")
 
     I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, I_Leak = give_currents(V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP, p)
-    peaks_idx = get_peaks(t, V;  min_h=-60, min_proms=5, max_w=15)
+    peaks_idx, n_peak = get_peaks(t, V;  min_h=-60, min_proms=5, max_w=15)
 
     # --- Plots --- #
 
@@ -57,8 +94,5 @@ function main()
     # plot_availability_voltage(t, V, m7, h7, m8, h8)
 end
 
-function parameter_analyses()
-    
-end
-
-main()
+#main()
+parameter_analyses()

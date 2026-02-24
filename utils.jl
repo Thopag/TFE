@@ -59,15 +59,15 @@ function get_peaks(t, x; min_h=-60, min_proms=5, max_w=15)
 
     peaks = findmaxima(x)
     if length(peaks[1]) == 0
-        return peaks[1]
+        return peaks[1], 0
     end
     peaks = peakheights(peaks; min=min_h)
     if length(peaks[1]) == 0
-        return peaks[1]
+        return peaks[1], 0
     end
     peaks = peakproms(peaks; min=min_proms)
     if length(peaks) == 0
-        return peaks[1]
+        return peaks[1], 0
     end
 
     peaks_idx, h, data, proms, w, edges = peakwidths(peaks)
@@ -80,7 +80,7 @@ function get_peaks(t, x; min_h=-60, min_proms=5, max_w=15)
     w = t[right] .- t[left]
     peaks_idx = peaks_idx[w .< max_w]
 
-    return peaks_idx
+    return peaks_idx, length(peaks_idx)
 end
 
 end
