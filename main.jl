@@ -50,7 +50,7 @@ function parameter_analyses()
     println("------ End parameter analyses ------")
 end
 
-function main()
+function main_default()
 
     amp = 2000                    # pA
     duration = 1700.0             # ms
@@ -94,5 +94,5 @@ function main()
     # plot_availability_voltage(t, V, m7, h7, m8, h8)
 end
 
-#main()
+#main_default()
 parameter_analyses()
