@@ -55,9 +55,22 @@ function give_currents(V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP, p)
     
 end
 
-function get_peaks(t, x, min_h, min_proms, max_w)
+function get_peaks(t, x; min_h=-60, min_proms=5, max_w=15)
 
-    peaks_idx, h, data, proms, w, edges = findpeaks(x; heights=(;min=min_h), proms=(;min=min_proms))
+    peaks = findmaxima(x)
+    if length(peaks[1]) == 0
+        return peaks[1]
+    end
+    peaks = peakheights(peaks; min=min_h)
+    if length(peaks[1]) == 0
+        return peaks[1]
+    end
+    peaks = peakproms(peaks; min=min_proms)
+    if length(peaks) == 0
+        return peaks[1]
+    end
+
+    peaks_idx, h, data, proms, w, edges = peakwidths(peaks)
 
     right = last.(edges)
     left = first.(edges)

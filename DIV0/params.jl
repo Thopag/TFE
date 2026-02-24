@@ -1,5 +1,64 @@
 
-function DIV0_parameter(amp, stim_on, stim_length)
+function DIV0_parameter(amp, stim_on, stim_length; 
+
+    # ** Na conductances
+    g_nav1p3 = 0.0,
+    g_nav1p8 = 30.0,
+    g_nav1p7 = 3.0,
+
+    # ** Leak conducatance
+    g_Leak = 0.025,
+
+    # ** K conductance
+    g_AHP = 2.5,
+    g_Km = 0.05,
+    g_Kdr = 3.5,
+
+    # Reversal Potential 
+    E_Na = 50.0,                          # [mV]
+    E_k = -90.0,                          # [mV]
+    E_Leak = -62.5,                       # [mV]
+
+    # --- Noise parameters --- #
+
+    with_noise = false,
+
+    mu_noise = 0.0,
+    tau_noise = 5.0,                       # (ms)
+    sigma_noise = 0.05
+    )
+
+    # --- Stimulus parameters --- #
+
+    # Cell Morphology
+    r = 11.63                           # [µm] cell radius
+    CellArea = 4.0*pi*(r^2)             # [µm2] cell area (sphere)
+
+    # Cell Capacitance:
+    Cr = 17.0                           # [pF] 
+    C = (Cr/CellArea)*100.0             # [µF/cm^2]
+
+    stim_off = stim_on + stim_length    # [ms]
+
+    Ihold = -3
+    I0 = (Ihold*(10^-6))/(CellArea*(10^-8))
+    Excitation = ((amp * (10^-6)) / (CellArea * (10^-8)))
+
+    # --- Parameter struct --- #
+
+    p = Parameters(
+        I0, stim_on, stim_off, Excitation, C,
+        g_nav1p3, g_nav1p7, g_nav1p8, E_Na,
+        g_Kdr, g_Km, g_AHP, E_k,
+        g_Leak, E_Leak,
+        sigma_noise, mu_noise, tau_noise,
+        with_noise
+    )
+    
+    return p
+end
+
+function DIV0_parameter_default(amp, stim_on, stim_length)
 
     # --- Cell Properties --- #
 

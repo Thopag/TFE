@@ -3,22 +3,39 @@ module Ploting
 
 using Plots, LaTeXStrings
 
-export plot_voltage, plot_variables, plot_channels, plot_currents, plot_test, plot_availability_voltage
+export empty_voltage_plot, plot_voltage, plot_variables, plot_channels, plot_currents, plot_test, plot_availability_voltage
 
 # 400 1700
 # 545 565
 xlimits = (400, 1700)
 
-function plot_voltage(t, V, amp, peaks_idx)
+function empty_voltage_plot()
+    p = plot(xlims=xlimits, xlabel="Time (ms)", ylabel= "Voltage (mV)")
+    return p
+end
 
-    p = plot(t, V, label=L"%$amp pA", color= :black, xlims=xlimits)
-    scatter!(t[peaks_idx], V[peaks_idx], label="", markersize=3, color=:red, xlims=xlimits)
-    xlabel!(p, "Time (ms)")
-    ylabel!(p, "Voltage (mV)")
+function plot_voltage(t, V, amp, peaks_idx; given_p=nothing, with_peak=false, save=false)
 
-    savefig(p, "plots/plot_voltage.pdf")
-    print("plot voltage\n")
-    display(p)
+    if isnothing(given_p)
+        p = plot(t, V, label=L"%$amp pA", color= :black, xlims=xlimits)
+        xlabel!(p, "Time (ms)")
+        ylabel!(p, "Voltage (mV)")
+    else
+        p = given_p
+        plot!(p, t, V, label=L"%$amp pA", color= :black)
+    end
+
+    if with_peak && length(peaks_idx) > 0
+        scatter!(p, t[peaks_idx], V[peaks_idx], label="", markersize=3, color=:red)
+    end
+
+    if save == true
+        savefig(p, "plots/plot_voltage.pdf")
+        print("save plot voltage\n")
+        display(p)
+    end
+
+    return p
 end
 
 function plot_variables(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp)

@@ -62,3 +62,5 @@ print("---- Start Ploting ----\n")
 includet("ploting.jl")
 using .Ploting
 print("---- End Ploting ----\n")
+
+using Plots, LaTeXStrings
