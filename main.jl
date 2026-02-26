@@ -52,7 +52,7 @@ end
 
 function main_default()
 
-    amp = 2000                    # pA
+    amp = 17                    # pA
     duration = 1700.0             # ms
     stim_on = 500.0               # ms
     stim_length = 1000.0          # ms
@@ -84,15 +84,15 @@ function main_default()
 
     # --- Plots --- #
 
-    p_volt = empty_voltage_plot()
-    plot_voltage(t, V, amp, peaks_idx; given_p=p_volt, save=true, with_peak=true)
+    # p_volt = empty_voltage_plot()
+    # plot_voltage(t, V, amp, peaks_idx; given_p=p_volt, save=true, with_peak=true)
 
     # plot_variables(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp)
     # plot_channels(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp)
     # plot_currents(t, V, I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, amp)
-    # plot_test(t, V, ndr, ldr, n_test, l_test, amp)
+    plot_test(t, V, ndr, ldr, n_test, l_test, amp)
     # plot_availability_voltage(t, V, m7, h7, m8, h8)
 end
 
-#main_default()
-parameter_analyses()
+main_default()
+#parameter_analyses()

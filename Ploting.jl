@@ -118,7 +118,7 @@ function plot_test(t, V, ndr, ldr, n_test, l_test, amp)
     plot!(p[1], t, ldr, label="ldr")
     plot!(p[1], t, n_test, label="n_test")
     plot!(p[1], t, l_test, label="l_test")
-    plot!(legendfontsize=4, legend=:topleft)
+    plot!(legendfontsize=6, legend=:topleft)
     xlabel!(p[1], "Time (ms)")
     ylabel!(p[1], "(-)")
 
@@ -127,6 +127,7 @@ function plot_test(t, V, ndr, ldr, n_test, l_test, amp)
     ylabel!(p[2], "Voltage (mV)")
 
     savefig(p, "plots/plot_l_n_test.pdf")
+    display(p)
     print("plot_l_n_test\n")
 end
 
