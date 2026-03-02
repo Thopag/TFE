@@ -75,10 +75,11 @@ end
 
 function main_default()
 
-    amp = 17*3                    # pA
+    amp = 17                    # pA
     duration = 1700.0             # ms
     stim_on = 500.0               # ms
     stim_length = 1000.0          # ms
+    end_stim = stim_on + stim_length
 
     p = get_param(amp, stim_on, stim_length)
 
@@ -95,16 +96,21 @@ function main_default()
     t_spikes = t[peaks_idx]
 
     freqs = instant_freqs(t_spikes)
-    print(global_freq(t_spikes))
+    freq, is_hyperexct = global_freq(t_spikes, end_stim)
+    print(freq)
 
     # --- Plots --- #
 
-    p_volt = empty_voltage_plot()
-    plot_voltage(t, V, amp, peaks_idx; given_p=p_volt, save=false, with_peak=true)
+    # 400 1700
+    # 545 565
+    xlimits = (500, 600)
 
-    # plot_variables(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp)
-    # plot_channels(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp)
-    # plot_currents(t, V, I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, amp)
+    # p_volt = empty_voltage_plot()
+    # plot_voltage(t, V, amp, peaks_idx; given_p=p_volt, save=false, with_peak=true)
+
+    plot_variables(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp; xlimits=xlimits)
+    plot_channels(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp; xlimits=xlimits)
+    plot_all_currents(t, V, I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, amp; xlimits=xlimits)
     # plot_test(t, V, ndr, ldr, n_test, l_test, amp)
     # plot_availability_voltage(t, V, m7, h7, m8, h8)
 
@@ -112,5 +118,5 @@ function main_default()
     # display(p_freq)
 end
 
-#main_default()
-parameter_analyses()
+main_default()
+#parameter_analyses()

@@ -3,11 +3,7 @@ module Ploting
 
 using Plots, LaTeXStrings
 
-export empty_voltage_plot, plot_voltage, plot_variables, plot_channels, plot_currents, plot_test, plot_availability_voltage
-
-# 400 1700
-# 545 565
-xlimits = (400, 1700)
+export empty_voltage_plot, plot_voltage, plot_variables, plot_channels, plot_currents, plot_all_currents, plot_test, plot_availability_voltage
 
 function empty_voltage_plot()
     p = plot(xlims=xlimits, xlabel="Time (ms)", ylabel= "Voltage (mV)")
@@ -38,7 +34,7 @@ function plot_voltage(t, V, amp, peaks_idx; given_p=nothing, with_peak=false, sa
     return p
 end
 
-function plot_variables(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp)
+function plot_variables(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp; xlimits=(400, 1700))
 
     p = plot(layout = (2, 1), xlims=xlimits)
     plot!(p[1], t, m3, label=L"m_{3}", linestyle = :solid, color=:blue)
@@ -65,7 +61,7 @@ function plot_variables(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp)
 
 end
 
-function plot_channels(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp)
+function plot_channels(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp; xlimits=(400, 1700))
 
     p = plot(layout = (2, 1), xlims=xlimits)
 
@@ -89,18 +85,41 @@ function plot_channels(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp)
 
 end
 
-function plot_currents(t, V, I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, amp)
+function plot_all_currents(t, V, I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, amp; xlimits=(400, 1700))
 
-    x_range = (450, 600)
-
-    p = plot(layout = (2, 1), xlims=x_range)
+    p = plot(layout = (2, 1), xlims=xlimits)
     
     plot!(p[1], t, V, color= :black, label=L"%$amp pA")
     ylims!(p[1], (-100, 50))
     xlabel!(p[1], "Time (ms)")
     ylabel!(p[1], "Voltage (mV)")
 
-    plot!(p[2], t, I_NaV1p3 .+ I_NaV1p7 .+ I_NaV1p8, color=:red, label="Sodium", legend = :topleft)
+    plot!(p[2], t, I_NaV1p3, color=:blue, label=L"I_{NaV1.3}", legend = :bottomright)
+    plot!(p[2], t, I_NaV1p7, color=:red, label=L"I_{NaV1.7}")
+    plot!(p[2], t, I_NaV1p8, color=:green, label=L"I_{NaV1.8}")
+
+    plot!(p[2], t, I_Kdr, color=:orange, label=L"I_{Kdr}")
+    plot!(p[2], t, I_Km, color=:purple, label=L"I_{KM}")
+    plot!(p[2], t, I_AHP, color=:brown, label=L"I_{AHP}")
+
+    #ylims!(p[2], (-250, 250))
+    xlabel!(p[2], "Time (ms)")
+    ylabel!(p[2], "Current (uA/cm2)")
+
+    savefig(p, "plots/plot_all_currents.pdf")
+    print("plot all currents\n")
+end
+
+function plot_currents(t, V, I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, amp; xlimits=(400, 1700))
+
+    p = plot(layout = (2, 1), xlims=xlimits)
+    
+    plot!(p[1], t, V, color= :black, label=L"%$amp pA")
+    ylims!(p[1], (-100, 50))
+    xlabel!(p[1], "Time (ms)")
+    ylabel!(p[1], "Voltage (mV)")
+
+    plot!(p[2], t, I_NaV1p3 .+ I_NaV1p7 .+ I_NaV1p8, color=:red, label="Sodium", legend = :bottomright)
     plot!(p[2], t, I_Kdr .+ I_Km .+ I_AHP, color=:blue , label="Potassium")
     #ylims!(p[2], (-250, 250))
     xlabel!(p[2], "Time (ms)")
