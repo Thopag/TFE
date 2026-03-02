@@ -19,10 +19,11 @@ function parameter_analyses()
     duration = 1700.0             # ms
     stim_on = 500.0               # ms
     stim_length = 1000.0          # ms
+    end_stim = stim_on + stim_length
     u0 = get_u0()
 
     params = Vector{Parameters}()
-    amps = 0:50:2500
+    amps = 0:20:120
     for amp in amps
         param = get_param(amp, stim_on, stim_length)
         push!(params, param)
@@ -31,45 +32,55 @@ function parameter_analyses()
     p_volt = empty_voltage_plot()
     L = length(params)
     peaks_count = Vector{Int}()
+    freqs = Vector{Float32}()
+    hyperexct_vec = Vector{Int}()
 
     for ((i,param), amp) in zip(enumerate(params), amps)
         print("\rProgress: $(round((i/L*100), digits=2)) %")
 
         t,V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP,Inoise,n_test,l_test = launch_simulation(u0, (0.0, duration), param)
-        #plot!(p_volt, t, V, label=L"%$amp pA", alpha= 0.5)
+        # plot!(p_volt, t, V, label=L"%$amp pA", alpha= 0.5)
 
-        peaks_idx, n_peak = get_peaks(t, V;  min_h=-60, min_proms=5, max_w=15)
+        peaks_idx, n_peak = get_peaks(t, V;  min_h=-30)
+        t_spikes = t[peaks_idx]
+        freq, is_hyperexct = global_freq(t_spikes, end_stim)
+
         push!(peaks_count, n_peak)
+        push!(freqs, freq)
+        push!(hyperexct_vec, is_hyperexct)
     end
     println("\n------ Plots ------")
-    #display(p_volt)
 
-    p_peaks = plot(amps, peaks_count, xlabel="--- (--)", ylabel= "Peaks count (-)")
+    x = amps
+    hyperexct_colors = [h == 1 ? :red : :blue for h in hyperexct_vec]
+
+    p_peaks = plot(x, peaks_count, xlabel="amp (pA)", ylabel= "Peaks count (-)", legend=false, color=:black, title="$folder peaks count")
+    scatter!(p_peaks, x, peaks_count, color=hyperexct_colors, markersize=3)
+
+    p_freqs = plot(x, freqs, xlabel="amp (pA)", ylabel= "Frequence (Hz)", legend=false, color=:black, title="$folder FI curve")
+    scatter!(p_freqs, x, freqs, color=hyperexct_colors, markersize=3)
+
+    plot!(p_volt, title="$folder samples")
+
     display(p_peaks)
+    display(p_freqs)
+    display(p_volt)
+
+    savefig(p_peaks, "plots/$folder-peaks-curve.pdf")
+    savefig(p_freqs, "plots/$folder-F-I-curve.pdf")
+    savefig(p_volt, "plots/$folder-V_AMP.pdf")
 
     println("------ End parameter analyses ------")
 end
 
 function main_default()
 
-    amp = 17                    # pA
+    amp = 17*3                    # pA
     duration = 1700.0             # ms
     stim_on = 500.0               # ms
     stim_length = 1000.0          # ms
 
-    p = get_param(amp, stim_on, stim_length; 
-
-        g_nav1p3 = 0.0,
-        g_nav1p8 = 30.0,
-        g_nav1p7 = 3.0,
-
-        g_Leak = 0.025,
-
-        g_AHP = 2.5,
-        g_Km = 0.05,
-        g_Kdr = 3.5,
-        with_noise=false,
-    )
+    p = get_param(amp, stim_on, stim_length)
 
     u0 = get_u0()
 
@@ -80,19 +91,26 @@ function main_default()
     print("--------------- End Simulation ---------------\n")
 
     I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, I_Leak = give_currents(V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP, p)
-    peaks_idx, n_peak = get_peaks(t, V;  min_h=-60, min_proms=5, max_w=15)
+    peaks_idx, n_peak = get_peaks(t, V;  min_h=-25)
+    t_spikes = t[peaks_idx]
+
+    freqs = instant_freqs(t_spikes)
+    print(global_freq(t_spikes))
 
     # --- Plots --- #
 
-    # p_volt = empty_voltage_plot()
-    # plot_voltage(t, V, amp, peaks_idx; given_p=p_volt, save=true, with_peak=true)
+    p_volt = empty_voltage_plot()
+    plot_voltage(t, V, amp, peaks_idx; given_p=p_volt, save=false, with_peak=true)
 
     # plot_variables(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp)
     # plot_channels(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp)
     # plot_currents(t, V, I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, amp)
-    plot_test(t, V, ndr, ldr, n_test, l_test, amp)
+    # plot_test(t, V, ndr, ldr, n_test, l_test, amp)
     # plot_availability_voltage(t, V, m7, h7, m8, h8)
+
+    # p_freq = scatter(t_spikes[1:end-1], freqs)
+    # display(p_freq)
 end
 
-main_default()
-#parameter_analyses()
+#main_default()
+parameter_analyses()

@@ -37,6 +37,24 @@ function beta_h_1_3(V)
     return 2.54/(1+exp((V-(-7.8-jp+10))/-10.68)) # +10 is different than DIV0
 end
 
+# ---- #
+
+function h_inf_1_3(V)
+    return alpha_h_1_3(V) / (alpha_h_1_3(V) + beta_h_1_3(V))
+end
+
+function tau_h_1_3(V)
+    return 1 / (alpha_h_1_3(V) + beta_h_1_3(V))
+end
+
+function m_inf_1_3(V)
+    return alpha_m_1_3(V) / (alpha_m_1_3(V) + beta_m_1_3(V))
+end
+
+function tau_m_1_3(V)
+    return 1 / (alpha_m_1_3(V) + beta_m_1_3(V))
+end
+
 # --------------------------- Na_V 1.7 --------------------------- #
 
 function alpha_m_1_7(V)
@@ -55,6 +73,23 @@ function beta_h_1_7(V)
     return 2.54/(1+exp((V-(-7.8-4.2))/-10.68))
 end
 
+# ---- #
+
+function h_inf_1_7(V)
+    return alpha_h_1_7(V) / (alpha_h_1_7(V) + beta_h_1_7(V))
+end
+
+function tau_h_1_7(V)
+    return 1 / (alpha_h_1_7(V) + beta_h_1_7(V))
+end
+
+function m_inf_1_7(V)
+    return alpha_m_1_7(V) / (alpha_m_1_7(V) + beta_m_1_7(V))
+end
+
+function tau_m_1_7(V)
+    return 1 / (alpha_m_1_7(V) + beta_m_1_7(V))
+end
 
 # --------------------------- Na_V 1.8 --------------------------- #
 
@@ -74,6 +109,24 @@ function beta_h_1_8(V)
     return 0.81/(1+exp((V-(11.44-5.3))/-13.12))
 end
 
+# ---- #
+
+function h_inf_1_8(V)
+    return alpha_h_1_8(V) / (alpha_h_1_8(V) + beta_h_1_8(V))
+end
+
+function tau_h_1_8(V)
+    return 1 / (alpha_h_1_8(V) + beta_h_1_8(V))
+end
+
+function m_inf_1_8(V)
+    return alpha_m_1_8(V) / (alpha_m_1_8(V) + beta_m_1_8(V))
+end
+
+function tau_m_1_8(V)
+    return 1 / (alpha_m_1_8(V) + beta_m_1_8(V))
+end
+
 # --------------------------- K_M --------------------------- #
 
 function n_inf_K_M(V)
@@ -81,7 +134,7 @@ function n_inf_K_M(V)
 end
 
 function tau_n_K_M(V)
-    celsius = 25
+    celsius = 25.0
     tadj = 3^((celsius-23.5)/10)
     return 1000.0/(3.3*(exp((V-(-35))/10)+exp(-(V+35)/10))) / tadj
 end
@@ -110,21 +163,50 @@ function beta_l_K_dr(V)
     return exp(1e-3*2*gml*(V-(-61))*9.648e4/(8.315*(273.16+25)))
 end
 
-function dot_n_K_dr(V, n)
-    return alpha_n_K_dr(V)*(1-n) - n*beta_n_K_dr(V)
+# ---- #
+
+function n_inf_K_dr(V)
+    return 1/(1+alpha_n_K_dr(V))
 end
 
-function dot_l_K_dr(V, l)
-    return alpha_l_K_dr(V)*(1-l) - l*beta_l_K_dr(V)
+function tau_n_K_dr(V)
+    q10 = 3^((25-30)/10)
+    return beta_n_K_dr(V)/(q10*0.03*(1+alpha_n_K_dr(V)))
+end
+
+function l_inf_K_dr(V)
+    return 1/(1+alpha_l_K_dr(V))
+end
+
+function tau_l_K_dr(V)
+    q10 = 3^((25-30)/10)
+    return beta_l_K_dr(V)/(q10*0.001*(1 + alpha_l_K_dr(V)))
+end
+
+# ---- #
+
+function dot_n_K_dr(V, n)
+    return (n_inf_K_dr(V)-n)/tau_n_K_dr(V)
+end
+
+function dot_l_K_dr(V, n)
+    return (l_inf_K_dr(V)-n)/tau_l_K_dr(V)
 end
 
 # --------------------------- AHP --------------------------- #
 
-function dot_z_AHP(V, z)
+function z_AHP_inf(V)
     beta_z_AHP = 5
     gamma_z =  4
-    tau_z = 100
-    return ( ( 1 / ( 1 + exp( (beta_z_AHP - V)/gamma_z ) ) ) - z)/ tau_z 
+    return 1 / ( 1 + exp( (beta_z_AHP - V)/gamma_z ) ) 
+end
+
+function tau_z_AHP(V)
+    return 100
+end
+
+function dot_z_AHP(V, z) 
+    return ( z_AHP_inf(V) - z) / tau_z_AHP(V)
 end
 
 # --------------------------- Simulation function --------------------------- #
@@ -136,7 +218,8 @@ end
 function ODE_system(du,u,p,t)
 
     # --- parameters --- #
-    I_ext = p.I0 + pulse(t,p.stim_on,p.stim_off) * p.Excitation
+
+    I_ext = p.I0 + pulse(t, p.stim_on, p.stim_off) * p.Excitation
     C = p.C
 
     g_nav1p3 = p.g_nav1p3
@@ -209,16 +292,8 @@ function ODE_system(du,u,p,t)
     du[6] = dot_m(V, m8, alpha_m_1_8, beta_m_1_8)
     du[7] = dot_h(V, h8, alpha_h_1_8, beta_h_1_8)
     
-    ##################
-    q10=3^((25-30)/10)
-    ninf = 1/(1+alpha_n_K_dr(V))
-    taun = beta_n_K_dr(V)/(q10*0.03*(1+alpha_n_K_dr(V)))
-    linf = 1/(1+alpha_l_K_dr(V))
-    taul = beta_l_K_dr(V)/(q10*0.001*(1 + alpha_l_K_dr(V)))
-
-    du[8] = (ninf - u[8])/taun
-    du[9] = (linf - u[9])/taul
-    ##################
+    du[8] = dot_n_K_dr(V, ndr)
+    du[9] = dot_l_K_dr(V, ldr)
     
     du[10] = dot_n_K_M(V, nm)
 
@@ -276,7 +351,6 @@ function simulation(u0, tspan, p)
     # -- SDE Simulation -- #
     prob = SDEProblem(ODE_system, stochastic_part, u0, tspan, p) 
     sol = solve(prob,dtmax=0.01)
-    #roda5
 
     # -- Simulation results -- #
     t = sol.t

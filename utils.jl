@@ -1,8 +1,9 @@
 module Utils
 
 using Peaks
+using Statistics
 
-export Parameters, give_currents, get_peaks
+export Parameters, give_currents, get_peaks, instant_freqs, global_freq
 
 # --------------------------- Parameters struct --------------------------- #
 
@@ -55,7 +56,7 @@ function give_currents(V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP, p)
     
 end
 
-function get_peaks(t, x; min_h=-60, min_proms=5, max_w=15)
+function get_peaks(t, x; min_h=-25, min_proms=0, max_w=Inf)
 
     peaks = findmaxima(x)
     if length(peaks[1]) == 0
@@ -81,6 +82,36 @@ function get_peaks(t, x; min_h=-60, min_proms=5, max_w=15)
     peaks_idx = peaks_idx[w .< max_w]
 
     return peaks_idx, length(peaks_idx)
+end
+
+function instant_freqs(t_spikes)
+
+    #If there is only 0 or 1 spike, we got a null frequence
+    if length(t_spikes) <= 1
+        return [0]
+    end
+    delta_t = diff(t_spikes)
+    # 1000 -> to go from ms to s
+    freqs =  1000 ./ delta_t
+    return freqs
+end
+
+function global_freq(t_spikes, end_stim)
+    freqs = instant_freqs(t_spikes)
+
+    f_global = mean(freqs)
+    if f_global > 0
+        last_delta_t = 1000 / freqs[end]
+        if (t_spikes[end] + last_delta_t*1.2) > end_stim
+            is_hyperexcitable = 1
+        else
+            is_hyperexcitable = 0
+        end
+    else
+        return f_global, 0
+    end
+    
+    return f_global, is_hyperexcitable
 end
 
 end
