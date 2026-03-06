@@ -5,7 +5,7 @@ using Plots, LaTeXStrings
 
 export empty_voltage_plot, plot_voltage, plot_variables, plot_channels, plot_currents, plot_all_currents, plot_test, plot_availability_voltage
 
-function empty_voltage_plot()
+function empty_voltage_plot(; xlimits=(400, 1700))
     p = plot(xlims=xlimits, xlabel="Time (ms)", ylabel= "Voltage (mV)")
     return p
 end
@@ -13,7 +13,7 @@ end
 function plot_voltage(t, V, amp, peaks_idx; given_p=nothing, with_peak=false, save=false)
 
     if isnothing(given_p)
-        p = plot(t, V, label=L"%$amp pA", color= :black, xlims=xlimits)
+        p = plot(t, V, label=L"%$amp pA", color= :black; xlimits=(400, 1700))
         xlabel!(p, "Time (ms)")
         ylabel!(p, "Voltage (mV)")
     else

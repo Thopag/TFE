@@ -25,7 +25,7 @@ function DIV7_parameter(amp, stim_on, stim_length;
 
     mu_noise = 0.0,
     tau_noise = 5.0,                       # (ms)
-    sigma_noise = 0.0,
+    sigma_noise = 0.05,
     )
 
     # --- Stimulus parameters --- #
@@ -112,7 +112,7 @@ function DIV7_parameter_default(amp, stim_on, stim_length)
 
     # --- Noise parameters --- #
 
-    with_noise = false
+    with_noise = true
 
     mu_noise = 0.0
     tau_noise = 5.0                       # (ms)

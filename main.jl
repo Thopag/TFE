@@ -1,7 +1,7 @@
 include("DIV0/params.jl")
 include("DIV7/params.jl")
 
-folder = "DIV0"
+folder = "DIV7"
 
 if folder == "DIV0"
     launch_simulation = ODE_DIV0.simulation
@@ -23,9 +23,17 @@ function parameter_analyses()
     u0 = get_u0()
 
     params = Vector{Parameters}()
-    amps = 0:20:120
+    amps = 0:1:120
     for amp in amps
-        param = get_param(amp, stim_on, stim_length)
+        param = get_param(amp, stim_on, stim_length;
+        with_noise = true
+
+        # ,g_nav1p8 = 4.0 # PHARMACOLOGY DIV0
+        # ,g_nav1p7 = 40.0 # dynamic clamp DIV0
+
+        ,g_nav1p7 = 10.5  # PHARMACOLOGY DIV7
+        ,g_nav1p8 = 40.0  # dynamic clamp DIV7
+        )
         push!(params, param)
     end
 
@@ -39,7 +47,7 @@ function parameter_analyses()
         print("\rProgress: $(round((i/L*100), digits=2)) %")
 
         t,V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP,Inoise,n_test,l_test = launch_simulation(u0, (0.0, duration), param)
-        # plot!(p_volt, t, V, label=L"%$amp pA", alpha= 0.5)
+        # plot!(p_volt, t, V, label=L"%$amp pA", alpha= 1)
 
         peaks_idx, n_peak = get_peaks(t, V;  min_h=-30)
         t_spikes = t[peaks_idx]
@@ -75,13 +83,21 @@ end
 
 function main_default()
 
-    amp = 17                    # pA
+    amp = 15*3                    # pA
     duration = 1700.0             # ms
     stim_on = 500.0               # ms
     stim_length = 1000.0          # ms
     end_stim = stim_on + stim_length
 
-    p = get_param(amp, stim_on, stim_length)
+    p = param = get_param(amp, stim_on, stim_length;
+        with_noise = true
+
+        # ,g_nav1p8 = 4.0 # PHARMACOLOGY DIV0
+        # ,g_nav1p7 = 40.0 # dynamic clamp DIV0
+
+        ,g_nav1p7 = 10.5  # PHARMACOLOGY DIV7
+        ,g_nav1p8 = 40.0  # dynamic clamp DIV7
+        )
 
     u0 = get_u0()
 
@@ -105,12 +121,12 @@ function main_default()
     # 545 565
     xlimits = (500, 600)
 
-    # p_volt = empty_voltage_plot()
-    # plot_voltage(t, V, amp, peaks_idx; given_p=p_volt, save=false, with_peak=true)
+    p_volt = empty_voltage_plot()
+    plot_voltage(t, V, amp, peaks_idx; given_p=p_volt, save=false, with_peak=true)
 
-    plot_variables(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp; xlimits=xlimits)
-    plot_channels(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp; xlimits=xlimits)
-    plot_all_currents(t, V, I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, amp; xlimits=xlimits)
+    # plot_variables(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp; xlimits=xlimits)
+    # plot_channels(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp; xlimits=xlimits)
+    # plot_all_currents(t, V, I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, amp; xlimits=xlimits)
     # plot_test(t, V, ndr, ldr, n_test, l_test, amp)
     # plot_availability_voltage(t, V, m7, h7, m8, h8)
 
@@ -118,5 +134,5 @@ function main_default()
     # display(p_freq)
 end
 
-main_default()
-#parameter_analyses()
+#main_default()
+parameter_analyses()
