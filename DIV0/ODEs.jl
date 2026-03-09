@@ -211,10 +211,6 @@ end
 
 # --------------------------- Simulation function --------------------------- #
 
-function pulse(t, ti, tf)
-    return (ti <= t <= tf) ? 1.0 : 0.0
-end
-
 function ODE_system(du,u,p,t)
 
     # --- parameters --- #
