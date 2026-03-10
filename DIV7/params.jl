@@ -19,6 +19,9 @@ function DIV7_parameter(amp, stim_on, stim_length;
     E_k = -90.0,                            # [mV]
     E_Leak = -70.0,                         # [mV]
 
+    # Lidocaine
+    C_lidocaine = 0,
+
     # --- Noise parameters --- #
 
     with_noise = false,
@@ -27,6 +30,14 @@ function DIV7_parameter(amp, stim_on, stim_length;
     tau_noise = 5.0,                       # (ms)
     sigma_noise = 0.05,
     )
+
+    # --- Lidocaine effect --- #
+
+    remaining_1_3, remaining_1_7, remaining_1_8 = get_lidocaine_inhibition(C_lidocaine)
+
+    g_nav1p3 = g_nav1p3*remaining_1_3
+    g_nav1p7 = g_nav1p7*remaining_1_7
+    g_nav1p8 = g_nav1p8*remaining_1_8
 
     # --- Stimulus parameters --- #
 
