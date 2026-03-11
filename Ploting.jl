@@ -166,12 +166,13 @@ function plot_all(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp, t_spik
                             I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, I_Leak, I_ext, I_noise
                                 ; xlimits=(400, 1700))
 
-    n_fig = 5
+    n_fig = 4
     p = plot(layout = (n_fig, 1), link = :x, xlims=xlimits, size = (1000, 900), xaxis = nothing)
 
     voltage = 1
-    ylabel!(p[voltage], "Voltage (mV)")
+    ylabel!(p[voltage], "Voltage (mV)", legend = :topleft)
     plot!(p[voltage], t, V, color= :black, label=L"%$amp pA")
+    vline!(p[voltage], t_spikes, color=:red, label="peaks")
 
     variable = 2
     ylabel!(p[variable], "Variable (-)")
@@ -211,9 +212,9 @@ function plot_all(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp, t_spik
     plot!(p[current], t, I_ext, color=:black, linestyle = :dash, label=L"I_{ext}")
     plot!(p[current], t, I_noise, color=:pink, label=L"I_{noise}")
 
-    noise = 5
-    plot!(p[noise], t, I_noise, color=:black, label=L"I_{noise}")
-    vline!(p[noise], t_spikes, color=:red, label="peaks")
+    # noise = 5
+    # plot!(p[noise], t, I_noise, color=:black, label=L"I_{noise}")
+    # vline!(p[noise], t_spikes, color=:red, label="peaks")
 
     # global_current = 5
     # ylabel!(p[global_current], "Current (uA/cm2)")

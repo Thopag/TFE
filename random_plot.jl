@@ -160,4 +160,26 @@ V = -150:0.5:60
 # tau_s()
 
 V = -60:0.5:0
-ss_currents(p)
+#ss_currents(p)
+
+
+M = 234.337 # g/mol
+
+# C = 150                 # ng/ml
+# C = C*(10^-9)/(10^-3)   # g/l
+# C = C/M                 # M
+# C = C*10^6              # µM
+# print(C)
+
+# C = 2                 # µg/ml
+# C = C*(10^-6)/(10^-3)   # g/l
+# C = C/M                 # M
+# C = C*10^6              # µM
+# print(C)
+
+# C = 0.4                 # %w/v
+# C = C/100             # g/ml
+# C = C/10^-3             # g/l
+# C = C/M                 # M
+# C = C*10^6              # µM
+# print(C)

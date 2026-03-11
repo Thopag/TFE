@@ -42,7 +42,7 @@ function parameter_analyses(params, analysed_values; duration = 1700.0,
             plot!(p_volt, t, V, label=L"%$analysed_value %$unit", alpha= 1)
         end
 
-        peaks_idx, n_peak = get_peaks(t, V;  min_h=-30)
+        peaks_idx, n_peak = get_peaks(t, V;  min_h=-30, min_proms=10)
         t_spikes = t[peaks_idx]
         freq, is_hyperexct = global_freq(t_spikes, param.stim_off)
 
@@ -98,7 +98,7 @@ function parameter_selection(;
     )
 
     params = Vector{Parameters}()
-    amps = 0:1:120
+    amps = 0:0.5:150
     for amp in amps
         param = get_param(amp, stim_on, stim_length;
         with_noise = false,
@@ -114,7 +114,7 @@ end
 
 function main()
     plot_sample = false
-    lido_concentrations = [0, 1, 10, 100, 1000]
+    lido_concentrations = [0, 1, 10, 50, 100, 500, 1000]
 
     all_analysed_values = Vector{Vector{Float32}}()
     all_peaks_count = Vector{Vector{Int}}()
