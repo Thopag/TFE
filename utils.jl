@@ -127,8 +127,9 @@ function window_count(t_spikes, on, off; window_width=100)
     uppers = edges[2:end]
 
     counts = count.((x -> (l <= x < u) for (l, u) in zip(lowers, uppers)), Ref(t_spikes))
+    first_count = counts[1]#mean(counts)
 
-    return counts
+    return counts, first_count
 end
 
 hill(D, f_max, IC50, h, y0) = y0 + (f_max * D^h) / (IC50^h + D^h)

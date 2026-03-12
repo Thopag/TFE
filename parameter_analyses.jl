@@ -32,6 +32,7 @@ function parameter_analyses(params, analysed_values; duration = 1700.0,
     peaks_count = Vector{Int}()
     freqs = Vector{Float32}()
     hyperexct_vec = Vector{Int}()
+    first_window_count = Vector{Float32}()
 
     for ((i,param), analysed_value) in zip(enumerate(params), analysed_values)
         print("\rProgress: $(round((i/L*100), digits=2)) %")
@@ -45,10 +46,13 @@ function parameter_analyses(params, analysed_values; duration = 1700.0,
         peaks_idx, n_peak = get_peaks(t, V;  min_h=-30, min_proms=10)
         t_spikes = t[peaks_idx]
         freq, is_hyperexct = global_freq(t_spikes, param.stim_off)
+        counts, mean_count = window_count(t_spikes, param.stim_on, param.stim_off; window_width=100)
 
         push!(peaks_count, n_peak)
         push!(freqs, freq)
         push!(hyperexct_vec, is_hyperexct)
+        push!(first_window_count, mean_count)
+        
     end
     println("\n------ End parameter analyses ------")
 
@@ -61,32 +65,39 @@ function parameter_analyses(params, analysed_values; duration = 1700.0,
 
     println("\n----------------------------------------------------\n")
 
-    return peaks_count, freqs, hyperexct_vec
+    return peaks_count, freqs, hyperexct_vec, first_window_count
 end
 
-function plot_analyses(all_analysed_values, all_peaks_count, all_freqs, all_hyperexct_vec, all_label; xlabel="amp pA")
+function plot_analyses(all_analysed_values, all_peaks_count, all_freqs, all_hyperexct_vec, all_first_window_count, all_label; xlabel="amp pA")
 
     println("------ Start plots ------")
 
     p_peaks = plot(xlabel=xlabel, ylabel= "Peaks count (-)", title="$folder peaks count")
     p_freqs = plot(xlabel=xlabel, ylabel= "Frequence (Hz)", title="$folder FI curve")
+    p_window = plot(xlabel=xlabel, ylabel= "Peaks count (-)", title="$folder First window count")
 
-    for (analysed_values, peaks_count, freqs, hyperexct_vec, label) in zip(all_analysed_values, all_peaks_count, all_freqs, all_hyperexct_vec, all_label)
+    for (analysed_values, peaks_count, freqs, hyperexct_vec, first_window_count, label) in zip(all_analysed_values, all_peaks_count, all_freqs, all_hyperexct_vec, all_first_window_count, all_label)
 
         hyperexct_colors = [h == 1 ? :red : :blue for h in hyperexct_vec]
 
         plot!(p_peaks, analysed_values, peaks_count, color=:black, label="", alpha=0.3)
-        scatter!(p_peaks, analysed_values, peaks_count, markerstrokecolor=hyperexct_colors, markersize=2.5, markerstrokewidth = 0.75, label=label)
+        scatter!(p_peaks, analysed_values, peaks_count, markerstrokecolor=hyperexct_colors, markersize=2.5, markerstrokewidth = 0.5, label=label)
 
         plot!(p_freqs, analysed_values, freqs, color=:black, label="", alpha=0.3)
-        scatter!(p_freqs, analysed_values, freqs, markerstrokecolor=hyperexct_colors, markersize=2.5, markerstrokewidth = 0.75, label=label)
+        scatter!(p_freqs, analysed_values, freqs, markerstrokecolor=hyperexct_colors, markersize=2.5, markerstrokewidth = 0.5, label=label)
+
+        plot!(p_window, analysed_values, first_window_count, color=:black, label="", alpha=0.3)
+        scatter!(p_window, analysed_values, first_window_count, markerstrokecolor=hyperexct_colors, markersize=2.5, markerstrokewidth = 0.5, label=label)
 
     end
 
     display(p_peaks)
     display(p_freqs)
+    display(p_window)
     savefig(p_peaks, "plots/$(folder)-peaks-curve.pdf")
     savefig(p_freqs, "plots/$(folder)-F-I-curve.pdf")
+    savefig(p_window, "plots/$(folder)-window-curve.pdf")
+
 
     println("------ End plots ------")
 end
@@ -120,12 +131,13 @@ function main()
     all_peaks_count = Vector{Vector{Int}}()
     all_freqs = Vector{Vector{Float32}}()
     all_hyperexct_vec = Vector{Vector{Int}}()
+    all_first_window_count = Vector{Vector{Float32}}()
     all_label = Vector{String}()
 
     for C_lido in lido_concentrations
 
         params, analysed_values = parameter_selection(;C_lido=C_lido)
-        peaks_count, freqs, hyperexct_vec = parameter_analyses(params, analysed_values; with_plot_sample=plot_sample, title="lidocaine_$(C_lido)_µM")
+        peaks_count, freqs, hyperexct_vec, first_window_count = parameter_analyses(params, analysed_values; with_plot_sample=plot_sample, title="lidocaine_$(C_lido)_µM")
 
         label = "$C_lido µM"
 
@@ -133,9 +145,12 @@ function main()
         push!(all_peaks_count, peaks_count)
         push!(all_freqs, freqs)
         push!(all_hyperexct_vec, hyperexct_vec)
+        push!(all_first_window_count, first_window_count)
         push!(all_label, label)
+
+        
     end
-    plot_analyses(all_analysed_values, all_peaks_count, all_freqs, all_hyperexct_vec, all_label; xlabel="amp pA")
+    plot_analyses(all_analysed_values, all_peaks_count, all_freqs, all_hyperexct_vec, all_first_window_count, all_label; xlabel="amp pA")
 end
 
 main()

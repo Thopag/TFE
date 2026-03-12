@@ -44,7 +44,7 @@ function main()
     peaks_idx, n_peak = get_peaks(t, V;  min_h=-30, min_proms=10)
     t_spikes = t[peaks_idx]
 
-    counts = window_count(t_spikes, stim_on, p.stim_off; window_width=100)
+    counts, mean_count = window_count(t_spikes, stim_on, p.stim_off; window_width=100)
 
     # --- Plots --- #
 
