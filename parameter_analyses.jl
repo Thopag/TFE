@@ -104,7 +104,7 @@ function parameter_selection(;
     )
 
     params = Vector{Parameters}()
-    amps = 0:75:300
+    amps = [80,100,120] #0:75:300
     for amp in amps
         param = get_param(amp, stim_on, stim_length;
         with_noise = false,
