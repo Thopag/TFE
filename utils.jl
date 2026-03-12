@@ -143,6 +143,10 @@ lidocain_1_3_resting_inib(D) = hill(D, 0.997, 1462, 1.35, 0)
 
 function get_lidocaine_inhibition(C)
     # C in µM
+    if C == 0
+        return 1, 1, 1
+    end
+    
     remaining_1_3 = 1.0 - lidocain_1_3_inact_inib(C) # which 1.3 ?
     remaining_1_7 = 1.0 - lidocain_1_7_channel(C)
     remaining_1_8 = 1.0 - lidocain_1_8_channel(C)

@@ -126,18 +126,19 @@ function plot_hill()
     plt = plot(xlabel="Lidocaine (µM)", ylabel= "inhibition (%)") 
     plot!(plt, xaxis=:log10, xlims=(0.1, 10000), legend=:topleft)
 
-    plot!(plt, D, lidocain_1_7_resting_inib.(D) .* 100, label="NaV 1.7 resting", linestyle = :dot, color=:red)
-    plot!(plt, D, lidocain_1_7_inact_inib.(D) .* 100, label="NaV 1.7 inact", linestyle = :dash, color=:red)
+    # plot!(plt, D, lidocain_1_7_resting_inib.(D) .* 100, label="NaV 1.7 resting", linestyle = :dot, color=:red)
+    # plot!(plt, D, lidocain_1_7_inact_inib.(D) .* 100, label="NaV 1.7 inact", linestyle = :dash, color=:red)
     plot!(plt, D, lidocain_1_7_channel.(D) .* 100, label="NaV 1.7 channel", linestyle = :solid, color=:red)
 
-    plot!(plt, D, lidocain_1_3_resting_inib.(D) .* 100, label="NaV 1.3 resting", linestyle = :dot, color=:blue)
-    plot!(plt, D, lidocain_1_3_inact_inib.(D) .* 100, label="NaV 1.3 inact", linestyle = :dash, color=:blue)
+    # plot!(plt, D, lidocain_1_3_resting_inib.(D) .* 100, label="NaV 1.3 resting", linestyle = :dot, color=:blue)
+    # plot!(plt, D, lidocain_1_3_inact_inib.(D) .* 100, label="NaV 1.3 inact", linestyle = :dash, color=:blue)
 
     plot!(plt, D, lidocain_1_8_channel.(D) .* 100, label="NaV 1.8 channel", linestyle = :solid, color=:green)
 
-    plot!(plt, D, lidocain_Na.(D) .* 100, label="Na", linestyle = :solid, color=:purple)
-    plot!(plt, D, lidocain_K.(D) .* 100, label="K", linestyle = :solid, color=:brown)
+    # plot!(plt, D, lidocain_Na.(D) .* 100, label="Na", linestyle = :solid, color=:purple)
+    # plot!(plt, D, lidocain_K.(D) .* 100, label="K", linestyle = :solid, color=:brown)
     # savefig(plt, "plots/lidocaine_inibition.pdf")
+    display(plt)
 end
 
 get_param = DIV7_parameter
@@ -155,7 +156,7 @@ p = get_param(amp, stim_on, stim_length;
     )
 
 V = -150:0.5:60
-# plot_hill()
+plot_hill()
 # steady_states()
 # tau_s()
 
@@ -165,21 +166,34 @@ V = -60:0.5:0
 
 M = 234.337 # g/mol
 
+# # Safety and Tolerability of the Lidocaine Patch 5%, a Targeted Peripheral Analgesic: A Review of the Literature
 # C = 150                 # ng/ml
 # C = C*(10^-9)/(10^-3)   # g/l
 # C = C/M                 # M
 # C = C*10^6              # µM
-# print(C)
+# println(C)
 
-# C = 2                 # µg/ml
+# # Computer-controlled lidocaine infusion for the evaluation of neuropathic pain after peripheral nerve injury
+# C = 2                   # µg/ml
 # C = C*(10^-6)/(10^-3)   # g/l
 # C = C/M                 # M
 # C = C*10^6              # µM
-# print(C)
+# println(C)
 
+# # Determination of the Minimum Local Analgesic Concentrations of Epidural Bupivacaine and Lidocaine in Labor 
 # C = 0.4                 # %w/v
-# C = C/100             # g/ml
+# C = C/100               # g/ml
 # C = C/10^-3             # g/l
 # C = C/M                 # M
 # C = C*10^6              # µM
-# print(C)
+# println(C)
+
+function pro()
+    g(x) = round(100*lidocain_1_8_channel(x), digits=2)
+    println(g(1))
+    println(g(10))
+    println(g(50))
+    println(g(100))
+    println(g(500))
+    println(g(1000))
+end

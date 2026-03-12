@@ -40,7 +40,7 @@ function parameter_analyses(params, analysed_values; duration = 1700.0,
         t,V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP,Inoise,n_test,l_test = launch_simulation(u0, (0.0, duration), param)
 
         if with_plot_sample
-            plot!(p_volt, t, V, label=L"%$analysed_value %$unit", alpha= 1)
+            plot!(p_volt, t, V, label=L"%$analysed_value %$unit", alpha= 0.4)
         end
 
         peaks_idx, n_peak = get_peaks(t, V;  min_h=-30, min_proms=10)
@@ -78,16 +78,11 @@ function plot_analyses(all_analysed_values, all_peaks_count, all_freqs, all_hype
 
     for (analysed_values, peaks_count, freqs, hyperexct_vec, first_window_count, label) in zip(all_analysed_values, all_peaks_count, all_freqs, all_hyperexct_vec, all_first_window_count, all_label)
 
-        hyperexct_colors = [h == 1 ? :red : :blue for h in hyperexct_vec]
+        hyperexct_form = [h == 1 ? :square : :circle for h in hyperexct_vec]
 
-        plot!(p_peaks, analysed_values, peaks_count, color=:black, label="", alpha=0.3)
-        scatter!(p_peaks, analysed_values, peaks_count, markerstrokecolor=hyperexct_colors, markersize=2.5, markerstrokewidth = 0.5, label=label)
-
-        plot!(p_freqs, analysed_values, freqs, color=:black, label="", alpha=0.3)
-        scatter!(p_freqs, analysed_values, freqs, markerstrokecolor=hyperexct_colors, markersize=2.5, markerstrokewidth = 0.5, label=label)
-
-        plot!(p_window, analysed_values, first_window_count, color=:black, label="", alpha=0.3)
-        scatter!(p_window, analysed_values, first_window_count, markerstrokecolor=hyperexct_colors, markersize=2.5, markerstrokewidth = 0.5, label=label)
+        plot!(p_peaks, analysed_values, peaks_count         , marker=hyperexct_form, markersize=2, linealpha=0.5, markeralpha=0.7, label=label)
+        plot!(p_freqs, analysed_values, freqs               , marker=hyperexct_form, markersize=2, linealpha=0.5, markeralpha=0.7, label=label)
+        plot!(p_window, analysed_values, first_window_count , marker=hyperexct_form, markersize=2, linealpha=0.5, markeralpha=0.7, label=label)
 
     end
 
@@ -109,7 +104,7 @@ function parameter_selection(;
     )
 
     params = Vector{Parameters}()
-    amps = 0:0.5:150
+    amps = 0:75:300
     for amp in amps
         param = get_param(amp, stim_on, stim_length;
         with_noise = false,
@@ -124,7 +119,7 @@ function parameter_selection(;
 end
 
 function main()
-    plot_sample = false
+    plot_sample = true
     lido_concentrations = [0, 1, 10, 50, 100, 500, 1000]
 
     all_analysed_values = Vector{Vector{Float32}}()

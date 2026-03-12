@@ -1,7 +1,7 @@
 include("DIV0/params.jl")
 include("DIV7/params.jl")
 
-folder = "DIV0"
+folder = "DIV7"
 
 if folder == "DIV0"
     launch_simulation = ODE_DIV0.simulation
@@ -15,13 +15,13 @@ end
 
 function main()
 
-    amp = 116                    # pA
+    amp = 45                    # pA
     duration = 1700.0             # ms
     stim_on = 500.0               # ms
     stim_length = 1000.0          # ms
 
     p = param = get_param(amp, stim_on, stim_length;
-        with_noise = false
+        with_noise = true
         ,C_lidocaine=0
 
         #,g_nav1p8 = 4.0 # PHARMACOLOGY DIV0
@@ -49,7 +49,7 @@ function main()
     # --- Plots --- #
 
     # 400 1700
-    xlimits = (1470, 1530)
+    xlimits = (400, 1700)
 
     # p_volt = empty_voltage_plot()
     # plot_voltage(t, V, amp, peaks_idx; given_p=p_volt, save=false, with_peak=true)
