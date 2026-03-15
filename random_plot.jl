@@ -2,24 +2,24 @@ include("DIV0/params.jl")
 include("DIV7/params.jl")
 
 function steady_states()
-    plt_inf = plot(xlabel="Voltage (mV)", ylabel= "- (-)", xlims=(-120, 50), legend=:bottomright)
+    plt_inf = plot(xlabel="Voltage (mV)", ylabel= "- (-)", xlims=(-160, -20), legend=:topright)
 
-    plot!(plt_inf, V, ODE_DIV7.m_inf_1_3.(V), label=L"m_{∞} Na 1.3", linestyle = :solid, color=:blue)
-    plot!(plt_inf, V, ODE_DIV7.h_inf_1_3.(V), label=L"h_{∞} Na 1.3", linestyle = :dash, color=:blue)
+    # plot!(plt_inf, V, ODE_DIV0.m_inf_1_3.(V), label=L"m_{∞} Na 1.3", linestyle = :solid, color=:blue)
+    plot!(plt_inf, V, ODE_DIV0.h_inf_1_3.(V), label=L"h_{∞} Na 1.3", linestyle = :dash, color=:blue)
 
-    plot!(plt_inf, V, ODE_DIV7.m_inf_1_7.(V), label=L"m_{∞} Na 1.7", linestyle = :solid, color=:red)
-    plot!(plt_inf, V, ODE_DIV7.h_inf_1_7.(V), label=L"h_{∞} Na 1.7", linestyle = :dash, color=:red)
+    # plot!(plt_inf, V, ODE_DIV0.m_inf_1_7.(V), label=L"m_{∞} Na 1.7", linestyle = :solid, color=:red)
+    # plot!(plt_inf, V, ODE_DIV0.h_inf_1_7.(V), label=L"h_{∞} Na 1.7", linestyle = :dash, color=:red)
 
-    plot!(plt_inf, V, ODE_DIV7.m_inf_1_8.(V), label=L"m_{∞} Na 1.8", linestyle = :solid, color=:green)
-    plot!(plt_inf, V, ODE_DIV7.h_inf_1_8.(V), label=L"h_{∞} Na 1.8", linestyle = :dash, color=:green)
+    # plot!(plt_inf, V, ODE_DIV0.m_inf_1_8.(V), label=L"m_{∞} Na 1.8", linestyle = :solid, color=:green)
+    # plot!(plt_inf, V, ODE_DIV0.h_inf_1_8.(V), label=L"h_{∞} Na 1.8", linestyle = :dash, color=:green)
 
-    plot!(plt_inf, V, ODE_DIV7.n_inf_K_M.(V), label=L"n_{∞} K_{M}", linestyle = :solid, color=:purple)
+    # plot!(plt_inf, V, ODE_DIV0.n_inf_K_M.(V), label=L"n_{∞} K_{M}", linestyle = :solid, color=:purple)
 
-    plot!(plt_inf, V, ODE_DIV7.n_inf_K_dr.(V), label=L"n_{∞} K_{dr}", linestyle = :solid, color=:orange)
-    plot!(plt_inf, V, ODE_DIV7.l_inf_K_dr.(V), label=L"l_{∞} K_{dr}", linestyle = :dash, color=:orange)
+    # plot!(plt_inf, V, ODE_DIV0.n_inf_K_dr.(V), label=L"n_{∞} K_{dr}", linestyle = :solid, color=:orange)
+    # plot!(plt_inf, V, ODE_DIV0.l_inf_K_dr.(V), label=L"l_{∞} K_{dr}", linestyle = :dash, color=:orange)
 
-    plot!(plt_inf, V, ODE_DIV7.z_AHP_inf.(V), label=L"{z_{AHP}}_{∞}", linestyle = :solid, color=:brown)
-    display(plt_inf)
+    # plot!(plt_inf, V, ODE_DIV0.z_AHP_inf.(V), label=L"{z_{AHP}}_{∞}", linestyle = :solid, color=:brown)
+    # display(plt_inf)
     savefig(plt_inf, "plots/infinity_variable.pdf")
 end
 
@@ -38,21 +38,21 @@ function ss_currents(p)
     g_Leak = p.g_Leak
     E_Leak = p.E_Leak
 
-    m3 = ODE_DIV7.m_inf_1_3.(V)
-    h3 = ODE_DIV7.h_inf_1_3.(V)
+    m3 = ODE_DIV0.m_inf_1_3.(V)
+    h3 = ODE_DIV0.h_inf_1_3.(V)
 
-    m7 = ODE_DIV7.m_inf_1_7.(V)
-    h7 = ODE_DIV7.h_inf_1_7.(V)
+    m7 = ODE_DIV0.m_inf_1_7.(V)
+    h7 = ODE_DIV0.h_inf_1_7.(V)
 
-    m8 = ODE_DIV7.m_inf_1_8.(V)
-    h8 = ODE_DIV7.h_inf_1_8.(V)
+    m8 = ODE_DIV0.m_inf_1_8.(V)
+    h8 = ODE_DIV0.h_inf_1_8.(V)
 
-    nm = ODE_DIV7.n_inf_K_M.(V)
+    nm = ODE_DIV0.n_inf_K_M.(V)
 
-    ndr = ODE_DIV7.n_inf_K_dr.(V)
-    ldr = ODE_DIV7.l_inf_K_dr.(V)
+    ndr = ODE_DIV0.n_inf_K_dr.(V)
+    ldr = ODE_DIV0.l_inf_K_dr.(V)
 
-    z_AHP = ODE_DIV7.z_AHP_inf.(V)
+    z_AHP = ODE_DIV0.z_AHP_inf.(V)
 
     INaV1p3 = g_nav1p3 .* (m3.^3) .* h3 .* (V .- E_Na)
     INaV1p7 = g_nav1p7 .* (m7.^3) .* h7 .* (V .- E_Na)
@@ -82,21 +82,21 @@ end
 function tau_s()
     plt_tau = plot(xlabel="Voltage (mV)", ylabel= "- (-)", yaxis=:log10, xlims=(-120, 50), legendfontsize=7, legend=:bottomright)
 
-    plot!(plt_tau, V, ODE_DIV7.tau_m_1_3.(V), label=L"τ_{m} Na 1.3", linestyle = :solid, color=:blue)
-    plot!(plt_tau, V, ODE_DIV7.tau_h_1_3.(V), label=L"τ_{h} Na 1.3", linestyle = :dash, color=:blue)
+    plot!(plt_tau, V, ODE_DIV0.tau_m_1_3.(V), label=L"τ_{m} Na 1.3", linestyle = :solid, color=:blue)
+    plot!(plt_tau, V, ODE_DIV0.tau_h_1_3.(V), label=L"τ_{h} Na 1.3", linestyle = :dash, color=:blue)
 
-    plot!(plt_tau, V, ODE_DIV7.tau_m_1_7.(V), label=L"τ_{m} Na 1.7", linestyle = :solid, color=:red)
-    plot!(plt_tau, V, ODE_DIV7.tau_h_1_7.(V), label=L"τ_{h} Na 1.7", linestyle = :dash, color=:red)
+    plot!(plt_tau, V, ODE_DIV0.tau_m_1_7.(V), label=L"τ_{m} Na 1.7", linestyle = :solid, color=:red)
+    plot!(plt_tau, V, ODE_DIV0.tau_h_1_7.(V), label=L"τ_{h} Na 1.7", linestyle = :dash, color=:red)
 
-    plot!(plt_tau, V, ODE_DIV7.tau_m_1_8.(V), label=L"τ_{m} Na 1.8", linestyle = :solid, color=:green)
-    plot!(plt_tau, V, ODE_DIV7.tau_h_1_8.(V), label=L"τ_{h} Na 1.8", linestyle = :dash, color=:green)
+    plot!(plt_tau, V, ODE_DIV0.tau_m_1_8.(V), label=L"τ_{m} Na 1.8", linestyle = :solid, color=:green)
+    plot!(plt_tau, V, ODE_DIV0.tau_h_1_8.(V), label=L"τ_{h} Na 1.8", linestyle = :dash, color=:green)
 
-    plot!(plt_tau, V, ODE_DIV7.tau_n_K_M.(V), label=L"τ_{n} K_{M}", linestyle = :solid, color=:purple)
+    plot!(plt_tau, V, ODE_DIV0.tau_n_K_M.(V), label=L"τ_{n} K_{M}", linestyle = :solid, color=:purple)
 
-    plot!(plt_tau, V, ODE_DIV7.tau_n_K_dr.(V), label=L"τ_{n} K_{dr}", linestyle = :solid, color=:orange)
-    plot!(plt_tau, V, ODE_DIV7.tau_l_K_dr.(V), label=L"τ_{l} K_{dr}", linestyle = :dash, color=:orange)
+    plot!(plt_tau, V, ODE_DIV0.tau_n_K_dr.(V), label=L"τ_{n} K_{dr}", linestyle = :solid, color=:orange)
+    plot!(plt_tau, V, ODE_DIV0.tau_l_K_dr.(V), label=L"τ_{l} K_{dr}", linestyle = :dash, color=:orange)
 
-    plot!(plt_tau, V, ODE_DIV7.tau_z_AHP.(V), label=L"τ_{z_{AHP}}", linestyle = :solid, color=:brown)
+    plot!(plt_tau, V, ODE_DIV0.tau_z_AHP.(V), label=L"τ_{z_{AHP}}", linestyle = :solid, color=:brown)
     display(plt_tau)
     savefig(plt_tau, "plots/tau_variable.pdf")
 end
@@ -141,6 +141,59 @@ function plot_hill()
     display(plt)
 end
 
+Boltzmann(V, V_1_2, k, A1, A2) = A1 / ( 1 + exp((V-V_1_2) / k) ) + A2 / ( 1 + exp((V-V_1_2) / k) )
+
+# Differential modulation of Nav1.7 and Nav1.8 peripheral nerve sodium channels by the local anesthetic lidocaine
+control_1_7_activation(V) = Boltzmann(V, -25.56, -3.75, 1, 0)
+control_1_7_inactivation(V) = Boltzmann(V, -68.38, 4.37, 1, 0)
+lidocaine_1_7_activation(V) = Boltzmann(V, -23.92, -3.89, 1, 0)
+lidocaine_1_7_inactivation(V) = Boltzmann(V, -79.02, 5.52, 1, 0)
+
+control_1_8_activation(V) = Boltzmann(V, 6.24, -5.73, 1, 0)
+control_1_8_inactivation(V) = Boltzmann(V, -42.72, 9.05, 1, 0)
+lidocaine_1_8_activation(V) = Boltzmann(V, 12.32, -6.63, 1, 0)
+lidocaine_1_8_inactivation(V) = Boltzmann(V, -46.81, 8.07, 1, 0)
+
+Boltzmann2(V, A1, V_1_2_1, k1, A2, V_1_2_2, k2) = A1 / ( 1 + exp((V-V_1_2_1) / k1) ) + A2 / ( 1 + exp((V-V_1_2_2) / k2) )
+
+# Lidocaine block of neonatal Nav1.3 is differentially modulated by  co-expression of h1 and h3 subunits
+control_1_3(V) = Boltzmann2(V, 0.97, -37.0, 5.6, 0.03, 4.4, 1.9)
+lidocain_1_3(V) = Boltzmann2(V, 0.97, -57.7, 8.8, 0.03, 3.6, 1.0)
+
+function plot_ss_inhib()
+
+    V = -130:0.5:10
+
+    plt = plot(xlabel="Voltage (mV)", ylabel= "- (-)", legend=:bottomleft)
+
+    # plot!(plt, V, control_1_7_activation.(V), label="control activation 1.7", linestyle = :solid, color=:purple)
+    # plot!(plt, V, control_1_7_inactivation.(V), label="control inactivation 1.7", linestyle = :dash, color=:purple)
+
+    # plot!(plt, V, lidocaine_1_7_activation.(V), label="lidocaine activation 1.7", linestyle = :solid, color=:orange)
+    # plot!(plt, V, lidocaine_1_7_inactivation.(V), label="lidocaine inactivation 1.7", linestyle = :dash, color=:orange)
+
+    # plot!(plt, V, ODE_DIV0.m_inf_1_7.(V), label=L"m_{∞} Na 1.7", linestyle = :solid, color=:red)
+    # plot!(plt, V, ODE_DIV0.h_inf_1_7.(V), label=L"h_{∞} Na 1.7", linestyle = :dash, color=:red)
+
+    # plot!(plt, V, control_1_8_activation.(V), label="control activation 1.8", linestyle = :solid, color=:purple)
+    # plot!(plt, V, control_1_8_inactivation.(V), label="control inactivation 1.8", linestyle = :dash, color=:purple)
+
+    # plot!(plt, V, lidocaine_1_8_activation.(V), label="lidocaine activation 1.8", linestyle = :solid, color=:orange)
+    # plot!(plt, V, lidocaine_1_8_inactivation.(V), label="lidocaine inactivation 1.8", linestyle = :dash, color=:orange)
+
+    # plot!(plt, V, ODE_DIV0.m_inf_1_8.(V), label=L"m_{∞} Na 1.8", linestyle = :solid, color=:green)
+    # plot!(plt, V, ODE_DIV0.h_inf_1_8.(V), label=L"h_{∞} Na 1.8", linestyle = :dash, color=:green)
+
+    plot!(plt, V, control_1_3.(V), label="control 1.3", linestyle = :solid, color=:purple)
+    plot!(plt, V, lidocain_1_3.(V), label="lidocaine 1.3", linestyle = :dash, color=:orange)
+    plot!(plt, V, ODE_DIV0.h_inf_1_3.(V), label=L"h_{∞} Na 1.3", linestyle = :dash, color=:blue)
+
+    savefig(plt, "plots/ss_inhib.pdf")
+    # display(plt)
+end
+
+plot_ss_inhib()
+
 get_param = DIV7_parameter
 amp = 17
 stim_on = 500.0
@@ -155,8 +208,8 @@ p = get_param(amp, stim_on, stim_length;
         # ,g_nav1p8 = 40.0  # dynamic clamp DIV7
     )
 
-V = -150:0.5:60
-plot_hill()
+V = -160:0.5:60
+# plot_hill()
 # steady_states()
 # tau_s()
 
