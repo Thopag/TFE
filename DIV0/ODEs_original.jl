@@ -5,10 +5,14 @@ using ..Utils
 
 export simulation, ODE_system, stochastic_part
 
-# --------------------------- Common to all --------------------------- #
+# --------------------------- Common to Na_V 1.7, Na_V 1.3, Na_V 1.8 --------------------------- #
 
-function dot_x(V, x, x_inf, tau_x)
-    return (x_inf(V)-x)/tau_x(V)
+function dot_m(V, m, alpha, beta)
+    return alpha(V)*(1-m) - m*beta(V)
+end
+
+function dot_h(V, h, alpha, beta)
+    return alpha(V)*(1-h) - h*beta(V)
 end
 
 # --------------------------- Na_V 1.3 --------------------------- #
@@ -135,6 +139,10 @@ function tau_n_K_M(V)
     return 1000.0/(3.3*(exp((V-(-35))/10)+exp(-(V+35)/10))) / tadj
 end
 
+function dot_n_K_M(V, n)
+    return (n_inf_K_M(V)-n)/tau_n_K_M(V)
+end
+
 # --------------------------- K_dr --------------------------- #
 
 function alpha_n_K_dr(V)
@@ -175,6 +183,16 @@ function tau_l_K_dr(V)
     return beta_l_K_dr(V)/(q10*0.001*(1 + alpha_l_K_dr(V)))
 end
 
+# ---- #
+
+function dot_n_K_dr(V, n)
+    return (n_inf_K_dr(V)-n)/tau_n_K_dr(V)
+end
+
+function dot_l_K_dr(V, n)
+    return (l_inf_K_dr(V)-n)/tau_l_K_dr(V)
+end
+
 # --------------------------- AHP --------------------------- #
 
 function z_AHP_inf(V)
@@ -185,6 +203,10 @@ end
 
 function tau_z_AHP(V)
     return 100
+end
+
+function dot_z_AHP(V, z) 
+    return ( z_AHP_inf(V) - z) / tau_z_AHP(V)
 end
 
 # --------------------------- Simulation function --------------------------- #
@@ -257,21 +279,21 @@ function ODE_system(du,u,p,t)
 
     du[1] = (I_ext+I_noise-I_NaV1p3-I_NaV1p7-I_NaV1p8-I_Kdr-I_Km-I_Leak-I_AHP)/C
 
-    du[2] = dot_x(V, m3, m_inf_1_3, tau_m_1_3)
-    du[3] = dot_x(V, h3, h_inf_1_3, tau_h_1_3)
+    du[2] = dot_m(V, m3, alpha_m_1_3, beta_m_1_3)
+    du[3] = dot_h(V, h3, alpha_h_1_3, beta_h_1_3)
 
-    du[4] = dot_x(V, m7, m_inf_1_7, tau_m_1_7)
-    du[5] = dot_x(V, h7, h_inf_1_7, tau_h_1_7)
+    du[4] = dot_m(V, m7, alpha_m_1_7, beta_m_1_7)
+    du[5] = dot_h(V, h7, alpha_h_1_7, beta_h_1_7)
 
-    du[6] = dot_x(V, m8, m_inf_1_8, tau_m_1_8)
-    du[7] = dot_x(V, h8, h_inf_1_8, tau_h_1_8)
-
-    du[8] = dot_x(V, ndr, n_inf_K_dr, tau_n_K_dr)
-    du[9] = dot_x(V, ldr, l_inf_K_dr, tau_l_K_dr)
+    du[6] = dot_m(V, m8, alpha_m_1_8, beta_m_1_8)
+    du[7] = dot_h(V, h8, alpha_h_1_8, beta_h_1_8)
     
-    du[10] = dot_x(V, nm, n_inf_K_M, tau_n_K_M)
+    du[8] = dot_n_K_dr(V, ndr)
+    du[9] = dot_l_K_dr(V, ldr)
+    
+    du[10] = dot_n_K_M(V, nm)
 
-    du[11] = dot_x(V, z_AHP, z_AHP_inf, tau_z_AHP)
+    du[11] = dot_z_AHP(V, z_AHP)
 
     ##################
     q10=3^((25-30)/10)

@@ -15,14 +15,14 @@ end
 
 function main()
 
-    amp = 200                    # pA
+    amp = 51                    # pA
     duration = 1700.0             # ms
     stim_on = 500.0               # ms
     stim_length = 1000.0          # ms
 
     p = param = get_param(amp, stim_on, stim_length;
         with_noise = false
-        ,C_lidocaine= 1000
+        ,C_lidocaine= 0
 
         #,g_nav1p8 = 4.0 # PHARMACOLOGY DIV0
         #,g_nav1p7 = 40.0 # dynamic clamp DIV0
