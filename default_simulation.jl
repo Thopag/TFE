@@ -60,7 +60,7 @@ function main()
                             I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, I_Leak, I_ext, I_noise
                                 ; xlimits=xlimits)
     display(plt_all)
-    savefig(plt_all, "plots/plot_all.pdf")
+    # savefig(plt_all, "plots/plot_all.pdf")
 
     # p_freq = scatter(t_spikes[1:end-1], freqs)
     # display(p_freq)
