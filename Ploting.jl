@@ -166,7 +166,7 @@ function plot_all(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp, t_spik
                             I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, I_Leak, I_ext, I_noise
                                 ; xlimits=(400, 1700))
 
-    n_fig = 5
+    n_fig = 4
     p = plot(layout = (n_fig, 1), link = :x, xlims=xlimits, size = (1000, 900), xaxis = nothing)
 
     voltage = 1
@@ -191,7 +191,7 @@ function plot_all(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp, t_spik
 
     channel = 3
     ylabel!(p[channel], "Channel Availability (%)")
-    plot!(p[channel], ylims=(0,10))
+    #plot!(p[channel], ylims=(0,10))
     plot!(p[channel], t, m3.^3 .* h3 .* 100, color=:blue, label=L"NaV_{1.3}")
     plot!(p[channel], t, m7.^3 .* h7 .* 100, color=:red, label=L"NaV_{1.7}")
     plot!(p[channel], t, m8.^3 .* h8 .* 100, color=:green, label=L"NaV_{1.8}")
@@ -201,7 +201,7 @@ function plot_all(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp, t_spik
 
     current = 4
     ylabel!(p[current], "Current (uA/cm2)", legendfontsize=6, legend = :bottomright)
-    plot!(p[current], ylims=(-2, 2))
+    #plot!(p[current], ylims=(-2, 2))
     plot!(p[current], t, I_NaV1p3, color=:blue, label=L"I_{NaV1.3}")
     plot!(p[current], t, I_NaV1p7, color=:red, label=L"I_{NaV1.7}")
     plot!(p[current], t, I_NaV1p8, color=:green, label=L"I_{NaV1.8}")
@@ -212,9 +212,9 @@ function plot_all(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp, t_spik
     plot!(p[current], t, I_ext, color=:black, linestyle = :dash, label=L"I_{ext}")
     plot!(p[current], t, I_noise, color=:pink, label=L"I_{noise}")
 
-    noise = 5
-    plot!(p[noise], t, I_noise, color=:black, label=L"I_{noise}")
-    vline!(p[noise], t_spikes, color=:red, label="peaks")
+    # noise = 5
+    # plot!(p[noise], t, I_noise, color=:black, label=L"I_{noise}")
+    # vline!(p[noise], t_spikes, color=:red, label="peaks")
 
     # global_current = 5
     # ylabel!(p[global_current], "Current (uA/cm2)")

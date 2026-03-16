@@ -1,7 +1,7 @@
 include("DIV0/params.jl")
 include("DIV7/params.jl")
 
-folder = "DIV7"
+folder = "DIV0"
 
 if folder == "DIV0"
     launch_simulation = ODE_DIV0.simulation
@@ -15,14 +15,14 @@ end
 
 function main()
 
-    amp = 45                    # pA
+    amp = 200                    # pA
     duration = 1700.0             # ms
     stim_on = 500.0               # ms
     stim_length = 1000.0          # ms
 
     p = param = get_param(amp, stim_on, stim_length;
-        with_noise = true
-        ,C_lidocaine=0
+        with_noise = false
+        ,C_lidocaine= 1000
 
         #,g_nav1p8 = 4.0 # PHARMACOLOGY DIV0
         #,g_nav1p7 = 40.0 # dynamic clamp DIV0
@@ -60,7 +60,7 @@ function main()
                             I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, I_Leak, I_ext, I_noise
                                 ; xlimits=xlimits)
     display(plt_all)
-    #savefig(plt_all, "plots/plot_all.pdf")
+    savefig(plt_all, "plots/plot_all.pdf")
 
     # p_freq = scatter(t_spikes[1:end-1], freqs)
     # display(p_freq)
