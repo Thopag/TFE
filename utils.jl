@@ -3,7 +3,7 @@ module Utils
 using Peaks
 using Statistics
 
-export Parameters, give_currents, pulse, get_peaks, instant_freqs, global_freq, window_count, get_lidocaine_inhibition
+export Parameters, give_currents, pulse, get_peaks, instant_freqs, global_pattern, window_count, get_lidocaine_inhibition
 
 # --------------------------- Parameters struct --------------------------- #
 
@@ -102,34 +102,48 @@ function instant_freqs(t_spikes)
     return freqs
 end
 
-function global_freq(t_spikes, end_stim)
-    freqs = instant_freqs(t_spikes)
-
-    f_global = mean(freqs)
-    if f_global > 0
-        last_delta_t = 1000 / freqs[end]
-        if (t_spikes[end] + last_delta_t*1.2) > end_stim
-            is_hyperexcitable = 1
-        else
-            is_hyperexcitable = 0
-        end
-    else
-        return f_global, 0
-    end
-    
-    return f_global, is_hyperexcitable
-end
-
 function window_count(t_spikes, on, off; window_width=100)
 
     edges = on:window_width:off
     lowers = edges[1:end-1]
     uppers = edges[2:end]
-
     counts = count.((x -> (l <= x < u) for (l, u) in zip(lowers, uppers)), Ref(t_spikes))
-    first_count = counts[1]#mean(counts)
 
-    return counts, first_count
+    return counts
+end
+
+function global_pattern(t_spikes, begin_stim, end_stim)
+    """
+    Value of pattern :
+    0 : No spike
+    1 : Single spike 
+    2 : Transiant
+    3 : Spikling
+    """
+    freqs = instant_freqs(t_spikes)
+    counts =  window_count(t_spikes, begin_stim, end_stim)
+
+    first_count = counts[1] 
+    f_global = mean(freqs)
+    
+    if first_count == 0
+        pattern = 0
+        return f_global, first_count, pattern
+    elseif first_count == 1
+        pattern = 1
+        return f_global, first_count, pattern
+    end
+
+    # Do not verify if length freq > 0
+    # If pass the previous "if", it is supposed to be OK
+    last_delta_t = 1000 / freqs[end]
+    if (t_spikes[end] + last_delta_t*1.2) > end_stim
+        pattern = 3
+    else
+        pattern = 2
+    end
+    
+    return f_global, first_count, pattern
 end
 
 hill(D, f_max, IC50, h, y0) = y0 + (f_max * D^h) / (IC50^h + D^h)

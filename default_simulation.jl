@@ -21,7 +21,7 @@ function main()
     stim_length = 1000.0          # ms
 
     p = param = get_param(amp, stim_on, stim_length;
-        with_noise = false
+        with_noise = false 
         ,C_lidocaine= 0
 
         #,g_nav1p8 = 4.0 # PHARMACOLOGY DIV0

@@ -5,6 +5,10 @@ using ..Utils
 
 export simulation, ODE_system, stochastic_part
 
+function Boltzmann(V, A1, V_1_2_1, k1, A2, V_1_2_2, k2) 
+    return A1 / ( 1 + exp((V-V_1_2_1) / k1) ) + A2 / ( 1 + exp((V-V_1_2_2) / k2) )
+end
+
 # --------------------------- Common to all --------------------------- #
 
 function dot_x(V, x, x_inf, tau_x)
@@ -87,6 +91,21 @@ function tau_m_1_7(V)
     return 1 / (alpha_m_1_7(V) + beta_m_1_7(V))
 end
 
+# ---- #
+# Differential modulation of Nav1.7 and Nav1.8 peripheral nerve sodium channels by the local anesthetic lidocaine
+
+function control_1_7_activation(V) 
+    # With 100 µM lidocaine 
+    # Boltzmann(V, 1.0, -23.92, -3.89, 0.0, 0.0, 1.0)
+    return Boltzmann(V, 1.0, -25.56, -3.75, 0.0, 0.0, 1.0)
+end
+
+function control_1_7_inactivation(V)
+    # With 100 µM lidocaine 
+    # Boltzmann(V, 1.0, -79.02, 5.52, 0.0, 0.0, 1.0)
+    return Boltzmann(V, 1.0, -68.38, 4.37, 0.0, 0.0, 1.0)
+end
+
 # --------------------------- Na_V 1.8 --------------------------- #
 
 function alpha_m_1_8(V)
@@ -121,6 +140,21 @@ end
 
 function tau_m_1_8(V)
     return 1 / (alpha_m_1_8(V) + beta_m_1_8(V))
+end
+
+# ---- #
+# Differential modulation of Nav1.7 and Nav1.8 peripheral nerve sodium channels by the local anesthetic lidocaine
+
+function control_1_8_activation(V)
+    # With 100 µM lidocaine
+    # Boltzmann(V, 1.0, 12.32, -6.63, 0.0, 0.0, 1.0)
+    return Boltzmann(V, 1.0, 6.24, -5.73, 0.0, 0.0, 1.0)
+end
+
+function control_1_8_inactivation(V)
+    # With 100 µM lidocaine
+    # Boltzmann(V, 1.0, -46.81, 8.07, 0.0, 0.0, 1.0)
+    return Boltzmann(V, 1.0, -42.72, 9.05, 0.0, 0.0, 1.0)
 end
 
 # --------------------------- K_M --------------------------- #
@@ -286,7 +320,6 @@ function ODE_system(du,u,p,t)
     ##################
 
     return
-
 end
 
 function stochastic_part(du,u,p,t)

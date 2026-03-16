@@ -31,7 +31,7 @@ function parameter_analyses(params, analysed_values; duration = 1700.0,
     L = length(params)
     peaks_count = Vector{Int}()
     freqs = Vector{Float32}()
-    hyperexct_vec = Vector{Int}()
+    pattern_vec = Vector{Int}()
     first_window_count = Vector{Float32}()
 
     for ((i,param), analysed_value) in zip(enumerate(params), analysed_values)
@@ -45,13 +45,12 @@ function parameter_analyses(params, analysed_values; duration = 1700.0,
 
         peaks_idx, n_peak = get_peaks(t, V;  min_h=-30, min_proms=10)
         t_spikes = t[peaks_idx]
-        freq, is_hyperexct = global_freq(t_spikes, param.stim_off)
-        counts, mean_count = window_count(t_spikes, param.stim_on, param.stim_off; window_width=100)
+        freq, first_count, pattern = global_pattern(t_spikes, param.stim_on, param.stim_off)
 
         push!(peaks_count, n_peak)
         push!(freqs, freq)
-        push!(hyperexct_vec, is_hyperexct)
-        push!(first_window_count, mean_count)
+        push!(pattern_vec, pattern)
+        push!(first_window_count, first_count)
         
     end
     println("\n------ End parameter analyses ------")
@@ -65,10 +64,10 @@ function parameter_analyses(params, analysed_values; duration = 1700.0,
 
     println("\n----------------------------------------------------\n")
 
-    return peaks_count, freqs, hyperexct_vec, first_window_count
+    return peaks_count, freqs, pattern_vec, first_window_count
 end
 
-function plot_analyses(all_analysed_values, all_peaks_count, all_freqs, all_hyperexct_vec, all_first_window_count, all_label; xlabel="amp pA")
+function plot_analyses(all_analysed_values, all_peaks_count, all_freqs, all_pattern_vec, all_first_window_count, all_label; xlabel="amp pA")
 
     println("------ Start plots ------")
 
@@ -76,13 +75,15 @@ function plot_analyses(all_analysed_values, all_peaks_count, all_freqs, all_hype
     p_freqs = plot(xlabel=xlabel, ylabel= "Frequence (Hz)", title="$folder FI curve")
     p_window = plot(xlabel=xlabel, ylabel= "Peaks count (-)", title="$folder First window count")
 
-    for (analysed_values, peaks_count, freqs, hyperexct_vec, first_window_count, label) in zip(all_analysed_values, all_peaks_count, all_freqs, all_hyperexct_vec, all_first_window_count, all_label)
+    markers_list = [:circle, :utriangle, :diamond, :square]
 
-        hyperexct_form = [h == 1 ? :square : :circle for h in hyperexct_vec]
+    for (analysed_values, peaks_count, freqs, pattern_vec, first_window_count, label) in zip(all_analysed_values, all_peaks_count, all_freqs, all_pattern_vec, all_first_window_count, all_label)
 
-        plot!(p_peaks, analysed_values, peaks_count         , marker=hyperexct_form, markersize=2, linealpha=0.5, markeralpha=0.7, label=label)
-        plot!(p_freqs, analysed_values, freqs               , marker=hyperexct_form, markersize=2, linealpha=0.5, markeralpha=0.7, label=label)
-        plot!(p_window, analysed_values, first_window_count , marker=hyperexct_form, markersize=2, linealpha=0.5, markeralpha=0.7, label=label)
+        pattern_form = markers_list[pattern_vec .+ 1]
+
+        plot!(p_peaks, analysed_values, peaks_count         , marker=pattern_form, markersize=2, linealpha=0.5, markeralpha=0.7, label=label)
+        plot!(p_freqs, analysed_values, freqs               , marker=pattern_form, markersize=2, linealpha=0.5, markeralpha=0.7, label=label)
+        plot!(p_window, analysed_values, first_window_count , marker=pattern_form, markersize=2, linealpha=0.5, markeralpha=0.7, label=label)
 
     end
 
@@ -104,7 +105,7 @@ function parameter_selection(;
     )
 
     params = Vector{Parameters}()
-    amps = [80,100,120] #0:75:300
+    amps = 0:2.5:300
     for amp in amps
         param = get_param(amp, stim_on, stim_length;
         with_noise = false,
@@ -119,33 +120,33 @@ function parameter_selection(;
 end
 
 function main()
-    plot_sample = true
+    plot_sample = false
     lido_concentrations = [0, 1, 10, 50, 100, 500, 1000]
 
     all_analysed_values = Vector{Vector{Float32}}()
     all_peaks_count = Vector{Vector{Int}}()
     all_freqs = Vector{Vector{Float32}}()
-    all_hyperexct_vec = Vector{Vector{Int}}()
+    all_pattern_vec = Vector{Vector{Int}}()
     all_first_window_count = Vector{Vector{Float32}}()
     all_label = Vector{String}()
 
     for C_lido in lido_concentrations
 
         params, analysed_values = parameter_selection(;C_lido=C_lido)
-        peaks_count, freqs, hyperexct_vec, first_window_count = parameter_analyses(params, analysed_values; with_plot_sample=plot_sample, title="lidocaine_$(C_lido)_µM")
+        peaks_count, freqs, pattern_vec, first_window_count = parameter_analyses(params, analysed_values; with_plot_sample=plot_sample, title="lidocaine_$(C_lido)_µM")
 
         label = "$C_lido µM"
 
         push!(all_analysed_values, analysed_values)
         push!(all_peaks_count, peaks_count)
         push!(all_freqs, freqs)
-        push!(all_hyperexct_vec, hyperexct_vec)
+        push!(all_pattern_vec, pattern_vec)
         push!(all_first_window_count, first_window_count)
         push!(all_label, label)
 
         
     end
-    plot_analyses(all_analysed_values, all_peaks_count, all_freqs, all_hyperexct_vec, all_first_window_count, all_label; xlabel="amp pA")
+    plot_analyses(all_analysed_values, all_peaks_count, all_freqs, all_pattern_vec, all_first_window_count, all_label; xlabel="amp pA")
 end
 
 main()
