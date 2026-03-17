@@ -1,0 +1,107 @@
+
+
+# ------------------- CONDUCTANCE INHIBITION ------------------- #
+
+hill(D, f_max, IC50, h, y0) = y0 + (f_max * D^h) / (IC50^h + D^h)
+
+# Differential Block of Sensory Neuronal Voltage-Gated Sodium Channels
+lidocain_1_3_resting_inib(D) = hill(D, 0.997, 1462, 1.35, 0)
+lidocain_1_7_resting_inib(D) = hill(D, 0.994, 718, 1.02, 0)
+
+lidocain_1_3_inact_inib(D) = hill(D, 0.949, 284, 0.48, 0)
+lidocain_1_7_inact_inib(D) = hill(D, 0.992, 44, 0.43, 0)
+
+# Differential modulation of Nav1.7 and Nav1.8 peripheral nerve sodium channels by the local anesthetic lidocaine
+lidocain_1_7_channel(D) = hill(D, 1.0079, 477.1, 1.31, 1.52 / 100)
+lidocain_1_8_channel(D) = hill(D, 0.9698, 118.31, 1.06, 4.78 / 100)
+
+# Fundamental Properties of local Anesthetics: Half-Maximal Blocking Concentrations for Tonic Block of Na+ and K+ Channels in Peripheral Nerve
+lidocain_Na(D) = hill(D, 1, 204, 0.99, 0)
+lidocain_K(D) = hill(D, 0.8, 1118, 1.22, 0)
+
+function plot_hill()
+
+    D = 10 .^ range(log10(0.1), log10(100000), length=100)
+
+    plt = plot(xlabel="Lidocaine (µM)", ylabel= "inhibition (%)") 
+    plot!(plt, xaxis=:log10, xlims=(0.1, 10000), legend=:topleft)
+
+    # plot!(plt, D, lidocain_1_7_resting_inib.(D) .* 100, label="NaV 1.7 resting", linestyle = :dot, color=:red)
+    # plot!(plt, D, lidocain_1_7_inact_inib.(D) .* 100, label="NaV 1.7 inact", linestyle = :dash, color=:red)
+    plot!(plt, D, lidocain_1_7_channel.(D) .* 100, label="NaV 1.7 channel", linestyle = :solid, color=:red)
+
+    # plot!(plt, D, lidocain_1_3_resting_inib.(D) .* 100, label="NaV 1.3 resting", linestyle = :dot, color=:blue)
+    # plot!(plt, D, lidocain_1_3_inact_inib.(D) .* 100, label="NaV 1.3 inact", linestyle = :dash, color=:blue)
+
+    plot!(plt, D, lidocain_1_8_channel.(D) .* 100, label="NaV 1.8 channel", linestyle = :solid, color=:green)
+
+    # plot!(plt, D, lidocain_Na.(D) .* 100, label="Na", linestyle = :solid, color=:purple)
+    # plot!(plt, D, lidocain_K.(D) .* 100, label="K", linestyle = :solid, color=:brown)
+    # savefig(plt, "plots/lidocaine_inibition.pdf")
+    display(plt)
+end
+
+function pro()
+    g(x) = round(100*lidocain_1_8_channel(x), digits=2)
+    println(g(1))
+    println(g(10))
+    println(g(50))
+    println(g(100))
+    println(g(500))
+    println(g(1000))
+end
+
+# ------------------- STEADY STATE INHIBITION ------------------- #
+
+Boltzmann_1(V, V_1_2, k, A1) = A1 / ( 1 + exp((V-V_1_2) / k) )
+
+# Differential modulation of Nav1.7 and Nav1.8 peripheral nerve sodium channels by the local anesthetic lidocaine
+control_1_7_activation(V) = Boltzmann_1(V, -25.56, -3.75, 1.0)
+control_1_7_inactivation(V) = Boltzmann_1(V, -68.38, 4.37, 1.0)
+lidocaine_1_7_activation(V) = Boltzmann_1(V, -23.92, -3.89, 1.0)
+lidocaine_1_7_inactivation(V) = Boltzmann_1(V, -79.02, 5.52, 1.0)
+
+control_1_8_activation(V) = Boltzmann_1(V, 6.24, -5.73, 1.0)
+control_1_8_inactivation(V) = Boltzmann_1(V, -42.72, 9.05, 1.0)
+lidocaine_1_8_activation(V) = Boltzmann_1(V, 12.32, -6.63, 1.0)
+lidocaine_1_8_inactivation(V) = Boltzmann_1(V, -46.81, 8.07, 1.0)
+
+Boltzmann2(V, A1, V_1_2_1, k1, A2, V_1_2_2, k2) = A1 / ( 1 + exp((V-V_1_2_1) / k1) ) + A2 / ( 1 + exp((V-V_1_2_2) / k2) )
+
+# Lidocaine block of neonatal Nav1.3 is differentially modulated by  co-expression of h1 and h3 subunits
+control_1_3(V) = Boltzmann2(V, 0.97, -37.0, 5.6, 0.03, 4.4, 1.9)
+lidocain_1_3(V) = Boltzmann2(V, 0.97, -57.7, 8.8, 0.03, 3.6, 1.0)
+
+function plot_ss_inhib()
+
+    V = -130:0.5:10
+
+    plt = plot(xlabel="Voltage (mV)", ylabel= "- (-)", legend=:bottomleft)
+
+    # plot!(plt, V, control_1_7_activation.(V), label="control activation 1.7", linestyle = :solid, color=:purple)
+    # plot!(plt, V, control_1_7_inactivation.(V), label="control inactivation 1.7", linestyle = :dash, color=:purple)
+
+    # plot!(plt, V, lidocaine_1_7_activation.(V), label="lidocaine activation 1.7", linestyle = :solid, color=:orange)
+    # plot!(plt, V, lidocaine_1_7_inactivation.(V), label="lidocaine inactivation 1.7", linestyle = :dash, color=:orange)
+
+    # plot!(plt, V, ODE_DIV0.m_inf_1_7.(V), label=L"m_{∞} Na 1.7", linestyle = :solid, color=:red)
+    # plot!(plt, V, ODE_DIV0.h_inf_1_7.(V), label=L"h_{∞} Na 1.7", linestyle = :dash, color=:red)
+
+    # plot!(plt, V, control_1_8_activation.(V), label="control activation 1.8", linestyle = :solid, color=:purple)
+    # plot!(plt, V, control_1_8_inactivation.(V), label="control inactivation 1.8", linestyle = :dash, color=:purple)
+
+    # plot!(plt, V, lidocaine_1_8_activation.(V), label="lidocaine activation 1.8", linestyle = :solid, color=:orange)
+    # plot!(plt, V, lidocaine_1_8_inactivation.(V), label="lidocaine inactivation 1.8", linestyle = :dash, color=:orange)
+
+    # plot!(plt, V, ODE_DIV0.m_inf_1_8.(V), label=L"m_{∞} Na 1.8", linestyle = :solid, color=:green)
+    # plot!(plt, V, ODE_DIV0.h_inf_1_8.(V), label=L"h_{∞} Na 1.8", linestyle = :dash, color=:green)
+
+    # plot!(plt, V, control_1_3.(V), label="control 1.3", linestyle = :solid, color=:purple)
+    # plot!(plt, V, lidocain_1_3.(V), label="lidocaine 1.3", linestyle = :dash, color=:orange)
+    # plot!(plt, V, ODE_DIV0.h_inf_1_3.(V), label=L"h_{∞} Na 1.3", linestyle = :dash, color=:blue)
+
+    # savefig(plt, "plots/ss_inhib.pdf")
+    display(plt)
+end
+
+plot_ss_inhib()

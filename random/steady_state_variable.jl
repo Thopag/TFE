@@ -1,0 +1,55 @@
+
+Boltzmann_1(V, V_1_2, k, A1) = A1 / ( 1 + exp((V-V_1_2) / k) )
+
+# Differential modulation of Nav1.7 and Nav1.8 peripheral nerve sodium channels by the local anesthetic lidocaine
+control_1_7_activation(V) = Boltzmann_1(V, -25.56, -3.75, 1.0)
+control_1_7_inactivation(V) = Boltzmann_1(V, -68.38, 4.37, 1.0)
+lidocaine_1_7_activation(V) = Boltzmann_1(V, -23.92, -3.89, 1.0)
+lidocaine_1_7_inactivation(V) = Boltzmann_1(V, -79.02, 5.52, 1.0)
+
+control_1_8_activation(V) = Boltzmann_1(V, 6.24, -5.73, 1.0)
+control_1_8_inactivation(V) = Boltzmann_1(V, -42.72, 9.05, 1.0)
+lidocaine_1_8_activation(V) = Boltzmann_1(V, 12.32, -6.63, 1.0)
+lidocaine_1_8_inactivation(V) = Boltzmann_1(V, -46.81, 8.07, 1.0)
+
+# ---- #
+
+Boltzmann2(V, A1, V_1_2_1, k1, A2, V_1_2_2, k2) = A1 / ( 1 + exp((V-V_1_2_1) / k1) ) + A2 / ( 1 + exp((V-V_1_2_2) / k2) )
+
+# Lidocaine block of neonatal Nav1.3 is differentially modulated by  co-expression of h1 and h3 subunits
+control_1_3(V) = Boltzmann2(V, 0.97, -37.0, 5.6, 0.03, 4.4, 1.9)
+lidocain_1_3(V) = Boltzmann2(V, 0.97, -57.7, 8.8, 0.03, 3.6, 1.0)
+
+function steady_states()
+
+    V = -160:0.5:60
+
+    plt = plot(xlabel="Voltage (mV)", ylabel= "- (-)", xlims=(-80, 70), legend=:bottomright)
+
+    # plot!(plt, V, ODE_DIV0.m_inf_1_3.(V), label=L"m_{∞} Na 1.3", linestyle = :solid, color=:blue)
+    # plot!(plt, V, ODE_DIV0.h_inf_1_3.(V), label=L"h_{∞} Na 1.3", linestyle = :dash, color=:blue)
+
+    # plot!(plt, V, ODE_DIV0.m_inf_1_7.(V), label=L"Original   m_{∞} Na 1.7", linestyle = :solid, color=:red)
+    # plot!(plt, V, ODE_DIV0.h_inf_1_7.(V), label=L"Original   h_{∞} Na 1.7", linestyle = :dash, color=:red)
+
+    plot!(plt, V, ODE_DIV0.m_inf_1_8.(V), label=L"Original   m_{∞} Na 1.8", linestyle = :solid, color=:green)
+    plot!(plt, V, ODE_DIV0.h_inf_1_8.(V), label=L"Original   h_{∞} Na 1.8", linestyle = :dash, color=:green)
+
+    # plot!(plt, V, ODE_DIV0.n_inf_K_M.(V), label=L"n_{∞} K_{M}", linestyle = :solid, color=:purple)
+
+    # plot!(plt, V, ODE_DIV0.n_inf_K_dr.(V), label=L"n_{∞} K_{dr}", linestyle = :solid, color=:orange)
+    # plot!(plt, V, ODE_DIV0.l_inf_K_dr.(V), label=L"l_{∞} K_{dr}", linestyle = :dash, color=:orange)
+
+    # plot!(plt, V, ODE_DIV0.z_AHP_inf.(V), label=L"{z_{AHP}}_{∞}", linestyle = :solid, color=:brown)
+
+    # plot!(plt, V, control_1_7_activation.(V), label=L"Article   m_{∞} Na 1.7", linestyle = :solid, color=:purple)
+    # plot!(plt, V, control_1_7_inactivation.(V), label=L"Article   h_{∞} Na 1.7", linestyle = :dash, color=:purple)
+
+    plot!(plt, V, ODE_DIV0.m_inf_1_8.(V; with_original = false), label=L"Article   m_{∞} Na 1.8", linestyle = :solid, color=:purple)
+    plot!(plt, V, ODE_DIV0.h_inf_1_8.(V; with_original = false), label=L"Article   h_{∞} Na 1.8", linestyle = :dash, color=:purple)
+
+    display(plt)
+    savefig(plt, "plots/infinity_variable.pdf")
+end
+
+steady_states()

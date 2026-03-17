@@ -4,11 +4,9 @@ include("DIV7/params.jl")
 folder = "DIV0"
 
 if folder == "DIV0"
-    launch_simulation = ODE_DIV0.simulation
     get_param = DIV0_parameter
     get_u0 = DIV0_u0
 elseif folder == "DIV7"
-    launch_simulation = ODE_DIV7.simulation
     get_param = DIV7_parameter
     get_u0 = DIV7_u0
 end
@@ -22,29 +20,32 @@ function main()
 
     p = param = get_param(amp, stim_on, stim_length;
         with_noise = false 
-        ,C_lidocaine= 0
+        ,C_lidocaine= 0.0
+        , with_original = true
 
         #,g_nav1p8 = 4.0 # PHARMACOLOGY DIV0
         #,g_nav1p7 = 40.0 # dynamic clamp DIV0
 
         # ,g_nav1p7 = 10.5  # PHARMACOLOGY DIV7
         # ,g_nav1p8 = 40.0  # dynamic clamp DIV7
-
         )
 
     u0 = get_u0()
+    pattern_labels = ["No spike", "Single spike ", "Transient", "Spikling"]
 
     print("folder: $folder with amp = $amp pA\n")
 
     print("--------------- Start Simulation ---------------\n")
-    t,V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP,I_noise,n_test,l_test = launch_simulation(u0, (0.0, duration), p)
+    t,V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP,I_noise,n_test,l_test = ODE.simulation(u0, (0.0, duration), p)
     print("--------------- End Simulation ---------------\n")
 
     I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, I_Leak, I_ext = give_currents(t,V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP, p)
     peaks_idx, n_peak = get_peaks(t, V;  min_h=-30, min_proms=10)
     t_spikes = t[peaks_idx]
 
-    counts, mean_count = window_count(t_spikes, stim_on, p.stim_off; window_width=100)
+    freq, first_count, pattern = global_pattern(t_spikes, n_peak, p.stim_on, p.stim_off; window_width=100)
+    pred_pattern = pattern_labels[pattern+1]
+    println("Predicted pattern : $pred_pattern")
 
     # --- Plots --- #
 

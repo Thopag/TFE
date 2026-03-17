@@ -20,7 +20,7 @@ function DIV7_parameter(amp, stim_on, stim_length;
     E_Leak = -70.0,                         # [mV]
 
     # Lidocaine
-    C_lidocaine = 0,
+    C_lidocaine = 0.0,
 
     # --- Noise parameters --- #
 
@@ -29,6 +29,8 @@ function DIV7_parameter(amp, stim_on, stim_length;
     mu_noise = 0.0,
     tau_noise = 5.0,                       # (ms)
     sigma_noise = 0.05,
+
+    with_original = true
     )
 
     # --- Lidocaine effect --- #
@@ -57,13 +59,16 @@ function DIV7_parameter(amp, stim_on, stim_length;
 
     # --- Parameter struct --- #
 
+    with_DIV0 = false
+
     p = Parameters(
         I0, stim_on, stim_off, Excitation, C,
         g_nav1p3, g_nav1p7, g_nav1p8, E_Na,
         g_Kdr, g_Km, g_AHP, E_k,
         g_Leak, E_Leak,
         sigma_noise, mu_noise, tau_noise,
-        with_noise
+        with_noise, C_lidocaine, with_original,
+        with_DIV0
     )
     
     return p
@@ -131,13 +136,16 @@ function DIV7_parameter_default(amp, stim_on, stim_length)
 
     # --- Parameter struct --- #
 
+    with_DIV0 = false
+
     p = Parameters(
         I0, stim_on, stim_off, Excitation, C,
         g_nav1p3, g_nav1p7, g_nav1p8, E_Na,
         g_Kdr, g_Km, g_AHP, E_k,
         g_Leak, E_Leak,
         sigma_noise, mu_noise, tau_noise,
-        with_noise
+        with_noise, 0.0, true,
+        with_DIV0
     )
     
     return p

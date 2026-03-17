@@ -170,9 +170,9 @@ function plot_all(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp, t_spik
     p = plot(layout = (n_fig, 1), link = :x, xlims=xlimits, size = (1000, 900), xaxis = nothing)
 
     voltage = 1
-    ylabel!(p[voltage], "Voltage (mV)", legend = :topleft)
+    ylabel!(p[voltage], "Voltage (mV)", legend = :topright)
     plot!(p[voltage], t, V, color= :black, label=L"%$amp pA")
-    vline!(p[voltage], t_spikes, color=:red, label="peaks")
+    #vline!(p[voltage], t_spikes, color=:red, label="peaks")
 
     variable = 2
     ylabel!(p[variable], "Variable (-)")

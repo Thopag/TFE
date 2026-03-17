@@ -27,6 +27,9 @@ struct Parameters{T}
     mu_noise::T
     tau_noise::T
     with_noise::Bool
+    C_lidocaine::T
+    with_original::Bool
+    with_DIV0::Bool
 end
 
 function pulse(t, ti, tf)
@@ -112,7 +115,7 @@ function window_count(t_spikes, on, off; window_width=100)
     return counts
 end
 
-function global_pattern(t_spikes, begin_stim, end_stim)
+function global_pattern(t_spikes, n_peak, begin_stim, end_stim; window_width=100)
     """
     Value of pattern :
     0 : No spike
@@ -121,15 +124,15 @@ function global_pattern(t_spikes, begin_stim, end_stim)
     3 : Spikling
     """
     freqs = instant_freqs(t_spikes)
-    counts =  window_count(t_spikes, begin_stim, end_stim)
+    counts =  window_count(t_spikes, begin_stim, end_stim; window_width=window_width)
 
-    first_count = counts[1] 
+    first_count = counts[1]
     f_global = mean(freqs)
     
-    if first_count == 0
+    if n_peak == 0
         pattern = 0
         return f_global, first_count, pattern
-    elseif first_count == 1
+    elseif n_peak == 1
         pattern = 1
         return f_global, first_count, pattern
     end

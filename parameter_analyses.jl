@@ -4,11 +4,9 @@ include("DIV7/params.jl")
 folder = "DIV0"
 
 if folder == "DIV0"
-    launch_simulation = ODE_DIV0.simulation
     get_param = DIV0_parameter
     get_u0 = DIV0_u0
 elseif folder == "DIV7"
-    launch_simulation = ODE_DIV7.simulation
     get_param = DIV7_parameter
     get_u0 = DIV7_u0
 end
@@ -37,7 +35,7 @@ function parameter_analyses(params, analysed_values; duration = 1700.0,
     for ((i,param), analysed_value) in zip(enumerate(params), analysed_values)
         print("\rProgress: $(round((i/L*100), digits=2)) %")
 
-        t,V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP,Inoise,n_test,l_test = launch_simulation(u0, (0.0, duration), param)
+        t,V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP,Inoise,n_test,l_test = ODE.simulation(u0, (0.0, duration), param)
 
         if with_plot_sample
             plot!(p_volt, t, V, label=L"%$analysed_value %$unit", alpha= 0.4)
@@ -45,7 +43,7 @@ function parameter_analyses(params, analysed_values; duration = 1700.0,
 
         peaks_idx, n_peak = get_peaks(t, V;  min_h=-30, min_proms=10)
         t_spikes = t[peaks_idx]
-        freq, first_count, pattern = global_pattern(t_spikes, param.stim_on, param.stim_off)
+        freq, first_count, pattern = global_pattern(t_spikes, n_peak, param.stim_on, param.stim_off)
 
         push!(peaks_count, n_peak)
         push!(freqs, freq)
@@ -101,7 +99,8 @@ end
 function parameter_selection(;
     stim_on = 500.0,                # ms
     stim_length = 1000.0,           # ms
-    C_lido = 0                      # µM
+    C_lido = 0.0                    # µM
+    ,with_original = true
     )
 
     params = Vector{Parameters}()
@@ -109,7 +108,8 @@ function parameter_selection(;
     for amp in amps
         param = get_param(amp, stim_on, stim_length;
         with_noise = false,
-        C_lidocaine=C_lido
+        C_lidocaine = C_lido,
+        with_original = with_original
         )
         push!(params, param)
     end
@@ -121,7 +121,10 @@ end
 
 function main()
     plot_sample = false
-    lido_concentrations = [0, 1, 10, 50, 100, 500, 1000]
+    #lido_concentrations = [0, 1, 10, 50, 100, 500, 1000]
+
+    original_vec = [true, false]
+    labels = ["Original", "Article"]
 
     all_analysed_values = Vector{Vector{Float32}}()
     all_peaks_count = Vector{Vector{Int}}()
@@ -130,12 +133,13 @@ function main()
     all_first_window_count = Vector{Vector{Float32}}()
     all_label = Vector{String}()
 
-    for C_lido in lido_concentrations
+    for (cycling_param,label) in zip(original_vec,labels)
 
-        params, analysed_values = parameter_selection(;C_lido=C_lido)
-        peaks_count, freqs, pattern_vec, first_window_count = parameter_analyses(params, analysed_values; with_plot_sample=plot_sample, title="lidocaine_$(C_lido)_µM")
+        params, analysed_values = parameter_selection(;with_original=cycling_param)
+        peaks_count, freqs, pattern_vec, first_window_count = parameter_analyses(params, analysed_values; 
+                                                                            with_plot_sample=plot_sample) #, title="lidocaine_$(C_lido)_µM")
 
-        label = "$C_lido µM"
+        #label = "$C_lido µM"
 
         push!(all_analysed_values, analysed_values)
         push!(all_peaks_count, peaks_count)
@@ -144,7 +148,6 @@ function main()
         push!(all_first_window_count, first_window_count)
         push!(all_label, label)
 
-        
     end
     plot_analyses(all_analysed_values, all_peaks_count, all_freqs, all_pattern_vec, all_first_window_count, all_label; xlabel="amp pA")
 end
