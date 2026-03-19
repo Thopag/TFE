@@ -11,16 +11,12 @@ end
 
 # --------------------------- Common to all --------------------------- #
 
-function dot_x(V, x, x_inf, tau_x)
-    return (x_inf(V)-x)/tau_x(V)
+function dot_x(V, x, x_inf, tau_x; kwargs...)
+    return (x_inf(V; kwargs...)-x)/tau_x(V)
 end
 
-function dot_x_sensible(V, x, x_inf, tau_x; with_original = true)
-    return (x_inf(V;with_original=with_original)-x)/tau_x(V)
-end
-
-function dot_x_DIV(V, x, x_inf, tau_x; with_DIV0 = true, with_original = true)
-    return (x_inf(V;with_DIV0=with_DIV0)-x)/tau_x(V; with_DIV0=with_DIV0)
+function dot_x_DIV(V, x, x_inf, tau_x; with_DIV0 = true, kwargs...)
+    return (x_inf(V;with_DIV0=with_DIV0, kwargs...)-x)/tau_x(V; with_DIV0=with_DIV0)
 end
 
 # --------------------------- Na_V 1.3 --------------------------- #
@@ -96,22 +92,22 @@ end
 
 # ---- #
 
-function h_inf_1_7(V; with_original = true)
+function h_inf_1_7(V; with_original = true, C_lido=0)
     if with_original
         return alpha_h_1_7(V) / (alpha_h_1_7(V) + beta_h_1_7(V))
     end
-    return control_1_7_inactivation(V)
+    return control_1_7_inactivation(V; C_lido=C_lido)
 end
 
 function tau_h_1_7(V)
     return 1 / (alpha_h_1_7(V) + beta_h_1_7(V))
 end
 
-function m_inf_1_7(V; with_original = true)
+function m_inf_1_7(V; with_original = true, C_lido=0)
     if with_original
         return alpha_m_1_7(V) / (alpha_m_1_7(V) + beta_m_1_7(V))
     end
-    return control_1_7_activation(V)
+    return control_1_7_activation(V; C_lido=C_lido)
 end
 
 function tau_m_1_7(V)
@@ -121,13 +117,13 @@ end
 # ---- #
 # Differential modulation of Nav1.7 and Nav1.8 peripheral nerve sodium channels by the local anesthetic lidocaine
 
-function control_1_7_activation(V) 
+function control_1_7_activation(V; C_lido=0) 
     # With 100 µM lidocaine 
     # Boltzmann(V, 1.0, -23.92, -3.89, 0.0, 0.0, 1.0)
     return Boltzmann(V, 1.0, -25.56, -3.75, 0.0, 0.0, 1.0)
 end
 
-function control_1_7_inactivation(V)
+function control_1_7_inactivation(V; C_lido=0)
     # With 100 µM lidocaine 
     # Boltzmann(V, 1.0, -79.02, 5.52, 0.0, 0.0, 1.0)
     return Boltzmann(V, 1.0, -68.38, 4.37, 0.0, 0.0, 1.0)
@@ -153,22 +149,22 @@ end
 
 # ---- #
 
-function h_inf_1_8(V; with_original = true)
+function h_inf_1_8(V; with_original = true, C_lido=0)
     if with_original
         return alpha_h_1_8(V) / (alpha_h_1_8(V) + beta_h_1_8(V))
     end
-    return control_1_8_inactivation(V)
+    return control_1_8_inactivation(V; C_lido=C_lido)
 end
 
 function tau_h_1_8(V)
     return 1 / (alpha_h_1_8(V) + beta_h_1_8(V))
 end
 
-function m_inf_1_8(V; with_original = true)
+function m_inf_1_8(V; with_original = true, C_lido=0)
     if with_original
         return alpha_m_1_8(V) / (alpha_m_1_8(V) + beta_m_1_8(V))
     end
-    return control_1_8_activation(V)
+    return control_1_8_activation(V; C_lido=C_lido)
 end
 
 function tau_m_1_8(V)
@@ -178,13 +174,13 @@ end
 # ---- #
 # Differential modulation of Nav1.7 and Nav1.8 peripheral nerve sodium channels by the local anesthetic lidocaine
 
-function control_1_8_activation(V)
+function control_1_8_activation(V; C_lido=0)
     # With 100 µM lidocaine
     # Boltzmann(V, 1.0, 12.32, -6.63, 0.0, 0.0, 1.0)
     return Boltzmann(V, 1.0, 6.24, -5.73, 0.0, 0.0, 1.0)
 end
 
-function control_1_8_inactivation(V)
+function control_1_8_inactivation(V; C_lido=0)
     # With 100 µM lidocaine
     # Boltzmann(V, 1.0, -46.81, 8.07, 0.0, 0.0, 1.0)
     return Boltzmann(V, 1.0, -42.72, 9.05, 0.0, 0.0, 1.0)
@@ -284,6 +280,8 @@ function ODE_system(du,u,p,t)
 
     with_original = p.with_original
 
+    C_lido = p.C_lidocaine
+
     # --- variables --- #
 
     V = u[1]
@@ -326,14 +324,14 @@ function ODE_system(du,u,p,t)
 
     du[1] = (I_ext+I_noise-I_NaV1p3-I_NaV1p7-I_NaV1p8-I_Kdr-I_Km-I_Leak-I_AHP)/C
 
-    du[2] = dot_x_sensible(V, m3, m_inf_1_3, tau_m_1_3; with_original=with_original)
+    du[2] = dot_x(V, m3, m_inf_1_3, tau_m_1_3; with_original=with_original)
     du[3] = dot_x_DIV(V, h3, h_inf_1_3, tau_h_1_3; with_DIV0=p.with_DIV0, with_original=with_original)
 
-    du[4] = dot_x_sensible(V, m7, m_inf_1_7, tau_m_1_7; with_original=with_original)
-    du[5] = dot_x_sensible(V, h7, h_inf_1_7, tau_h_1_7; with_original=with_original)
+    du[4] = dot_x(V, m7, m_inf_1_7, tau_m_1_7; with_original=with_original, C_lido=C_lido)
+    du[5] = dot_x(V, h7, h_inf_1_7, tau_h_1_7; with_original=with_original, C_lido=C_lido)
 
-    du[6] = dot_x_sensible(V, m8, m_inf_1_8, tau_m_1_8; with_original=with_original)
-    du[7] = dot_x_sensible(V, h8, h_inf_1_8, tau_h_1_8; with_original=with_original)
+    du[6] = dot_x(V, m8, m_inf_1_8, tau_m_1_8; with_original=with_original, C_lido=C_lido)
+    du[7] = dot_x(V, h8, h_inf_1_8, tau_h_1_8; with_original=with_original, C_lido=C_lido)
 
     du[8] = dot_x(V, ndr, n_inf_K_dr, tau_n_K_dr)
     du[9] = dot_x(V, ldr, l_inf_K_dr, tau_l_K_dr)

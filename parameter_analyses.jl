@@ -20,7 +20,7 @@ function parameter_analyses(params, analysed_values; duration = 1700.0,
     println("title : $title")
     println("Duration : $duration ms")
     println("Analysed values is $param_name : $analysed_values $unit")
-    
+
     if with_plot_sample
         println("With plot sample on")
         p_volt = empty_voltage_plot()
@@ -65,63 +65,40 @@ function parameter_analyses(params, analysed_values; duration = 1700.0,
     return peaks_count, freqs, pattern_vec, first_window_count
 end
 
-function plot_analyses(all_analysed_values, all_peaks_count, all_freqs, all_pattern_vec, all_first_window_count, all_label; xlabel="amp pA")
-
-    println("------ Start plots ------")
-
-    p_peaks = plot(xlabel=xlabel, ylabel= "Peaks count (-)", title="$folder peaks count")
-    p_freqs = plot(xlabel=xlabel, ylabel= "Frequence (Hz)", title="$folder FI curve")
-    p_window = plot(xlabel=xlabel, ylabel= "Peaks count (-)", title="$folder First window count")
-
-    markers_list = [:circle, :utriangle, :diamond, :square]
-
-    for (analysed_values, peaks_count, freqs, pattern_vec, first_window_count, label) in zip(all_analysed_values, all_peaks_count, all_freqs, all_pattern_vec, all_first_window_count, all_label)
-
-        pattern_form = markers_list[pattern_vec .+ 1]
-
-        plot!(p_peaks, analysed_values, peaks_count         , marker=pattern_form, markersize=2, linealpha=0.5, markeralpha=0.7, label=label)
-        plot!(p_freqs, analysed_values, freqs               , marker=pattern_form, markersize=2, linealpha=0.5, markeralpha=0.7, label=label)
-        plot!(p_window, analysed_values, first_window_count , marker=pattern_form, markersize=2, linealpha=0.5, markeralpha=0.7, label=label)
-
-    end
-
-    display(p_peaks)
-    display(p_freqs)
-    display(p_window)
-    savefig(p_peaks, "plots/$(folder)-peaks-curve.pdf")
-    savefig(p_freqs, "plots/$(folder)-F-I-curve.pdf")
-    savefig(p_window, "plots/$(folder)-window-curve.pdf")
-
-
-    println("------ End plots ------")
-end
-
 function parameter_selection(;
+    amp = 55,
     stim_on = 500.0,                # ms
     stim_length = 1000.0,           # ms
-    C_lido = 0.0                    # µM
-    ,with_original = true
+    kwargs...
     )
 
     params = Vector{Parameters}()
-    amps = 0:2.5:300
-    for amp in amps
-        param = get_param(amp, stim_on, stim_length;
+
+    amps = 0:2.5:300.0
+    #g_nav1p7_s = 0:50:100.0
+    #C_lido_s = [0.0, 1.0, 10.0, 25.0, 50.0, 75.0, 100.0, 250.0, 500.0, 750.0, 1000.0]
+
+    analysed_values = amps
+    for i in analysed_values
+        param = get_param(i, stim_on, stim_length;
         with_noise = false,
-        C_lidocaine = C_lido,
-        with_original = with_original
+        #C_lidocaine=i,
+        kwargs...
         )
         push!(params, param)
     end
-
-    analysed_values = amps
 
     return params, analysed_values
 end
 
 function main()
     plot_sample = false
-    #lido_concentrations = [0, 1, 10, 50, 100, 500, 1000]
+
+    # amps = [55.0]#0:25:150.0
+    # labels = ["$amp pA" for amp in amps]
+
+    # lido_concentrations = [0.0, 1.0, 10.0, 50.0, 100.0, 500.0, 1000.0]
+    # labels = ["$C_lido µM" for C_lido in lido_concentrations]
 
     original_vec = [true, false]
     labels = ["Original", "Article"]
@@ -131,25 +108,26 @@ function main()
     all_freqs = Vector{Vector{Float32}}()
     all_pattern_vec = Vector{Vector{Int}}()
     all_first_window_count = Vector{Vector{Float32}}()
-    all_label = Vector{String}()
+    all_params = Vector{Vector{Parameters}}()
 
-    for (cycling_param,label) in zip(original_vec,labels)
+    cycling_vec = original_vec
+
+    for cycling_param in cycling_vec
 
         params, analysed_values = parameter_selection(;with_original=cycling_param)
         peaks_count, freqs, pattern_vec, first_window_count = parameter_analyses(params, analysed_values; 
-                                                                            with_plot_sample=plot_sample) #, title="lidocaine_$(C_lido)_µM")
-
-        #label = "$C_lido µM"
+                                                                            with_plot_sample=plot_sample, title="$(cycling_param)") #, unit="mS/cm2", param_name="g_nav1p7")
 
         push!(all_analysed_values, analysed_values)
         push!(all_peaks_count, peaks_count)
         push!(all_freqs, freqs)
         push!(all_pattern_vec, pattern_vec)
         push!(all_first_window_count, first_window_count)
-        push!(all_label, label)
+        push!(all_params, params)
 
     end
-    plot_analyses(all_analysed_values, all_peaks_count, all_freqs, all_pattern_vec, all_first_window_count, all_label; xlabel="amp pA")
+    plot_analyses(all_analysed_values, all_peaks_count, all_freqs, all_pattern_vec, all_first_window_count, labels; xlabel="amp pA")
+    #plot_param_plan(all_params, all_pattern_vec, labels)
 end
 
 main()
