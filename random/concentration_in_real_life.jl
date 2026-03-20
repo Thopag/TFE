@@ -23,7 +23,7 @@ println("$(round(C, digits=2)) µM")
 println("----------------------------------------------------------------------")
 
 # Determination of the Minimum Local Analgesic Concentrations of Epidural Bupivacaine and Lidocaine in Labor 
-C = 0.4                 # %w/v
+C = 0.37                # %w/v
 C = 10*C                # mg/ml
 C = C/(10^3)            # g/ml
 C = C/10^-3             # g/l
@@ -34,7 +34,7 @@ println("IN DRUG")
 println("$(round(C, digits=2)) µM")
 println("----------------------------------------------------------------------")
 
-# Lidocaine: A Local Anesthetic, Its Adverse Effects and Management
+# Lidocaine: A Local Anesthetic, Its Adverse Effects and Management (from Lidocaine Toxicity)
 C = 2                   # % (I suppose) <=> %w/v 
 C = 10*C                # mg/ml
 C = C/(10^3)            # g/ml
@@ -42,6 +42,16 @@ C = C/(10^-3)           # g/l
 C = C/M                 # M
 C = C*10^6              # µM
 println("Lidocaine: A Local Anesthetic, Its Adverse Effects and Management")
-println("IN DRUG")
+println("IN DRUG for IntraOral injection")
+println("$(round(C, digits=2)) µM")
+println("----------------------------------------------------------------------")
+
+# Lidocaine Toxicity
+C = 5                   # µg/ml
+C = C*(10^-6)/(10^-3)   # g/l
+C = C/M                 # M
+C = C*10^6              # µM
+println("Lidocaine Toxicity")
+println("IN PLASMA")
 println("$(round(C, digits=2)) µM")
 println("----------------------------------------------------------------------")
