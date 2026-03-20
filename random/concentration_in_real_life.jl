@@ -30,7 +30,7 @@ C = C/10^-3             # g/l
 C = C/M                 # M
 C = C*10^6              # µM
 println("Determination of the Minimum Local Analgesic Concentrations of Epidural Bupivacaine and Lidocaine in Labor")
-println("IN DRUG")
+println("IN DRUG (Epidural)")
 println("$(round(C, digits=2)) µM")
 println("----------------------------------------------------------------------")
 
@@ -42,7 +42,7 @@ C = C/(10^-3)           # g/l
 C = C/M                 # M
 C = C*10^6              # µM
 println("Lidocaine: A Local Anesthetic, Its Adverse Effects and Management")
-println("IN DRUG for IntraOral injection")
+println("IN DRUG (IntraOral injection)")
 println("$(round(C, digits=2)) µM")
 println("----------------------------------------------------------------------")
 
