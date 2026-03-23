@@ -74,7 +74,7 @@ function parameter_selection(;
 
     params = Vector{Parameters}()
 
-    amps = 0:50:150
+    amps = 0:25:300
     #g_nav1p7_s = 0:50:100.0
     #C_lido_s = [0.0, 1.0, 10.0, 25.0, 50.0, 75.0, 100.0, 250.0, 500.0, 750.0, 1000.0]
 
@@ -98,29 +98,29 @@ function main()
     # amps = [55.0]#0:25:150.0
     # labels = ["$amp pA" for amp in amps]
 
-    # lido_concentrations = [0.0, 1.0, 10.0, 50.0, 100.0, 500.0, 1000.0]
-    # labels = ["$C_lido µM" for C_lido in lido_concentrations]
+    lido_concentrations = [0.0, 1.0, 10.0, 50.0, 100.0, 500.0, 1000.0]
+    labels = ["$C_lido" for C_lido in lido_concentrations]
 
     # original_vec = [true, false]
     # labels = ["Original", "Article"]
 
-    g_nav1p8_s = [0.0, 3.0, 9.0, 15.0, 50.0, 100.0, 1000.0]
-    labels = ["$g" for g in g_nav1p8_s]
+    # g_nav1p8_s = [0.0, 3.0, 9.0, 15.0, 50.0, 100.0, 1000.0]
+    # labels = ["$g" for g in g_nav1p8_s]
 
-    g_nav1p7_s = [0.0, 30.0, 90.0, 150.0, 500.0, 1000.0, 10000.0]
-    labels = ["$g" for g in g_nav1p7_s]
+    # g_nav1p7_s = [0.0, 30.0, 90.0, 150.0, 500.0, 1000.0, 10000.0]
+    # labels = ["$g" for g in g_nav1p7_s]
 
     cycling_value_rheobases = Vector{String}()
     rheobases = Vector{Float32}()
 
-    cycling_vec = zip(g_nav1p7_s, g_nav1p8_s)
+    cycling_vec = lido_concentrations
 
-    labels = ["($g7,$g8)" for (g7,g8) in cycling_vec]
+    # labels = ["($g7,$g8)" for (g7,g8) in cycling_vec]
     
     # -------- Set up ploting -------- #
 
     x_lab = "amp pA"
-    cycling_param_label = "(g_nav1p7,g_nav1p8)  (mS/cm2)"
+    cycling_param_label = "Lidocaine (µM)"
 
     p_peaks = plot(xlabel=x_lab, ylabel= "Peaks count (-)", title="peaks count")
     p_freqs = plot(xlabel=x_lab, ylabel= "Frequence (Hz)", title="FI curve")
@@ -134,7 +134,8 @@ function main()
 
     for (i, (cycling_param, label)) in enumerate(zip(cycling_vec, labels))
 
-        params, analysed_values = parameter_selection(;g_nav1p7=cycling_param[1], g_nav1p8=cycling_param[2]) # Change param here
+        # --------------------------------------------- Change param here
+        params, analysed_values = parameter_selection(;C_lidocaine=cycling_param) 
         peaks_count, freqs, pattern_vec, first_window_count = parameter_analyses(params, analysed_values; 
                                                                             with_plot_sample=plot_sample, title="$(cycling_param)") #, unit="mS/cm2", param_name="g_nav1p7")
 

@@ -1,6 +1,8 @@
 include("../DIV0/params.jl")
 include("../DIV7/params.jl")
 
+V = -80.0:0.5:70.0
+
 function ss_currents(p)
 
     g_nav1p3 = p.g_nav1p3
@@ -15,22 +17,23 @@ function ss_currents(p)
 
     g_Leak = p.g_Leak
     E_Leak = p.E_Leak
+    with_original=p.with_original
 
-    m3 = ODE_DIV0.m_inf_1_3.(V)
-    h3 = ODE_DIV0.h_inf_1_3.(V)
+    m3 = ODE.m_inf_1_3.(V; with_original=with_original)
+    h3 = ODE.h_inf_1_3.(V; with_DIV0=p.with_DIV0, with_original=with_original)
 
-    m7 = ODE_DIV0.m_inf_1_7.(V)
-    h7 = ODE_DIV0.h_inf_1_7.(V)
+    m7 = ODE.m_inf_1_7.(V; with_original=with_original)
+    h7 = ODE.h_inf_1_7.(V; with_original=with_original)
 
-    m8 = ODE_DIV0.m_inf_1_8.(V)
-    h8 = ODE_DIV0.h_inf_1_8.(V)
+    m8 = ODE.m_inf_1_8.(V; with_original=with_original)
+    h8 = ODE.h_inf_1_8.(V; with_original=with_original)
 
-    nm = ODE_DIV0.n_inf_K_M.(V)
+    nm = ODE.n_inf_K_M.(V)
 
-    ndr = ODE_DIV0.n_inf_K_dr.(V)
-    ldr = ODE_DIV0.l_inf_K_dr.(V)
+    ndr = ODE.n_inf_K_dr.(V)
+    ldr = ODE.l_inf_K_dr.(V)
 
-    z_AHP = ODE_DIV0.z_AHP_inf.(V)
+    z_AHP = ODE.z_AHP_inf.(V)
 
     INaV1p3 = g_nav1p3 .* (m3.^3) .* h3 .* (V .- E_Na)
     INaV1p7 = g_nav1p7 .* (m7.^3) .* h7 .* (V .- E_Na)
@@ -40,36 +43,48 @@ function ss_currents(p)
     IAHP = g_AHP .* (z_AHP.^1) .* (V .- E_k)
     ILeak = g_Leak .* (V .- E_Leak)
 
-    plt_I = plt_tau = plot(xlabel="Voltage (mV)", ylabel= "Current (uA/cm2)", legendfontsize=7, legend=:topleft)
-    
-    plot!(plt_I, V, INaV1p3, color=:blue, label=L"I_{NaV1.3}")
-    plot!(plt_I, V, INaV1p7, color=:red, label=L"I_{NaV1.7}")
-    plot!(plt_I, V, INaV1p8, color=:green, label=L"I_{NaV1.8}")
-
-    plot!(plt_I, V, IKdr, color=:orange, label=L"I_{Kdr}")
-    plot!(plt_I, V, IKm, color=:purple, label=L"I_{KM}")
-    plot!(plt_I, V, IAHP, color=:brown, label=L"I_{AHP}")
-
-    plot!(plt_I, V, ILeak, color=:black, label=L"I_{Leak}")
-
-    display(plt_I)
-    savefig(plt_I, "plots/ss_current.pdf")
+    return INaV1p3, INaV1p7, INaV1p8, IKdr, IKm, IAHP, ILeak
     
 end
 
-get_param = DIV7_parameter
-amp = 17
-stim_on = 500.0
-stim_length = 1000.0
+function main()
 
-p = get_param(amp, stim_on, stim_length;
+    get_param = DIV0_parameter
+    amp = 17
+    stim_on = 500.0
+    stim_length = 1000.0
 
-        # g_nav1p8 = 4.0 # PHARMACOLOGY DIV0
-        # ,g_nav1p7 = 40.0 # dynamic clamp DIV0
+    plt_I = plot(xlabel="Voltage (mV)", ylabel= "Current (uA/cm2)", legendfontsize=7, legend=:bottomright)
 
-        # ,g_nav1p7 = 10.5  # PHARMACOLOGY DIV7
-        # ,g_nav1p8 = 40.0  # dynamic clamp DIV7
-    )
+    p = get_param(amp, stim_on, stim_length;
+        with_original=true)
+    
+    INaV1p3, INaV1p7, INaV1p8, IKdr, IKm, IAHP, ILeak = ss_currents(p)
 
-V = -60:0.5:0
-ss_currents(p)
+    plot!(plt_I, V, INaV1p3, color=:blue, label=L"I_{NaV1.3}")
+    plot!(plt_I, V, INaV1p7, color=:red, label=L"I_{NaV1.7}")
+    plot!(plt_I, V, INaV1p8, color=:green, label=L"I_{NaV1.8}")
+    
+    # plot!(plt_I, V, IKdr, color=:orange, label=L"I_{Kdr}")
+    # plot!(plt_I, V, IKm, color=:purple, label=L"I_{KM}")
+    # plot!(plt_I, V, IAHP, color=:brown, label=L"I_{AHP}")
+
+    # plot!(plt_I, V, ILeak, color=:black, label=L"I_{Leak}")
+    
+    p = get_param(amp, stim_on, stim_length;
+        g_nav1p7 = 33000.0,
+        with_original=false)
+
+    INaV1p3, INaV1p7, INaV1p8, IKdr, IKm, IAHP, ILeak = ss_currents(p)
+
+    plot!(plt_I, V, INaV1p3, color=:blue, linestyle=:dash, label=L"I_{NaV1.3} article")
+    plot!(plt_I, V, INaV1p7, color=:red, linestyle=:dash, label=L"I_{NaV1.7} article")
+    plot!(plt_I, V, INaV1p8, color=:green, linestyle=:dash, label=L"I_{NaV1.8} article")
+
+    display(plt_I)
+    savefig(plt_I, "plots/ss_current.pdf")
+
+end
+
+main()
+
