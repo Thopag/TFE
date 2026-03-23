@@ -104,4 +104,42 @@ function plot_ss_inhib()
     display(plt)
 end
 
-plot_ss_inhib()
+#plot_ss_inhib()
+
+function plot_conduct_inhib()
+
+    g_nav1p3 = 0.0
+    g_nav1p7 = 3.0
+    g_nav1p8 = 30.0
+
+    lido_concentrations = 10 .^ range(log10(0.1), log10(2000), length=1000)
+    test_point = [1.0, 10.0, 50.0, 100.0, 500.0, 1000.0]
+    
+    results = get_lidocaine_inhibition.(lido_concentrations)
+    remaining_1_3 = [r[1] for r in results]
+    remaining_1_7 = [r[2] for r in results]
+    remaining_1_8 = [r[3] for r in results]
+
+    plt_1p3 = plot(lido_concentrations, g_nav1p3 .* remaining_1_3, xaxis=:log10, xlabel="Lidocains (µM)", ylabel= "g_nav1p3 (mS/cm2)", label="")
+    plt_1p7 = plot(lido_concentrations, g_nav1p7 .* remaining_1_7, xaxis=:log10, xlabel="Lidocains (µM)", ylabel= "g_nav1p7 (mS/cm2)", label="")
+    plt_1p8 = plot(lido_concentrations, g_nav1p8 .* remaining_1_8, xaxis=:log10, xlabel="Lidocains (µM)", ylabel= "g_nav1p8 (mS/cm2)", label="")
+
+    results = get_lidocaine_inhibition.(test_point)
+    remaining_1_3 = [r[1] for r in results]
+    remaining_1_7 = [r[2] for r in results]
+    remaining_1_8 = [r[3] for r in results]
+
+    plt_1p3 = scatter!(plt_1p3, test_point, g_nav1p3 .* remaining_1_3, color=:black, marker=:circle, label="")
+    plt_1p7 = scatter!(plt_1p7, test_point, g_nav1p7 .* remaining_1_7, color=:black, marker=:circle, label="")
+    plt_1p8 = scatter!(plt_1p8, test_point, g_nav1p8 .* remaining_1_8, color=:black, marker=:circle, label="")
+
+    display(plt_1p3)
+    display(plt_1p7)
+    display(plt_1p8)
+    savefig(plt_1p3, "plots/plt_1p3.pdf")
+    savefig(plt_1p7, "plots/plt_1p7.pdf")
+    savefig(plt_1p8, "plots/ss_inhib.pdf")
+
+end
+
+plot_conduct_inhib()

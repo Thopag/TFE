@@ -57,7 +57,7 @@ function parameter_analyses(params, analysed_values; duration = 1700.0,
         println("Display plot sample")
         plot!(p_volt, title="$folder $title samples")
         display(p_volt)
-        savefig(p_volt, "plots/$(folder)_$(param_name)_$(title)-V_sample.pdf")
+        #savefig(p_volt, "plots/$(folder)_$(param_name)_$(title)-V_sample.pdf")
     end
 
     println("\n----------------------------------------------------\n")
@@ -74,7 +74,7 @@ function parameter_selection(;
 
     params = Vector{Parameters}()
 
-    amps = 0:2.5:300.0
+    amps = 0:50:150
     #g_nav1p7_s = 0:50:100.0
     #C_lido_s = [0.0, 1.0, 10.0, 25.0, 50.0, 75.0, 100.0, 250.0, 500.0, 750.0, 1000.0]
 
@@ -83,6 +83,7 @@ function parameter_selection(;
         param = get_param(i, stim_on, stim_length;
         with_noise = false,
         #C_lidocaine=i,
+        #with_original=false,
         kwargs...
         )
         push!(params, param)
@@ -100,34 +101,78 @@ function main()
     # lido_concentrations = [0.0, 1.0, 10.0, 50.0, 100.0, 500.0, 1000.0]
     # labels = ["$C_lido µM" for C_lido in lido_concentrations]
 
-    original_vec = [true, false]
-    labels = ["Original", "Article"]
+    # original_vec = [true, false]
+    # labels = ["Original", "Article"]
 
-    all_analysed_values = Vector{Vector{Float32}}()
-    all_peaks_count = Vector{Vector{Int}}()
-    all_freqs = Vector{Vector{Float32}}()
-    all_pattern_vec = Vector{Vector{Int}}()
-    all_first_window_count = Vector{Vector{Float32}}()
-    all_params = Vector{Vector{Parameters}}()
+    g_nav1p8_s = [0.0, 3.0, 9.0, 15.0, 50.0, 100.0, 1000.0]
+    labels = ["$g" for g in g_nav1p8_s]
 
-    cycling_vec = original_vec
+    g_nav1p7_s = [0.0, 30.0, 90.0, 150.0, 500.0, 1000.0, 10000.0]
+    labels = ["$g" for g in g_nav1p7_s]
 
-    for cycling_param in cycling_vec
+    cycling_value_rheobases = Vector{String}()
+    rheobases = Vector{Float32}()
 
-        params, analysed_values = parameter_selection(;with_original=cycling_param)
+    cycling_vec = zip(g_nav1p7_s, g_nav1p8_s)
+
+    labels = ["($g7,$g8)" for (g7,g8) in cycling_vec]
+    
+    # -------- Set up ploting -------- #
+
+    x_lab = "amp pA"
+    cycling_param_label = "(g_nav1p7,g_nav1p8)  (mS/cm2)"
+
+    p_peaks = plot(xlabel=x_lab, ylabel= "Peaks count (-)", title="peaks count")
+    p_freqs = plot(xlabel=x_lab, ylabel= "Frequence (Hz)", title="FI curve")
+    p_window = plot(xlabel=x_lab, ylabel= "Peaks count (-)", title="First window count")
+    plt_rheo = plot(xlabel=cycling_param_label, ylabel="rheobase (pA)")#, xscale=:log10)
+
+    p_pattern = plot(xlabel=x_lab, ylabel= cycling_param_label, title="Pattern", yticks = (1:length(labels), labels), legend=:topright)
+    for (c, l) in zip(Ploting.colors_list, Ploting.label_list)
+        scatter!(p_pattern, [], [], marker=:square, color = c, label = l, markersize = 4)
+    end
+
+    for (i, (cycling_param, label)) in enumerate(zip(cycling_vec, labels))
+
+        params, analysed_values = parameter_selection(;g_nav1p7=cycling_param[1], g_nav1p8=cycling_param[2]) # Change param here
         peaks_count, freqs, pattern_vec, first_window_count = parameter_analyses(params, analysed_values; 
                                                                             with_plot_sample=plot_sample, title="$(cycling_param)") #, unit="mS/cm2", param_name="g_nav1p7")
 
-        push!(all_analysed_values, analysed_values)
-        push!(all_peaks_count, peaks_count)
-        push!(all_freqs, freqs)
-        push!(all_pattern_vec, pattern_vec)
-        push!(all_first_window_count, first_window_count)
-        push!(all_params, params)
+        rheobase_idx = findfirst(x -> x >= 1, pattern_vec)
+        if isnothing(rheobase_idx)
+            println("No spike where found with $cycling_param")
+        else
+            println("First spike at $(analysed_values[rheobase_idx]) pA")
+            push!(cycling_value_rheobases, label)
+            push!(rheobases, analysed_values[rheobase_idx])
+        end
+
+        # -------- Ploting -------- #
+
+        pattern_form = Ploting.markers_list[pattern_vec .+ 1]
+        pattern_color = Ploting.colors_list[pattern_vec .+ 1]
+
+        plot!(p_peaks, analysed_values, peaks_count         , marker=pattern_form, markersize=2, linealpha=0.5, markeralpha=0.7, label=label)
+        plot!(p_freqs, analysed_values, freqs               , marker=pattern_form, markersize=2, linealpha=0.5, markeralpha=0.7, label=label)
+        plot!(p_window, analysed_values, first_window_count , marker=pattern_form, markersize=2, linealpha=0.5, markeralpha=0.7, label=label)
+        bar!(p_pattern, analysed_values, fill(i+0.5, length(analysed_values)), fillto=fill(i-0.45, length(analysed_values)), 
+                                                                        lw=0, linecolor=:match, bar_width=(analysed_values[1]-analysed_values[2])*1.05, label="", color=pattern_color)
 
     end
-    plot_analyses(all_analysed_values, all_peaks_count, all_freqs, all_pattern_vec, all_first_window_count, labels; xlabel="amp pA")
-    #plot_param_plan(all_params, all_pattern_vec, labels)
+
+    bar!(plt_rheo, cycling_value_rheobases, rheobases, label="")
+    display(plt_rheo)
+    savefig(plt_rheo, "plots/rheobases.pdf")
+
+    display(p_peaks)
+    display(p_freqs)
+    display(p_window)
+    display(p_pattern)
+    savefig(p_peaks, "plots/peaks-curve.pdf")
+    savefig(p_freqs, "plots/F-I-curve.pdf")
+    savefig(p_window, "plots/window-curve.pdf")
+    savefig(p_pattern, "plots/pattern.pdf")
+
 end
 
 main()

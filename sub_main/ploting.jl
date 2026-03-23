@@ -8,11 +8,19 @@ export empty_voltage_plot, plot_voltage, plot_all, plot_analyses, plot_param_pla
 
 # Pattern :
 
+label_list = ["No spike", "Single spike ", "Transient", "Spikling"]
+
 # circle : No spike
 # utriangle : Single spike 
-# diamond : Transiant
+# diamond : Transient
 # square : Spikling
 markers_list = [:circle, :utriangle, :diamond, :square]
+
+# blue : No spike
+# green : Single spike 
+# orange : Transient
+# red3 : Spikling
+colors_list = [:midnightblue, :darkgreen, :orange, :red3]
 
 function empty_voltage_plot(; xlimits=(400, 1700))
     p = plot(xlims=xlimits, xlabel="Time (ms)", ylabel= "Voltage (mV)")
