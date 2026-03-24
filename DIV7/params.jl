@@ -30,7 +30,8 @@ function DIV7_parameter(amp, stim_on, stim_length;
     tau_noise = 5.0,                       # (ms)
     sigma_noise = 0.05,
 
-    with_original = true
+    with_original = true,
+    with_lido_shift = false
     )
 
     # --- Lidocaine effect --- #
@@ -68,7 +69,7 @@ function DIV7_parameter(amp, stim_on, stim_length;
         g_Leak, E_Leak,
         sigma_noise, mu_noise, tau_noise,
         with_noise, C_lidocaine, with_original,
-        with_DIV0
+        with_DIV0, with_lido_shift
     )
     
     return p

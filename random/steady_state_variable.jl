@@ -42,14 +42,14 @@ function steady_states()
 
     V = -160:0.5:80
 
-    plt = plot(xlabel="Voltage (mV)", ylabel= "- (-)", xlims=(-100, 80), legend=:bottomright)
+    plt = plot(xlabel="Voltage (mV)", ylabel= "- (-)", xlims=(-160, 80), legend=:bottomright)
 
     # plot!(plt, V, ODE.m_inf_1_3.(V), label=L"m_{∞} Na 1.3", linestyle = :solid, color=:blue)
     # plot!(plt, V, ODE.h_inf_1_3.(V), label=L"h_{∞} Na 1.3", linestyle = :dash, color=:blue)
 
     """--------------------------------------------------------------------------------------------------"""
 
-    # plot!(plt, V, ODE.m_inf_1_7.(V), label=L"Original   m_{∞} Na 1.7", linestyle = :solid, color=:red)
+    # plot!(plt, V, ODE.m_inf_1_7.(V; C_lido=0), label=L"Original   m_{∞} Na 1.7", linestyle = :solid, color=:red)
     # plot!(plt, V, ODE.h_inf_1_7.(V), label=L"Original   h_{∞} Na 1.7", linestyle = :dash, color=:red)
 
     # plot!(plt, V, control_1_7_activation.(V), label=L"Article   m_{∞} Na 1.7", linestyle = :solid, color=:purple)
@@ -85,8 +85,10 @@ function steady_states()
     # plot!(plt, V, ODE.z_AHP_inf.(V), label=L"{z_{AHP}}_{∞}", linestyle = :solid, color=:brown)
 
 
+    """--------------------------------------------------------------------------------------------------"""
+
     display(plt)
-    savefig(plt, "plots/infinity_variable.pdf")
+    #savefig(plt, "plots/infinity_variable.pdf")
 end
 
 steady_states()

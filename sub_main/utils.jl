@@ -30,6 +30,7 @@ struct Parameters{T}
     C_lidocaine::T
     with_original::Bool
     with_DIV0::Bool
+    with_lido_shift::Bool
 end
 
 function pulse(t, ti, tf)
