@@ -90,7 +90,7 @@ function plot_all(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp, t_spik
 
     current = 4
     ylabel!(p[current], "Current (uA/cm2)", legendfontsize=6, legend = :bottomright)
-    #plot!(p[current], ylims=(-2, 2))
+    plot!(p[current], ylims=(-2.5, 5))
     plot!(p[current], t, I_NaV1p3, color=:blue, label=L"I_{NaV1.3}")
     plot!(p[current], t, I_NaV1p7, color=:red, label=L"I_{NaV1.7}")
     plot!(p[current], t, I_NaV1p8, color=:green, label=L"I_{NaV1.8}")

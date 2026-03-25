@@ -5,6 +5,10 @@ includet("utils.jl")
 using .Utils
 print("---- End Utils ----\n")
 
+print("---- Start Lidocaine effect ----\n")
+includet("lidocaine.jl")
+using .Lidocaine
+print("---- End Lidocaine effect ----\n")
 
 print("---- Start ODE ----\n")
 includet("ODEs.jl")
@@ -22,7 +26,7 @@ function warm_up()
         0.0, 0.0,
         0.0, 0.0, 0.0,
         false, 0.0, true,
-        true
+        true, false
     )
 
     ODE.simulation(u0, tspan, p)

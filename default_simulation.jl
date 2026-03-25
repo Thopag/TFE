@@ -1,7 +1,7 @@
 include("DIV0/params.jl")
 include("DIV7/params.jl")
 
-folder = "DIV0"
+folder = "DIV7"
 
 if folder == "DIV0"
     get_param = DIV0_parameter
@@ -13,24 +13,17 @@ end
 
 function main()
 
-    amp = 150                    # pA
+    amp = 80                    # pA
     duration = 1700.0             # ms
     stim_on = 500.0               # ms
     stim_length = 1000.0          # ms
 
     p = param = get_param(amp, stim_on, stim_length;
-        with_noise = false 
-        ,C_lidocaine= 0.0
-        ,with_original = true
-
-        #,g_nav1p8 = 4.0 # PHARMACOLOGY DIV0
-        #,g_nav1p7 = 40.0 # dynamic clamp DIV0
-
-        # ,g_nav1p7 = 10.5  # PHARMACOLOGY DIV7
-        # ,g_nav1p8 = 40.0  # dynamic clamp DIV7
-
-        #,g_nav1p8 = 1000.0
-        ,g_nav1p7 = 10000.0
+        with_noise = false,
+        C_lidocaine=100.0,
+        #with_original=false,
+        with_lido_shift=true,
+        #with_inhibition=false,
         )
 
     u0 = get_u0()

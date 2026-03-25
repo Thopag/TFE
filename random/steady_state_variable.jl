@@ -49,9 +49,9 @@ function steady_states()
 
     """--------------------------------------------------------------------------------------------------"""
 
-    # plot!(plt, V, ODE.m_inf_1_7.(V; C_lido=0), label=L"Original   m_{∞} Na 1.7", linestyle = :solid, color=:red)
-    # plot!(plt, V, ODE.h_inf_1_7.(V), label=L"Original   h_{∞} Na 1.7", linestyle = :dash, color=:red)
-
+    #plot!(plt, V, ODE.m_inf_1_7.(V; C_lido=0, with_lido_shift=false), label=L"Original   m_{∞} Na 1.7", linestyle = :solid, color=:red)
+    #plot!(plt, V, ODE.h_inf_1_7.(V; C_lido=0, with_lido_shift=false), label=L"Original   h_{∞} Na 1.7", linestyle = :dash, color=:red)
+    
     # plot!(plt, V, control_1_7_activation.(V), label=L"Article   m_{∞} Na 1.7", linestyle = :solid, color=:purple)
     # plot!(plt, V, control_1_7_inactivation.(V), label=L"Article   h_{∞} Na 1.7", linestyle = :dash, color=:purple)
 
@@ -64,7 +64,7 @@ function steady_states()
     """--------------------------------------------------------------------------------------------------"""
 
     # plot!(plt, V, ODE.m_inf_1_8.(V), label=L"Original   m_{∞} Na 1.8", linestyle = :solid, color=:green)
-    # plot!(plt, V, ODE.h_inf_1_8.(V), label=L"Original   h_{∞} Na 1.8", linestyle = :dash, color=:green)
+    # plot!(plt, V, ODE.h_inf_1_8.(V; C_lido=0), label=L"Original   h_{∞} Na 1.8", linestyle = :dash, color=:green)
 
     # plot!(plt, V, control_1_8_activation.(V), label=L"Article   m_{∞} Na 1.8", linestyle = :solid, color=:purple)
     # plot!(plt, V, control_1_8_inactivation.(V), label=L"Article   h_{∞} Na 1.8", linestyle = :dash, color=:purple)

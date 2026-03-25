@@ -31,16 +31,19 @@ function DIV0_parameter(amp, stim_on, stim_length;
     sigma_noise = 0.05,
 
     with_original = true,
-    with_lido_shift = false
-    )
 
     # --- Lidocaine effect --- #
 
-    remaining_1_3, remaining_1_7, remaining_1_8 = get_lidocaine_inhibition(C_lidocaine)
+    with_lido_shift = false,
+    with_inhibition = true
+    )
 
-    g_nav1p3 = g_nav1p3*remaining_1_3
-    g_nav1p7 = g_nav1p7*remaining_1_7
-    g_nav1p8 = g_nav1p8*remaining_1_8
+    if with_inhibition
+        remaining_1_3, remaining_1_7, remaining_1_8 = get_lidocaine_inhibition(C_lidocaine)
+        g_nav1p3 = g_nav1p3*remaining_1_3
+        g_nav1p7 = g_nav1p7*remaining_1_7
+        g_nav1p8 = g_nav1p8*remaining_1_8
+    end
     
     # --- Stimulus parameters --- #
 

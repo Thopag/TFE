@@ -2,6 +2,7 @@ module ODE
 
 using DifferentialEquations
 using ..Utils
+using ..Lidocaine
 
 export simulation, ODE_system, stochastic_part
 
@@ -12,66 +13,77 @@ end
 # --------------------------- Common to all --------------------------- #
 
 function dot_x(V, x, x_inf, tau_x; kwargs...)
-    return (x_inf(V; kwargs...)-x)/tau_x(V)
+    return (x_inf(V; kwargs...)-x)/tau_x(V; kwargs...)
 end
 
 function dot_x_DIV(V, x, x_inf, tau_x; with_DIV0 = true, kwargs...)
-    return (x_inf(V;with_DIV0=with_DIV0, kwargs...)-x)/tau_x(V; with_DIV0=with_DIV0)
+    return (x_inf(V;with_DIV0=with_DIV0, kwargs...)-x)/tau_x(V; with_DIV0=with_DIV0, kwargs...)
 end
 
 # --------------------------- Na_V 1.3 --------------------------- #
 
-function alpha_m_1_3(V)
+function alpha_m_1_3(V; lido_shift=0)
     jp = 4.2
-    return 10.22/(1+exp((V-(-7.19-jp-12))/-15.43))
+    return 10.22/(1+exp((V-(-7.19-jp-12+lido_shift))/-15.43))
 end
 
-function alpha_h_1_3(V; with_DIV0=true)
+function alpha_h_1_3(V; with_DIV0=true, lido_shift=0)
     jp = 4.2
     if with_DIV0
-        return 0.0744/(1+exp((V-(-99.76-jp))/11.07))
+        return 0.0744/(1+exp((V-(-99.76-jp+lido_shift))/11.07))
     end
-    return 0.0744/(1+exp((V-(-99.76-jp+10))/11.07))
+    return 0.0744/(1+exp((V-(-99.76-jp+10+lido_shift))/11.07))
 end
 
-function beta_m_1_3(V)
+function beta_m_1_3(V; lido_shift=0)
     jp = 4.2
-    return 23.76/(1+exp((V-(-70.37-jp-12))/14.53))
+    return 23.76/(1+exp((V-(-70.37-jp-12+lido_shift))/14.53))
 end
 
-function beta_h_1_3(V; with_DIV0=true)
+function beta_h_1_3(V; with_DIV0=true, lido_shift=0)
     jp = 4.2
     if with_DIV0
-        return 2.54/(1+exp((V-(-7.8-jp))/-10.68))
+        return 2.54/(1+exp((V-(-7.8-jp+lido_shift))/-10.68))
     end
-    return 2.54/(1+exp((V-(-7.8-jp+10))/-10.68))
+    return 2.54/(1+exp((V-(-7.8-jp+10+lido_shift))/-10.68))
 end
 
 # ---- #
 
-function h_inf_1_3(V; with_DIV0=true, with_original = true)
-    if !with_original
-        # Change 
-        return alpha_h_1_3(V; with_DIV0=with_DIV0) / (alpha_h_1_3(V; with_DIV0=with_DIV0) + beta_h_1_3(V; with_DIV0=with_DIV0))
+function h_inf_1_3(V; with_DIV0=true, with_original = true, C_lido=0, with_lido_shift=false)
+    # Lidocaine effect
+    lido_shift = 0
+    if with_lido_shift
+        lido_shift = inact_1_3_shift(C_lido)
     end
-
-    return alpha_h_1_3(V; with_DIV0=with_DIV0) / (alpha_h_1_3(V; with_DIV0=with_DIV0) + beta_h_1_3(V; with_DIV0=with_DIV0))
-
+    return alpha_h_1_3(V; with_DIV0=with_DIV0, lido_shift=lido_shift) / (alpha_h_1_3(V; with_DIV0=with_DIV0, lido_shift=lido_shift) + beta_h_1_3(V; with_DIV0=with_DIV0, lido_shift=lido_shift))
 end
 
-function tau_h_1_3(V; with_DIV0=true)
-    return 1 / (alpha_h_1_3(V; with_DIV0=with_DIV0) + beta_h_1_3(V; with_DIV0=with_DIV0))
-end
-
-function m_inf_1_3(V; with_original = true)
-    if !with_original
-        return alpha_m_1_3(V) / (alpha_m_1_3(V) + beta_m_1_3(V))
+function tau_h_1_3(V; with_DIV0=true, with_original = true, C_lido=0, with_lido_shift=false)
+    # Lidocaine effect
+    lido_shift = 0
+    if with_lido_shift
+        lido_shift = 0
     end
-    return alpha_m_1_3(V) / (alpha_m_1_3(V) + beta_m_1_3(V))
+    return 1 / (alpha_h_1_3(V; with_DIV0=with_DIV0, lido_shift=lido_shift) + beta_h_1_3(V; with_DIV0=with_DIV0, lido_shift=lido_shift))
 end
 
-function tau_m_1_3(V)
-    return 1 / (alpha_m_1_3(V) + beta_m_1_3(V))
+function m_inf_1_3(V; with_original = true, C_lido=0, with_lido_shift=false)
+    # Lidocaine effect
+    lido_shift = 0
+    if with_lido_shift
+        lido_shift = act_1_3_shift(C_lido)
+    end
+    return alpha_m_1_3(V; lido_shift=lido_shift) / (alpha_m_1_3(V; lido_shift=lido_shift) + beta_m_1_3(V; lido_shift=lido_shift))
+end
+
+function tau_m_1_3(V; with_original = true, C_lido=0, with_lido_shift=false)
+    # Lidocaine effect
+    lido_shift = 0
+    if with_lido_shift
+        lido_shift = 0
+    end
+    return 1 / (alpha_m_1_3(V; lido_shift=lido_shift) + beta_m_1_3(V; lido_shift=lido_shift))
 end
 
 # --------------------------- Na_V 1.7 --------------------------- #
@@ -101,16 +113,16 @@ function h_inf_1_7(V; with_original = true, C_lido=0, with_lido_shift=false)
     # Lidocaine effect
     lido_shift = 0
     if with_lido_shift
-        lido_shift = C_lido
+        lido_shift = inact_1_7_shift(C_lido)
     end
     return alpha_h_1_7(V; lido_shift=lido_shift) / (alpha_h_1_7(V; lido_shift=lido_shift) + beta_h_1_7(V; lido_shift=lido_shift))
 end
 
-function tau_h_1_7(V; C_lido=0, with_lido_shift=false)
+function tau_h_1_7(V; with_original = true, C_lido=0, with_lido_shift=false)
     # Lidocaine effect
     lido_shift = 0
     if with_lido_shift
-        lido_shift = C_lido
+        lido_shift = 0
     end
     return 1 / (alpha_h_1_7(V; lido_shift=lido_shift) + beta_h_1_7(V; lido_shift=lido_shift))
 end
@@ -122,16 +134,16 @@ function m_inf_1_7(V; with_original = true, C_lido=0, with_lido_shift=false)
     # Lidocaine effect
     lido_shift = 0
     if with_lido_shift
-        lido_shift = C_lido
+        lido_shift = act_1_7_shift(C_lido)
     end
     return alpha_m_1_7(V; lido_shift=lido_shift) / (alpha_m_1_7(V; lido_shift=lido_shift) + beta_m_1_7(V; lido_shift=lido_shift))
 end
 
-function tau_m_1_7(V; C_lido=0, with_lido_shift=false)
+function tau_m_1_7(V; with_original = true, C_lido=0, with_lido_shift=false)
     # Lidocaine effect
     lido_shift = 0
     if with_lido_shift
-        lido_shift = C_lido
+        lido_shift = 0
     end
     return 1 / (alpha_m_1_7(V; lido_shift=lido_shift) + beta_m_1_7(V; lido_shift=lido_shift))
 end
@@ -178,16 +190,16 @@ function h_inf_1_8(V; with_original = true, C_lido=0, with_lido_shift=false)
     # Lidocaine effect
     lido_shift = 0
     if with_lido_shift
-        lido_shift = C_lido
+        lido_shift = inact_1_8_shift(C_lido)
     end
-    return alpha_h_1_8(V; lido_shift=C_lido) / (alpha_h_1_8(V; lido_shift=C_lido) + beta_h_1_8(V; lido_shift=C_lido))
+    return alpha_h_1_8(V; lido_shift=lido_shift) / (alpha_h_1_8(V; lido_shift=lido_shift) + beta_h_1_8(V; lido_shift=lido_shift))
 end
 
-function tau_h_1_8(V; C_lido=C_lido, with_lido_shift=false)
+function tau_h_1_8(V; with_original = true, C_lido=0, with_lido_shift=false)
     # Lidocaine effect
     lido_shift = 0
     if with_lido_shift
-        lido_shift = C_lido
+        lido_shift = 0
     end
     return 1 / (alpha_h_1_8(V; lido_shift=lido_shift) + beta_h_1_8(V; lido_shift=lido_shift))
 end
@@ -199,16 +211,16 @@ function m_inf_1_8(V; with_original = true, C_lido=0, with_lido_shift=false)
     # Lidocaine effect
     lido_shift = 0
     if with_lido_shift
-        lido_shift = C_lido
+        lido_shift = act_1_8_shift(C_lido)
     end
     return alpha_m_1_8(V; lido_shift=lido_shift) / (alpha_m_1_8(V; lido_shift=lido_shift) + beta_m_1_8(V; lido_shift=lido_shift))
 end
 
-function tau_m_1_8(V; C_lido=C_lido, with_lido_shift=false)
+function tau_m_1_8(V; with_original = true, C_lido=0, with_lido_shift=false)
     # Lidocaine effect
     lido_shift = 0
     if with_lido_shift
-        lido_shift = C_lido
+        lido_shift = 0
     end
     return 1 / (alpha_m_1_8(V; lido_shift=lido_shift) + beta_m_1_8(V; lido_shift=lido_shift))
 end
@@ -367,8 +379,8 @@ function ODE_system(du,u,p,t)
 
     du[1] = (I_ext+I_noise-I_NaV1p3-I_NaV1p7-I_NaV1p8-I_Kdr-I_Km-I_Leak-I_AHP)/C
 
-    du[2] = dot_x(V, m3, m_inf_1_3, tau_m_1_3; with_original=with_original)
-    du[3] = dot_x_DIV(V, h3, h_inf_1_3, tau_h_1_3; with_DIV0=p.with_DIV0, with_original=with_original)
+    du[2] = dot_x(V, m3, m_inf_1_3, tau_m_1_3; with_original=with_original, C_lido=C_lido, with_lido_shift=with_lido_shift)
+    du[3] = dot_x_DIV(V, h3, h_inf_1_3, tau_h_1_3; with_DIV0=p.with_DIV0, with_original=with_original, C_lido=C_lido, with_lido_shift=with_lido_shift)
 
     du[4] = dot_x(V, m7, m_inf_1_7, tau_m_1_7; with_original=with_original, C_lido=C_lido, with_lido_shift=with_lido_shift)
     du[5] = dot_x(V, h7, h_inf_1_7, tau_h_1_7; with_original=with_original, C_lido=C_lido, with_lido_shift=with_lido_shift)

@@ -108,9 +108,9 @@ end
 
 function plot_conduct_inhib()
 
-    g_nav1p3 = 0.0
-    g_nav1p7 = 3.0
-    g_nav1p8 = 30.0
+    g_nav1p3 = 0.35
+    g_nav1p8 = 0.2
+    g_nav1p7 = 35.0
 
     lido_concentrations = 10 .^ range(log10(0.1), log10(2000), length=1000)
     test_point = [1.0, 10.0, 50.0, 100.0, 500.0, 1000.0]
@@ -138,8 +138,26 @@ function plot_conduct_inhib()
     display(plt_1p8)
     savefig(plt_1p3, "plots/plt_1p3.pdf")
     savefig(plt_1p7, "plots/plt_1p7.pdf")
-    savefig(plt_1p8, "plots/ss_inhib.pdf")
+    savefig(plt_1p8, "plots/plt_1p8.pdf")
 
 end
 
+function plot_ss_shift()
+
+    V = -130:0.5:20
+
+    plt = plot(xlabel="Voltage (mV)", ylabel= "(-)", legendfontsize=7, legend=:bottomright, title="NaV1.3 steady states")
+
+    lido_concentrations = [0.0, 1.0, 10.0, 50.0, 100.0, 500.0, 1000.0]
+
+    with_lido_shift=true
+    for (i,C_lido) in enumerate(lido_concentrations)
+        plot!(plt, V, ODE.m_inf_1_3.(V; C_lido=C_lido, with_lido_shift=with_lido_shift), label="$C_lido µM", linestyle = :solid, color=palette(:default)[i])
+        plot!(plt, V, ODE.h_inf_1_3.(V; with_DIV0 = false, C_lido=C_lido, with_lido_shift=with_lido_shift), label="", linestyle = :dash, color=palette(:default)[i])
+    end
+    display(plt)
+    savefig(plt, "plots/shifted_ss.pdf")
+end
+
 plot_conduct_inhib()
+#plot_ss_shift()

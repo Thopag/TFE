@@ -3,7 +3,7 @@ module Utils
 using Peaks
 using Statistics
 
-export Parameters, give_currents, pulse, get_peaks, instant_freqs, global_pattern, window_count, get_lidocaine_inhibition
+export Parameters, give_currents, pulse, get_peaks, instant_freqs, global_pattern, window_count
 
 # --------------------------- Parameters struct --------------------------- #
 
@@ -149,28 +149,5 @@ function global_pattern(t_spikes, n_peak, begin_stim, end_stim; window_width=100
     
     return f_global, first_count, pattern
 end
-
-hill(D, f_max, IC50, h, y0) = y0 + (f_max * D^h) / (IC50^h + D^h)
-
-lidocain_1_7_channel(D) = hill(D, 1.0079, 477.1, 1.31, 1.52 / 100)
-lidocain_1_8_channel(D) = hill(D, 0.9698, 118.31, 1.06, 4.78 / 100)
-
-# which of the 2 ?
-lidocain_1_3_inact_inib(D) = hill(D, 0.949, 284, 0.48, 0)
-lidocain_1_3_resting_inib(D) = hill(D, 0.997, 1462, 1.35, 0)
-
-function get_lidocaine_inhibition(C)
-    # C in µM
-    if C == 0
-        return 1, 1, 1
-    end
-    
-    remaining_1_3 = 1.0 - lidocain_1_3_inact_inib(C) # which 1.3 ?
-    remaining_1_7 = 1.0 - lidocain_1_7_channel(C)
-    remaining_1_8 = 1.0 - lidocain_1_8_channel(C)
-
-    return remaining_1_3, remaining_1_7, remaining_1_8
-end
-
 
 end

@@ -1,7 +1,7 @@
 include("DIV0/params.jl")
 include("DIV7/params.jl")
 
-folder = "DIV0"
+folder = "DIV7"
 
 if folder == "DIV0"
     get_param = DIV0_parameter
@@ -71,10 +71,9 @@ function parameter_selection(;
     stim_length = 1000.0,           # ms
     kwargs...
     )
-
     params = Vector{Parameters}()
 
-    amps = 0:25:300
+    amps = 0:2.5:300
     #g_nav1p7_s = 0:50:100.0
     #C_lido_s = [0.0, 1.0, 10.0, 25.0, 50.0, 75.0, 100.0, 250.0, 500.0, 750.0, 1000.0]
 
@@ -84,6 +83,8 @@ function parameter_selection(;
         with_noise = false,
         #C_lidocaine=i,
         #with_original=false,
+        with_lido_shift=true,
+        #with_inhibition=false,
         kwargs...
         )
         push!(params, param)
