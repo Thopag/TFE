@@ -167,18 +167,22 @@ end
 
 function alpha_m_1_8(V; lido_shift=0)
     return 7.21/(1+exp((V-(0.063-5.3+lido_shift))/-7.86))
+    #return 7.35-7.35/(1+exp((V-(-1.38-5.3))/10.9))
 end
 
 function alpha_h_1_8(V; lido_shift=0)
     return 1.63/(1+exp((V-(-68.5-5.3+lido_shift))/10.01))
+    #return 0.011+1.39/(1+exp((V-(-78.04-5.3))/11.32))
 end
 
 function beta_m_1_8(V; lido_shift=0)
     return 7.4/(1+exp((V-(-53.06-5.3+lido_shift))/19.34))
+    #return 5.97/(1+exp((V-(-56.43-5.3))/18.26))
 end
 
 function beta_h_1_8(V; lido_shift=0)
     return 0.81/(1+exp((V-(11.44-5.3+lido_shift))/-13.12))
+    #return 0.56-0.56/(1+exp((V-(21.82-5.3))/20.03))
 end
 
 # ---- #
