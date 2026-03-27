@@ -83,7 +83,7 @@ end
 function main()
     V = -130:0.5:70
 
-    plt = plot(xlabel="Voltage (mV)", legend=:topleft, yaxis=:log10)
+    plt = plot(xlabel="Voltage (mV)", legend=:topleft) #, yaxis=:log10)
     # plot!(plt, V, x_inf.(V, alpha_m_model, beta_m_model), label="1.8 model", color=:green)
     # plot!(plt, V, x_inf.(V, alpha_m_rat, beta_m_rat), label="1.8 article rat", color=:blue)
     # plot!(plt, V, x_inf.(V, alpha_m_human, beta_m_human), label="1.8 article human", color=:red)
@@ -100,19 +100,19 @@ function main()
     # plot!(plt, V, tau_x.(V, alpha_h_rat, beta_h_rat), linestyle=:dash, label="", color=:blue)
     # plot!(plt, V, tau_x.(V, alpha_h_human, beta_h_human), linestyle=:dash, label="", color=:red)
 
-    # plot!(plt, V, ODE.n_inf_K_dr.(V), label="Kdr model", color=:green)
-    # plot!(plt, V, x_inf.(V, alpha_n, beta_n), label="Kdr article", color=:red)
-    # plot!(plt, V, x_inf.(V, ODE.alpha_n_K_dr, ODE.beta_n_K_dr), label="Kdr test", color=:blue)
+    plot!(plt, V, ODE.n_inf_K_dr.(V), label="Kdr model", color=:green)
+    plot!(plt, V, x_inf.(V, alpha_n, beta_n), label="Kdr article", color=:red)
+    plot!(plt, V, x_inf.(V, ODE.alpha_n_K_dr, ODE.beta_n_K_dr), label="Kdr test", color=:blue)
 
-    # plot!(plt, V, ODE.l_inf_K_dr.(V), linestyle=:dash, label="", color=:green)
-    # plot!(plt, V, x_inf.(V, alpha_l, beta_l), linestyle=:dash, label="", color=:red)
-    # plot!(plt, V, x_inf.(V, ODE.alpha_l_K_dr, ODE.beta_l_K_dr), linestyle=:dash, label="", color=:blue)
+    plot!(plt, V, ODE.l_inf_K_dr.(V), linestyle=:dash, label="", color=:green)
+    plot!(plt, V, x_inf.(V, alpha_l, beta_l), linestyle=:dash, label="", color=:red)
+    plot!(plt, V, x_inf.(V, ODE.alpha_l_K_dr, ODE.beta_l_K_dr), linestyle=:dash, label="", color=:blue)
 
-    plot!(plt, V, ODE.tau_n_K_dr.(V), label="Kdr model", color=:green)
-    plot!(plt, V, tau_x.(V, alpha_n, beta_n), label="Kdr article", color=:red)
+    # plot!(plt, V, ODE.tau_n_K_dr.(V), label="Kdr model", color=:green)
+    # plot!(plt, V, tau_x.(V, alpha_n, beta_n), label="Kdr article", color=:red)
 
-    plot!(plt, V, ODE.tau_l_K_dr.(V), linestyle=:dash, label="", color=:green)
-    plot!(plt, V, tau_x.(V, alpha_l, beta_l), linestyle=:dash, label="", color=:red)
+    # plot!(plt, V, ODE.tau_l_K_dr.(V), linestyle=:dash, label="", color=:green)
+    # plot!(plt, V, tau_x.(V, alpha_l, beta_l), linestyle=:dash, label="", color=:red)
 
     # plot!(plt, V, ODE.beta_n_K_dr.(V), label="Kdr model", color=:green)
     # plot!(plt, V, beta_n.(V), label="Kdr article", color=:red)

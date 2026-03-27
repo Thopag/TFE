@@ -52,12 +52,12 @@ end
 
 function main()
 
-    get_param = DIV7_parameter
+    get_param = DIV0_parameter
     amp = 17
     stim_on = 500.0
     stim_length = 1000.0
 
-    plt_I = plot(xlabel="Voltage (mV)", ylabel= "Current (uA/cm2)", legendfontsize=7, legend=:bottomright, title="NaV1.3 steady state current")
+    plt_I = plot(xlabel="Voltage (mV)", ylabel= "Current (uA/cm2)", legendfontsize=7, legend=:bottomright, title="NaV1.8 steady state current")
 
     lido_concentrations = [0.0, 1.0, 10.0, 50.0, 100.0, 500.0, 1000.0]
 
@@ -71,9 +71,9 @@ function main()
         
         INaV1p3, INaV1p7, INaV1p8, IKdr, IKm, IAHP, ILeak = ss_currents(p)
 
-        plot!(plt_I, V, INaV1p3, label="$C_lido µM", color=palette(:default)[i], alpha=1)
+        #plot!(plt_I, V, INaV1p3, label="$C_lido µM", color=palette(:default)[i], alpha=1)
         #plot!(plt_I, V, INaV1p7, label="", color=palette(:default)[i], alpha=0.5)
-        #plot!(plt_I, V, INaV1p8, label="", color=palette(:default)[i], alpha=0.5)
+        plot!(plt_I, V, INaV1p8, label="$C_lido µM", color=palette(:default)[i], alpha=1)
     end
 
     # plot!(plt_I, V, IKdr, color=:orange, label=L"I_{Kdr}")

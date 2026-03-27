@@ -83,7 +83,7 @@ function parameter_selection(;
         with_noise = false,
         #C_lidocaine=i,
         #with_original=false,
-        #with_lido_shift=true,
+        with_lido_shift=true,
         #with_inhibition=false,
         kwargs...
         )
@@ -99,7 +99,7 @@ function main()
     # amps = [55.0]#0:25:150.0
     # labels = ["$amp pA" for amp in amps]
 
-    lido_concentrations = [0.0]#, 1.0, 10.0, 50.0, 100.0, 500.0, 1000.0]
+    lido_concentrations = [0.0, 1.0, 10.0, 50.0, 100.0, 500.0, 1000.0]
     labels = ["$C_lido" for C_lido in lido_concentrations]
 
     # original_vec = [true, false]
