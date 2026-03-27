@@ -18,7 +18,8 @@ end
 # 23 mV shift at 1000 µM (Sheets et al. 2008)
 # 10.6 mV shift at 100 µM (Chevrier et al. 2004)
 function inact_1_7_shift(C)
-    return - ((10 / (1 + exp(-0.06 * (C - 50)))) + (14.5 / (1 + exp(-0.0065 * (C - 400)))) - 1.2)
+    # old return - ((10 / (1 + exp(-0.06 * (C - 50)))) + (14.5 / (1 + exp(-0.0065 * (C - 400)))) - 1.2)
+    return - ( (-24.2 / (1 + exp(3.17 * (log10(C) - log10(120))))) + 24.2)
 end
 
 # 1.7 activation
