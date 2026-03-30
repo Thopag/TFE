@@ -89,19 +89,23 @@ end
 # --------------------------- Na_V 1.7 --------------------------- #
 
 function alpha_m_1_7(V; lido_shift=0)
-    return 10.22/(1+exp((V-(-7.19-4.2+lido_shift))/-15.43))
+    jp = 4.2
+    return 10.22/(1+exp((V-(-7.19-jp+lido_shift))/-15.43))
 end
 
 function alpha_h_1_7(V; lido_shift=0)
-    return 0.0744/(1+exp((V-(-99.76-4.2+lido_shift))/11.07))
+    jp = 4.2
+    return 0.0744/(1+exp((V-(-99.76-jp+lido_shift))/11.07))
 end
 
 function beta_m_1_7(V; lido_shift=0)
-    return 23.76/(1+exp((V-(-70.37-4.2+lido_shift))/14.53))
+    jp = 4.2
+    return 23.76/(1+exp((V-(-70.37-jp+lido_shift))/14.53))
 end
 
 function beta_h_1_7(V; lido_shift=0)
-    return 2.54/(1+exp((V-(-7.8-4.2+lido_shift))/-10.68))
+    jp = 4.2
+    return 2.54/(1+exp((V-(-7.8-jp+lido_shift))/-10.68))
 end
 
 # ---- #
@@ -166,27 +170,31 @@ end
 # --------------------------- Na_V 1.8 --------------------------- #
 
 function alpha_m_1_8(V; lido_shift=0)
-    return 7.21/(1+exp((V-(0.063-5.3+lido_shift))/-7.86))
+    jp = 5.3
+    return 7.21/(1+exp((V-(0.063-jp+lido_shift))/-7.86))
     #human version
-    #return 7.35-7.35/(1+exp((V-(-1.38-5.3+lido_shift))/10.9))
+    #return 7.35-7.35/(1+exp((V-(-1.38-jp+lido_shift))/10.9))
 end
 
 function alpha_h_1_8(V; lido_shift=0)
-    return 1.63/(1+exp((V-(-68.5-5.3+lido_shift))/10.01))
+    jp = 5.3
+    return 1.63/(1+exp((V-(-68.5-jp+lido_shift))/10.01))
     #human version
-    #return 0.011+1.39/(1+exp((V-(-78.04-5.3+lido_shift))/11.32))
+    #return 0.011+1.39/(1+exp((V-(-78.04-jp+lido_shift))/11.32))
 end
 
 function beta_m_1_8(V; lido_shift=0)
-    return 7.4/(1+exp((V-(-53.06-5.3+lido_shift))/19.34))
+    jp = 5.3
+    return 7.4/(1+exp((V-(-53.06-jp+lido_shift))/19.34))
     #human version
-    #return 5.97/(1+exp((V-(-56.43-5.3+lido_shift))/18.26))
+    #return 5.97/(1+exp((V-(-56.43-jp+lido_shift))/18.26))
 end
 
 function beta_h_1_8(V; lido_shift=0)
-    return 0.81/(1+exp((V-(11.44-5.3+lido_shift))/-13.12))
+    jp = 5.3
+    return 0.81/(1+exp((V-(11.44-jp+lido_shift))/-13.12))
     #human version
-    #return 0.56-0.56/(1+exp((V-(21.82-5.3+lido_shift))/20.03))
+    #return 0.56-0.56/(1+exp((V-(21.82-jp+lido_shift))/20.03))
 end
 
 # ---- #
