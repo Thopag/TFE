@@ -8,19 +8,21 @@ export empty_voltage_plot, plot_voltage, plot_all, plot_analyses, plot_param_pla
 
 # Pattern :
 
-label_list = ["No spike", "Single spike ", "Transient", "Spikling"]
+label_list = ["No spike", "Single spike", "Two spikes", "Transient", "Spikling"]
 
 # circle : No spike
 # utriangle : Single spike 
+# :dtriangle : Two spikes 
 # diamond : Transient
 # square : Spikling
-markers_list = [:circle, :utriangle, :diamond, :square]
+markers_list = [:circle, :utriangle, :dtriangle, :diamond, :square]
 
 # blue : No spike
-# green : Single spike 
+# darkgreen : Single spike 
+# yellowgreen : Two spikes
 # orange : Transient
 # red3 : Spikling
-colors_list = [:midnightblue, :darkgreen, :orange, :red3]
+colors_list = [:midnightblue, :darkgreen, :yellowgreen, :orange, :red3]
 
 function empty_voltage_plot(; xlimits=(400, 1700))
     p = plot(xlims=xlimits, xlabel="Time (ms)", ylabel= "Voltage (mV)")
@@ -55,51 +57,51 @@ function plot_all(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp, t_spik
                             I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, I_Leak, I_ext, I_noise
                                 ; xlimits=(400, 1700))
 
-    n_fig = 4
-    p = plot(layout = (n_fig, 1), link = :x, xlims=xlimits, size = (1000, 900), xaxis = nothing)
+    n_fig = 1
+    p = plot(layout = (n_fig, 1), link = :x, xlims=xlimits, size = (1000, 300), xaxis = nothing)
 
     voltage = 1
-    ylabel!(p[voltage], "Voltage (mV)", legend = :topright)
+    ylabel!(p[voltage], "Voltage (mV)", legend = :topright, ylims=(-90,40))
     plot!(p[voltage], t, V, color= :black, label=L"%$amp pA")
     #vline!(p[voltage], t_spikes, color=:red, label="peaks")
 
-    variable = 2
-    ylabel!(p[variable], "Variable (-)")
-    #plot!(p[variable], ylims=(0, 0.25))
-    plot!(p[variable], legend = :bottomright)
-    plot!(p[variable], t, m3, label=L"m_{3}", linestyle = :solid, color=:blue)
-    plot!(p[variable], t, h3, label=L"h_{3}", linestyle = :dash, color=:blue)
-    plot!(p[variable], t, m7, label=L"m_{7}", linestyle = :solid, color=:red)
-    plot!(p[variable], t, h7, label=L"h_{7}", linestyle = :dash, color=:red)
-    plot!(p[variable], t, m8, label=L"m_{8}", linestyle = :solid, color=:green)
-    plot!(p[variable], t, h8, label=L"h_{8}", linestyle = :dash, color=:green)
-    plot!(p[variable], t, ndr, label=L"n_{dr}", linestyle = :solid, color=:orange)
-    plot!(p[variable], t, ldr, label=L"l_{dr}", linestyle = :dash, color=:orange)
-    plot!(p[variable], t, nm, label=L"n_{m}", linestyle = :solid, color=:purple)
-    plot!(p[variable], t, z_AHP, label=L"z_{AHP}", linestyle = :solid, color=:brown)
+    # variable = 2
+    # ylabel!(p[variable], "Variable (-)")
+    # #plot!(p[variable], ylims=(0, 0.25))
+    # plot!(p[variable], legend = :bottomright)
+    # plot!(p[variable], t, m3, label=L"m_{3}", linestyle = :solid, color=:blue)
+    # plot!(p[variable], t, h3, label=L"h_{3}", linestyle = :dash, color=:blue)
+    # plot!(p[variable], t, m7, label=L"m_{7}", linestyle = :solid, color=:red)
+    # plot!(p[variable], t, h7, label=L"h_{7}", linestyle = :dash, color=:red)
+    # plot!(p[variable], t, m8, label=L"m_{8}", linestyle = :solid, color=:green)
+    # plot!(p[variable], t, h8, label=L"h_{8}", linestyle = :dash, color=:green)
+    # plot!(p[variable], t, ndr, label=L"n_{dr}", linestyle = :solid, color=:orange)
+    # plot!(p[variable], t, ldr, label=L"l_{dr}", linestyle = :dash, color=:orange)
+    # plot!(p[variable], t, nm, label=L"n_{m}", linestyle = :solid, color=:purple)
+    # plot!(p[variable], t, z_AHP, label=L"z_{AHP}", linestyle = :solid, color=:brown)
 
-    channel = 3
-    ylabel!(p[channel], "Channel Availability (%)")
-    #plot!(p[channel], ylims=(0,10))
-    plot!(p[channel], t, m3.^3 .* h3 .* 100, color=:blue, label=L"NaV_{1.3}")
-    plot!(p[channel], t, m7.^3 .* h7 .* 100, color=:red, label=L"NaV_{1.7}")
-    plot!(p[channel], t, m8.^3 .* h8 .* 100, color=:green, label=L"NaV_{1.8}")
-    plot!(p[channel], t, ndr.^3 .* ldr .* 100, color=:orange, label=L"K_{dr}")
-    plot!(p[channel], t, nm .* 100, color=:purple, label=L"K_{m}")
-    plot!(p[channel], t, z_AHP .* 100, color=:brown, label=L"K_{AHP}")
+    # channel = 3
+    # ylabel!(p[channel], "Channel Availability (%)")
+    # # plot!(p[channel], ylims=(0,10))
+    # plot!(p[channel], t, m3.^3 .* h3 .* 100, color=:blue, label=L"NaV_{1.3}")
+    # plot!(p[channel], t, m7.^3 .* h7 .* 100, color=:red, label=L"NaV_{1.7}")
+    # plot!(p[channel], t, m8.^3 .* h8 .* 100, color=:green, label=L"NaV_{1.8}")
+    # plot!(p[channel], t, ndr.^3 .* ldr .* 100, color=:orange, label=L"K_{dr}")
+    # plot!(p[channel], t, nm .* 100, color=:purple, label=L"K_{m}")
+    # plot!(p[channel], t, z_AHP .* 100, color=:brown, label=L"K_{AHP}")
 
-    current = 4
-    ylabel!(p[current], "Current (uA/cm2)", legendfontsize=6, legend = :bottomright)
-    plot!(p[current], ylims=(-2.5, 5))
-    plot!(p[current], t, I_NaV1p3, color=:blue, label=L"I_{NaV1.3}")
-    plot!(p[current], t, I_NaV1p7, color=:red, label=L"I_{NaV1.7}")
-    plot!(p[current], t, I_NaV1p8, color=:green, label=L"I_{NaV1.8}")
-    plot!(p[current], t, I_Kdr, color=:orange, label=L"I_{Kdr}")
-    plot!(p[current], t, I_Km, color=:purple, label=L"I_{KM}")
-    plot!(p[current], t, I_AHP, color=:brown, label=L"I_{AHP}")
-    plot!(p[current], t, I_Leak, color=:black, label=L"I_{Leak}")
-    plot!(p[current], t, I_ext, color=:black, linestyle = :dash, label=L"I_{ext}")
-    plot!(p[current], t, I_noise, color=:pink, label=L"I_{noise}")
+    # current = 4
+    # ylabel!(p[current], "Current (uA/cm2)", legendfontsize=6, legend = :bottomright)
+    # plot!(p[current], ylims=(-2.5, 5))
+    # plot!(p[current], t, I_NaV1p3, color=:blue, label=L"I_{NaV1.3}")
+    # plot!(p[current], t, I_NaV1p7, color=:red, label=L"I_{NaV1.7}")
+    # plot!(p[current], t, I_NaV1p8, color=:green, label=L"I_{NaV1.8}")
+    # plot!(p[current], t, I_Kdr, color=:orange, label=L"I_{Kdr}")
+    # plot!(p[current], t, I_Km, color=:purple, label=L"I_{KM}")
+    # plot!(p[current], t, I_AHP, color=:brown, label=L"I_{AHP}")
+    # plot!(p[current], t, I_Leak, color=:black, label=L"I_{Leak}")
+    # plot!(p[current], t, I_ext, color=:black, linestyle = :dash, label=L"I_{ext}")
+    # plot!(p[current], t, I_noise, color=:pink, label=L"I_{noise}")
 
     # noise = 5
     # plot!(p[noise], t, I_noise, color=:black, label=L"I_{noise}")

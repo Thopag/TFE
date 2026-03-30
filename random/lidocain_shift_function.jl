@@ -2,7 +2,7 @@
 
 # 1.3 inactivation
 function test(C)
-    return   - ( (-4.8 / (1 + exp(8.56 * (log10(C) - log10(64))))) + 4.8)
+    return  - ((-21.4 / (1 + exp(3.17 * (log10(C) - log10(120))))) + 21.4)
 end
 
 
@@ -16,8 +16,8 @@ function main()
     plt = plot(xlabel="Lidocaine (µM)", ylabel= "shift (mV)", legend=:bottomleft) 
     plot!(plt, xaxis=:log10, xlims=(0.01, 100000))
 
-    plot!(plt, D, test.(D), label="1.8 inactivation")
-    scatter!(plt, [0.01, 0.1, 100, 1000], [0.0, 0.0, -4.0, -4.8], color=:black, label="")
+    plot!(plt, D, test.(D), label="1.3 inactivation")
+    scatter!(plt, [0.01001, 0.1, 1000], [0.0, 0.0, -20.3], color=:black, label="")
 
     display(plt)
     savefig(plt, "plots/shift.pdf")

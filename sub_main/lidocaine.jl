@@ -6,12 +6,13 @@ export get_lidocaine_inhibition, inact_1_3_shift, act_1_3_shift, inact_1_7_shift
 
 # 1.3 inactivation
 function inact_1_3_shift(C)
-    return  - ( (22.5 / (1 + exp(-0.015 * (C - 90)))) - 2.3)
+    # return  - ( (22.5 / (1 + exp(-0.015 * (C - 90)))) - 2.3)
+    return - ((-21.4 / (1 + exp(3.17 * (log10(C) - log10(120))))) + 21.4)
 end
 
 # 1.3 activation
 function act_1_3_shift(C)
-    return 0
+    return 0.0
 end
 
 # 1.7 inactivation
@@ -24,19 +25,21 @@ end
 
 # 1.7 activation
 function act_1_7_shift(C)
-    return 0
+    return 0.0
 end
 
 # 1.8 inactivation
 # 4.8 mV shift at 1000 µM (Sheets et al. 2008)
 # 4 mV shift at 100 µM (Chevrier et al. 2004)
 function inact_1_8_shift(C)
-    return  - ((4 / (1 + exp(-0.08 * (C - 50)))) + (0.8 / (1 + exp(-0.0065 * (C - 400)))) - 0.0)
+    # old return  - ((4 / (1 + exp(-0.08 * (C - 50)))) + (0.8 / (1 + exp(-0.0065 * (C - 400)))) - 0.0)
+    return - ( (4.8 / (1 + exp(-14.16 * (log10(C) - log10(77))))) + 0)
 end
 
 # 1.8 activation
 function act_1_8_shift(C)
-    return ((7 / (1 + exp(-0.055 * (C - 60)))) - 0.2)
+    # return ((7 / (1 + exp(-0.055 * (C - 60)))) - 0.2)
+    return (-6.8 / (1 + exp(8.73 * (log10(C) - log10(56.5))))) + 6.8
 end
 
 # ----------------- Lidocaine conductance inhibition ----------------- #
@@ -53,8 +56,8 @@ lidocain_1_3_resting_inib(D) = hill(D, 0.997, 1462, 1.35, 0)
 
 function get_lidocaine_inhibition(C)
     # C in µM
-    if C == 0
-        return 1, 1, 1
+    if C == 0.0
+        return 1.0, 1.0, 1.0
     end
     remaining_1_3 = 1.0 - lidocain_1_3_resting_inib(C) # not sure about this curve context
     remaining_1_7 = 1.0 - lidocain_1_7_channel(C)

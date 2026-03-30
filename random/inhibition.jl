@@ -120,9 +120,9 @@ function plot_conduct_inhib()
     remaining_1_7 = [r[2] for r in results]
     remaining_1_8 = [r[3] for r in results]
 
-    plt_1p3 = plot(lido_concentrations, g_nav1p3 .* remaining_1_3, xaxis=:log10, xlabel="Lidocains (µM)", ylabel= "g_nav1p3 (mS/cm2)", label="")
-    plt_1p7 = plot(lido_concentrations, g_nav1p7 .* remaining_1_7, xaxis=:log10, xlabel="Lidocains (µM)", ylabel= "g_nav1p7 (mS/cm2)", label="")
-    plt_1p8 = plot(lido_concentrations, g_nav1p8 .* remaining_1_8, xaxis=:log10, xlabel="Lidocains (µM)", ylabel= "g_nav1p8 (mS/cm2)", label="")
+    plt_1p3 = plot(lido_concentrations, g_nav1p3 .* remaining_1_3, xaxis=:log10, xlabel="Lidocains (µM)", ylabel= "g_nav1p3 (mS/cm2)", label="", title="g 1.3")
+    plt_1p7 = plot(lido_concentrations, g_nav1p7 .* remaining_1_7, xaxis=:log10, xlabel="Lidocains (µM)", ylabel= "g_nav1p7 (mS/cm2)", label="", title="g 1.7")
+    plt_1p8 = plot(lido_concentrations, g_nav1p8 .* remaining_1_8, xaxis=:log10, xlabel="Lidocains (µM)", ylabel= "g_nav1p8 (mS/cm2)", label="", title="g 1.8")
 
     results = get_lidocaine_inhibition.(test_point)
     remaining_1_3 = [r[1] for r in results]
@@ -144,16 +144,17 @@ end
 
 function plot_ss_shift()
 
-    V = -130:0.5:20
+    V = -130:0.5:5
 
     plt = plot(xlabel="Voltage (mV)", ylabel= "(-)", legendfontsize=7, legend=:bottomright, title="NaV1.3 steady states")
 
     lido_concentrations = [0.0, 1.0, 10.0, 50.0, 100.0, 500.0, 1000.0]
+    #lido_concentrations = [0.0, 10.0, 100.0, 1000.0]
 
     with_lido_shift=true
     for (i,C_lido) in enumerate(lido_concentrations)
         plot!(plt, V, ODE.m_inf_1_3.(V; C_lido=C_lido, with_lido_shift=with_lido_shift), label="$C_lido µM", linestyle = :solid, color=palette(:default)[i])
-        plot!(plt, V, ODE.h_inf_1_3.(V; with_DIV0 = false, C_lido=C_lido, with_lido_shift=with_lido_shift), label="", linestyle = :dash, color=palette(:default)[i])
+        plot!(plt, V, ODE.h_inf_1_3.(V; with_DIV0=false, C_lido=C_lido, with_lido_shift=with_lido_shift), label="", linestyle = :dash, color=palette(:default)[i])
     end
     display(plt)
     savefig(plt, "plots/shifted_ss.pdf")

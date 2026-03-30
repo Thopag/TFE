@@ -66,7 +66,7 @@ function give_currents(t,V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP, p)
     
 end
 
-function get_peaks(t, x; min_h=-25, min_proms=0, max_w=Inf)
+function get_peaks(t, x; min_h=-5.0, min_proms=10.0, max_w=Inf)
 
     peaks = findmaxima(x)
     if length(peaks[1]) == 0
@@ -121,20 +121,26 @@ function global_pattern(t_spikes, n_peak, begin_stim, end_stim; window_width=100
     Value of pattern :
     0 : No spike
     1 : Single spike 
-    2 : Transiant
-    3 : Spikling
+    2 : Two spikes 
+    3 : Transient
+    4 : Spikling
     """
     freqs = instant_freqs(t_spikes)
-    counts =  window_count(t_spikes, begin_stim, end_stim; window_width=window_width)
+    #counts =  window_count(t_spikes, begin_stim, end_stim; window_width=window_width)
 
-    first_count = counts[1]
+    first_count = 404 #counts[1]
     f_global = mean(freqs)
     
     if n_peak == 0
         pattern = 0
         return f_global, first_count, pattern
-    elseif n_peak == 1
+    end
+    
+    if n_peak == 1
         pattern = 1
+        return f_global, first_count, pattern
+    elseif n_peak == 2
+        pattern = 2
         return f_global, first_count, pattern
     end
 
@@ -142,9 +148,9 @@ function global_pattern(t_spikes, n_peak, begin_stim, end_stim; window_width=100
     # If pass the previous "if", it is supposed to be OK
     last_delta_t = 1000 / freqs[end]
     if (t_spikes[end] + last_delta_t*1.2) > end_stim
-        pattern = 3
+        pattern = 4
     else
-        pattern = 2
+        pattern = 3
     end
     
     return f_global, first_count, pattern

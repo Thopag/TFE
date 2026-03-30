@@ -52,14 +52,15 @@ end
 
 function main()
 
-    get_param = DIV0_parameter
+    get_param = DIV7_parameter
     amp = 17
     stim_on = 500.0
     stim_length = 1000.0
 
-    plt_I = plot(xlabel="Voltage (mV)", ylabel= "Current (uA/cm2)", legendfontsize=7, legend=:bottomright, title="NaV1.8 steady state current")
+    plt_I = plot(xlabel="Voltage (mV)", ylabel= "Current (uA/cm2)", legendfontsize=7, legend=:bottomright, title="All NaV steady state current")
 
-    lido_concentrations = [0.0, 1.0, 10.0, 50.0, 100.0, 500.0, 1000.0]
+    #lido_concentrations = [0.0, 1.0, 10.0, 50.0, 100.0, 500.0, 1000.0]
+    lido_concentrations = [0.0, 100.0, 1000.0]
 
     for (i,C_lido) in enumerate(lido_concentrations)
         p = get_param(amp, stim_on, stim_length;
@@ -71,8 +72,8 @@ function main()
         
         INaV1p3, INaV1p7, INaV1p8, IKdr, IKm, IAHP, ILeak = ss_currents(p)
 
-        #plot!(plt_I, V, INaV1p3, label="$C_lido µM", color=palette(:default)[i], alpha=1)
-        #plot!(plt_I, V, INaV1p7, label="", color=palette(:default)[i], alpha=0.5)
+        plot!(plt_I, V, INaV1p3, label="", linestyle=:dot, color=palette(:default)[i], alpha=1)
+        plot!(plt_I, V, INaV1p7, label="", linestyle=:dash, color=palette(:default)[i], alpha=1)
         plot!(plt_I, V, INaV1p8, label="$C_lido µM", color=palette(:default)[i], alpha=1)
     end
 
@@ -81,7 +82,7 @@ function main()
     # plot!(plt_I, V, IAHP, color=:brown, label=L"I_{AHP}")
     # plot!(plt_I, V, ILeak, color=:black, label=L"I_{Leak}")
 
-    display(plt_I)
+    #display(plt_I)
     savefig(plt_I, "plots/ss_current.pdf")
 
 end

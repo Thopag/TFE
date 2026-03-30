@@ -52,7 +52,7 @@ end
 
 function h_inf_1_3(V; with_DIV0=true, with_original = true, C_lido=0, with_lido_shift=false)
     # Lidocaine effect
-    lido_shift = 0
+    lido_shift = 0.0
     if with_lido_shift
         lido_shift = inact_1_3_shift(C_lido)
     end
@@ -61,16 +61,16 @@ end
 
 function tau_h_1_3(V; with_DIV0=true, with_original = true, C_lido=0, with_lido_shift=false)
     # Lidocaine effect
-    lido_shift = 0
+    lido_shift = 0.0
     if with_lido_shift
-        lido_shift = 0
+        lido_shift = 0.0
     end
     return 1 / (alpha_h_1_3(V; with_DIV0=with_DIV0, lido_shift=lido_shift) + beta_h_1_3(V; with_DIV0=with_DIV0, lido_shift=lido_shift))
 end
 
 function m_inf_1_3(V; with_original = true, C_lido=0, with_lido_shift=false)
     # Lidocaine effect
-    lido_shift = 0
+    lido_shift = 0.0
     if with_lido_shift
         lido_shift = act_1_3_shift(C_lido)
     end
@@ -79,9 +79,9 @@ end
 
 function tau_m_1_3(V; with_original = true, C_lido=0, with_lido_shift=false)
     # Lidocaine effect
-    lido_shift = 0
+    lido_shift = 0.0
     if with_lido_shift
-        lido_shift = 0
+        lido_shift = 0.0
     end
     return 1 / (alpha_m_1_3(V; lido_shift=lido_shift) + beta_m_1_3(V; lido_shift=lido_shift))
 end
@@ -111,7 +111,7 @@ function h_inf_1_7(V; with_original = true, C_lido=0, with_lido_shift=false)
         return control_1_7_inactivation(V; C_lido=C_lido)
     end
     # Lidocaine effect
-    lido_shift = 0
+    lido_shift = 0.0
     if with_lido_shift
         lido_shift = inact_1_7_shift(C_lido)
     end
@@ -120,9 +120,9 @@ end
 
 function tau_h_1_7(V; with_original = true, C_lido=0, with_lido_shift=false)
     # Lidocaine effect
-    lido_shift = 0
+    lido_shift = 0.0
     if with_lido_shift
-        lido_shift = 0
+        lido_shift = 0.0
     end
     return 1 / (alpha_h_1_7(V; lido_shift=lido_shift) + beta_h_1_7(V; lido_shift=lido_shift))
 end
@@ -132,7 +132,7 @@ function m_inf_1_7(V; with_original = true, C_lido=0, with_lido_shift=false)
         return control_1_7_activation(V; C_lido=C_lido)
     end
     # Lidocaine effect
-    lido_shift = 0
+    lido_shift = 0.0
     if with_lido_shift
         lido_shift = act_1_7_shift(C_lido)
     end
@@ -141,9 +141,9 @@ end
 
 function tau_m_1_7(V; with_original = true, C_lido=0, with_lido_shift=false)
     # Lidocaine effect
-    lido_shift = 0
+    lido_shift = 0.0
     if with_lido_shift
-        lido_shift = 0
+        lido_shift = 0.0
     end
     return 1 / (alpha_m_1_7(V; lido_shift=lido_shift) + beta_m_1_7(V; lido_shift=lido_shift))
 end
@@ -196,7 +196,7 @@ function h_inf_1_8(V; with_original = true, C_lido=0, with_lido_shift=false)
         return control_1_8_inactivation(V; C_lido=C_lido) 
     end
     # Lidocaine effect
-    lido_shift = 0
+    lido_shift = 0.0
     if with_lido_shift
         lido_shift = inact_1_8_shift(C_lido)
     end
@@ -205,9 +205,9 @@ end
 
 function tau_h_1_8(V; with_original = true, C_lido=0, with_lido_shift=false)
     # Lidocaine effect
-    lido_shift = 0
+    lido_shift = 0.0
     if with_lido_shift
-        lido_shift = 0
+        lido_shift = 0.0
     end
     return 1 / (alpha_h_1_8(V; lido_shift=lido_shift) + beta_h_1_8(V; lido_shift=lido_shift))
 end
@@ -217,7 +217,7 @@ function m_inf_1_8(V; with_original = true, C_lido=0, with_lido_shift=false)
         return control_1_8_activation(V; C_lido=C_lido)
     end
     # Lidocaine effect
-    lido_shift = 0
+    lido_shift = 0.0
     if with_lido_shift
         lido_shift = act_1_8_shift(C_lido)
     end
@@ -226,9 +226,9 @@ end
 
 function tau_m_1_8(V; with_original = true, C_lido=0, with_lido_shift=false)
     # Lidocaine effect
-    lido_shift = 0
+    lido_shift = 0.0
     if with_lido_shift
-        lido_shift = 0
+        lido_shift = 0.0
     end
     return 1 / (alpha_m_1_8(V; lido_shift=lido_shift) + beta_m_1_8(V; lido_shift=lido_shift))
 end
@@ -276,7 +276,7 @@ function beta_n_K_dr(V)
 end
 
 function beta_l_K_dr(V)
-    gml=1.0
+    gml = 1.0
     return exp(1e-3*2*gml*(V-(-61))*9.648e4/(8.315*(273.16+25)))
 end
 
