@@ -8,20 +8,20 @@ export empty_voltage_plot, plot_voltage, plot_all, plot_analyses, plot_param_pla
 
 # Pattern :
 
-label_list = ["No spike", "Single spike", "Two spikes", "Transient", "Spikling"]
+label_list = ["No spike", "Single spike", "Two spikes", "Transient", "Spiking"]
 
 # circle : No spike
 # utriangle : Single spike 
 # :dtriangle : Two spikes 
 # diamond : Transient
-# square : Spikling
+# square : Spiking
 markers_list = [:circle, :utriangle, :dtriangle, :diamond, :square]
 
 # blue : No spike
 # darkgreen : Single spike 
 # yellowgreen : Two spikes
 # orange : Transient
-# red3 : Spikling
+# red3 : Spiking
 colors_list = [:midnightblue, :darkgreen, :yellowgreen, :orange, :red3]
 
 function empty_voltage_plot(; xlimits=(400, 1700))

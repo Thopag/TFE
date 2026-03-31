@@ -14,7 +14,7 @@ print("---- Start ODE ----\n")
 includet("ODEs.jl")
 using .ODE
 
-function warm_up() 
+function warm_up()
 
     tspan = (0.0, 0.5)
     u0 = zeros(Float64, 14)

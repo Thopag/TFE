@@ -71,7 +71,7 @@ function parameter_analyses(params, analysed_values; duration = 1700.0,
     return peaks_count, freqs, pattern_vec, first_peak_height
 end
 
-function parameter_selection(;
+function parameter_selection(analysed_values;
     amp = 55,
     stim_on = 500.0,                # ms
     stim_length = 1000.0,           # ms
@@ -79,16 +79,9 @@ function parameter_selection(;
     )
     params = Vector{Parameters}()
 
-    amps = 0:2.5:300.0
-    #g_nav1p7_s = 0:50:100.0
-    #C_lido_s = [0.0, 1.0, 10.0, 25.0, 50.0, 75.0, 100.0, 250.0, 500.0, 750.0, 1000.0]
-
-    analysed_values = amps
     for i in analysed_values
         param = get_param(i, stim_on, stim_length;
-        with_noise = false,
         #C_lidocaine=i,
-        #with_original=false,
         with_lido_shift=true,
         #with_inhibition=false,
         kwargs...
@@ -96,7 +89,7 @@ function parameter_selection(;
         push!(params, param)
     end
 
-    return params, analysed_values
+    return params
 end
 
 function main()
@@ -105,7 +98,8 @@ function main()
     # amps = [55.0]#0:25:150.0
     # labels = ["$amp pA" for amp in amps]
 
-    lido_concentrations = [0.0, 1.0, 10.0, 50.0, 100.0, 500.0, 1000.0]
+    #lido_concentrations = [1.0, 10.0, 50.0, 100.0, 500.0, 1000.0]
+    lido_concentrations = 10 .^ range(log10(1), log10(1000), length=15)
     labels = ["$C_lido" for C_lido in lido_concentrations]
 
     # original_vec = [true, false]
@@ -117,13 +111,21 @@ function main()
     # g_nav1p8_s = [0.0, 3.0, 9.0, 15.0, 64.0, 100.0, 1000.0]
     # labels = ["$g" for g in g_nav1p8_s]
 
+    # -------- sub cycling param -------- #
+
+    amps = 0:5:50.0
+    #g_nav1p7_s = 0:50:100.0
+    #C_lido_s = [0.0, 1.0, 10.0, 25.0, 50.0, 75.0, 100.0, 250.0, 500.0, 750.0, 1000.0]
+
+    # -------------------- #
     cycling_value_rheobases = Vector{String}()
     rheobases = Vector{Float32}()
 
+    analysed_values = amps
     cycling_vec = lido_concentrations
 
     # labels = ["($g8, $g7)" for (g8,g7) in cycling_vec]
-    
+
     # -------- Set up ploting -------- #
 
     x_lab = "amp pA"
@@ -134,15 +136,17 @@ function main()
     p_height = plot(xlabel=x_lab, ylabel= "Height (mV)", title="First peak height")
     plt_rheo = plot(xlabel=cycling_param_label, ylabel="rheobase (pA)")#, xscale=:log10)
 
+    p_plan = plot(xlabel=x_lab, ylabel=cycling_param_label, title="Heat map $folder", yscale=:log10, legend=:topright, legendfontsize=7)
     p_pattern = plot(xlabel=x_lab, ylabel= cycling_param_label, title="Pattern $folder", yticks = (1:length(labels), labels), legend=:topright, legendfontsize=7)
     for (c, l) in zip(Ploting.colors_list, Ploting.label_list)
         scatter!(p_pattern, [], [], marker=:square, color = c, label = l, markersize = 4)
+        scatter!(p_plan, [], [], marker=:circle, color = c, label = l, markersize = 4)
     end
 
     for (i, (cycling_param, label)) in enumerate(zip(cycling_vec, labels))
 
         # --------------------------------------------- Change param here !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        params, analysed_values = parameter_selection(;C_lidocaine=cycling_param) 
+        params = parameter_selection(analysed_values;C_lidocaine=cycling_param) 
         peaks_count, freqs, pattern_vec, first_peak_height = parameter_analyses(params, analysed_values; 
                                                                             with_plot_sample=plot_sample, title="$(cycling_param)") #, unit="mS/cm2", param_name="g_nav1p7")
 
@@ -160,17 +164,21 @@ function main()
         pattern_form = Ploting.markers_list[pattern_vec .+ 1]
         pattern_color = Ploting.colors_list[pattern_vec .+ 1]
 
-        plot!(p_peaks, analysed_values, peaks_count         , marker=pattern_form, markersize=2, linealpha=0.5, markeralpha=0.7, label=label)
-        plot!(p_freqs, analysed_values, freqs               , marker=pattern_form, markersize=2, linealpha=0.5, markeralpha=0.7, label=label)
-        plot!(p_height, analysed_values, first_peak_height  , marker=:circle     , markersize=2, linealpha=0.6, markeralpha=0.7, label=label)
+        # plot!(p_peaks, analysed_values, peaks_count         , marker=pattern_form, markersize=2, linealpha=0.5, markeralpha=0.7, label=label)
+        # plot!(p_freqs, analysed_values, freqs               , marker=pattern_form, markersize=2, linealpha=0.5, markeralpha=0.7, label=label)
+        # plot!(p_height, analysed_values, first_peak_height  , marker=:circle     , markersize=2, linealpha=0.6, markeralpha=0.7, label=label)
         bar!(p_pattern, analysed_values, fill(i+0.5, length(analysed_values)), fillto=fill(i-0.45, length(analysed_values)), 
                                                                         lw=0, linecolor=:match, bar_width=(analysed_values[1]-analysed_values[2])*1.05, label="", color=pattern_color)
+
+        scatter!(p_plan, analysed_values, fill(cycling_param, length(analysed_values)), markersize=12, color=pattern_color, label="")
 
     end
 
     bar!(plt_rheo, cycling_value_rheobases, rheobases, label="")
     # display(plt_rheo)
+    # display(p_plan)
     savefig(plt_rheo, "plots/rheobases.pdf")
+    savefig(p_plan, "plots/heat_plan.pdf")
 
     # display(p_peaks)
     # display(p_freqs)
