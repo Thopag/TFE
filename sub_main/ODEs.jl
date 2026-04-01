@@ -388,21 +388,21 @@ function ODE_system(du,u,p,t)
     if with_noise
         du[12] = - ( I_noise - mu_noise) / tau_noise
     else
-        du[12] = 0
+        du[12] = 0.0
     end
 
     # --- ODE --- #
 
     du[1] = (I_ext+I_noise-I_NaV1p3-I_NaV1p7-I_NaV1p8-I_Kdr-I_Km-I_Leak-I_AHP)/C
 
-    du[2] = dot_x(V, m3, m_inf_1_3, tau_m_1_3; with_original=with_original, C_lido=C_lido, with_lido_shift=with_lido_shift)
-    du[3] = dot_x_DIV(V, h3, h_inf_1_3, tau_h_1_3; with_DIV0=p.with_DIV0, with_original=with_original, C_lido=C_lido, with_lido_shift=with_lido_shift)
+    du[2] = dot_x(V, m3, m_inf_1_3, tau_m_1_3; C_lido=C_lido, with_lido_shift=with_lido_shift)
+    du[3] = dot_x_DIV(V, h3, h_inf_1_3, tau_h_1_3; C_lido=C_lido, with_lido_shift=with_lido_shift, with_DIV0=p.with_DIV0)
 
-    du[4] = dot_x(V, m7, m_inf_1_7, tau_m_1_7; with_original=with_original, C_lido=C_lido, with_lido_shift=with_lido_shift)
-    du[5] = dot_x(V, h7, h_inf_1_7, tau_h_1_7; with_original=with_original, C_lido=C_lido, with_lido_shift=with_lido_shift)
+    du[4] = dot_x(V, m7, m_inf_1_7, tau_m_1_7; C_lido=C_lido, with_lido_shift=with_lido_shift)
+    du[5] = dot_x(V, h7, h_inf_1_7, tau_h_1_7; C_lido=C_lido, with_lido_shift=with_lido_shift)
 
-    du[6] = dot_x(V, m8, m_inf_1_8, tau_m_1_8; with_original=with_original, C_lido=C_lido, with_lido_shift=with_lido_shift)
-    du[7] = dot_x(V, h8, h_inf_1_8, tau_h_1_8; with_original=with_original, C_lido=C_lido, with_lido_shift=with_lido_shift)
+    du[6] = dot_x(V, m8, m_inf_1_8, tau_m_1_8; C_lido=C_lido, with_lido_shift=with_lido_shift)
+    du[7] = dot_x(V, h8, h_inf_1_8, tau_h_1_8; C_lido=C_lido, with_lido_shift=with_lido_shift)
 
     du[8] = dot_x(V, ndr, n_inf_K_dr, tau_n_K_dr)
     du[9] = dot_x(V, ldr, l_inf_K_dr, tau_l_K_dr)
@@ -433,24 +433,24 @@ function stochastic_part(du,u,p,t)
     tau_noise = p.tau_noise
     with_noise = p.with_noise
 
-    du[1] = 0
-    du[2] = 0
-    du[3] = 0
-    du[4] = 0
-    du[5] = 0
-    du[6] = 0
-    du[7] = 0
-    du[8] = 0
-    du[9] = 0
-    du[10] = 0
-    du[11] = 0
-    du[13] = 0
-    du[14] = 0
+    du[1] = 0.0
+    du[2] = 0.0
+    du[3] = 0.0
+    du[4] = 0.0
+    du[5] = 0.0
+    du[6] = 0.0
+    du[7] = 0.0
+    du[8] = 0.0
+    du[9] = 0.0
+    du[10] = 0.0
+    du[11] = 0.0
+    du[13] = 0.0
+    du[14] = 0.0
 
     if with_noise
-        du[12] = sigma_noise * sqrt(2 / tau_noise)
+        du[12] = sigma_noise * sqrt(2.0 / tau_noise)
     else
-        du[12] = 0
+        du[12] = 0.0
     end
 
     return
@@ -462,6 +462,10 @@ function simulation(u0, tspan, p)
     # -- SDE Simulation -- #
     prob = SDEProblem(ODE_system, stochastic_part, u0, tspan, p) 
     sol = solve(prob,dtmax=0.01)
+
+    # -- ODE Simulation -- #
+    # prob = ODEProblem(ODE_system, u0, tspan, p) 
+    # sol = solve(prob,dtmax=0.01)
 
     # -- Simulation results -- #
     t = sol.t

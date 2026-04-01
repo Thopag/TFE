@@ -70,17 +70,18 @@ function get_peaks(t, x; min_h=-5.0, min_proms=10.0, max_w=Inf)
 
     peaks = findmaxima(x)
     if length(peaks[1]) == 0
-        return peaks[1], 0
+        return peaks[1], 0, []
     end
+    r = peaks[1]
     peaks = peakheights(peaks; min=min_h)
     if length(peaks[1]) == 0
-        return peaks[1], 0
+        return r, 0, []
     end
+    r = peaks[1]
     peaks = peakproms(peaks; min=min_proms)
     if length(peaks) == 0
-        return peaks[1], 0
+        return r, 0, []
     end
-
     peaks_idx, h, data, proms, w, edges = peakwidths(peaks)
 
     right = last.(edges)
@@ -91,13 +92,15 @@ function get_peaks(t, x; min_h=-5.0, min_proms=10.0, max_w=Inf)
     w = t[right] .- t[left]
     peaks_idx = peaks_idx[w .< max_w]
 
-    return peaks_idx, length(peaks_idx)
+    w_peaks = w[w .< max_w]
+
+    return peaks_idx, length(peaks_idx), w_peaks
 end
 
-function instant_freqs(t_spikes)
+function instant_freqs(t_spikes, n_peak)
 
     #If there is only 0 or 1 spike, we got a null frequence
-    if length(t_spikes) <= 1
+    if n_peak <= 1
         return [0]
     end
     delta_t = diff(t_spikes)
@@ -125,7 +128,7 @@ function global_pattern(t_spikes, n_peak, begin_stim, end_stim; window_width=100
     3 : Transient
     4 : Spikling
     """
-    freqs = instant_freqs(t_spikes)
+    freqs = instant_freqs(t_spikes, n_peak)
     #counts =  window_count(t_spikes, begin_stim, end_stim; window_width=window_width)
 
     first_count = 404 #counts[1]

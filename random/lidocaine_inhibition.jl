@@ -51,7 +51,7 @@ function pro()
     println(g(1000))
 end
 
-# ------------------- STEADY STATE INHIBITION ------------------- #
+# ------------------- STEADY STATE INHIBITION OLD ARTICLE------------------- #
 
 Boltzmann_1(V, V_1_2, k, A1) = A1 / ( 1 + exp((V-V_1_2) / k) )
 
@@ -142,23 +142,6 @@ function plot_conduct_inhib()
 
 end
 
-function plot_ss_shift()
+#plot_conduct_inhib()
 
-    V = -130:0.5:5
-
-    plt = plot(xlabel="Voltage (mV)", ylabel= "(-)", legendfontsize=7, legend=:bottomright, title="NaV1.3 steady states")
-
-    lido_concentrations = [0.0, 1.0, 10.0, 50.0, 100.0, 500.0, 1000.0]
-    #lido_concentrations = [0.0, 10.0, 100.0, 1000.0]
-
-    with_lido_shift=true
-    for (i,C_lido) in enumerate(lido_concentrations)
-        plot!(plt, V, ODE.m_inf_1_3.(V; C_lido=C_lido, with_lido_shift=with_lido_shift), label="$C_lido µM", linestyle = :solid, color=palette(:default)[i])
-        plot!(plt, V, ODE.h_inf_1_3.(V; with_DIV0=false, C_lido=C_lido, with_lido_shift=with_lido_shift), label="", linestyle = :dash, color=palette(:default)[i])
-    end
-    display(plt)
-    savefig(plt, "plots/shifted_ss.pdf")
-end
-
-plot_conduct_inhib()
-#plot_ss_shift()
+#print(1 .- get_lidocaine_inhibition(1000))
