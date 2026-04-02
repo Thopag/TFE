@@ -15,18 +15,19 @@ function main()
 
     with_plot = true
 
-    amp = 200.0                    # pA
+    amp = 50.0                    # pA
     duration = 1700.0             # ms
     stim_on = 500.0               # ms
     stim_length = 1000.0          # ms
 
     inhib = 1.0
+    shift = 0.0
     p = param = get_param(amp, stim_on, stim_length;
-        C_lidocaine=0.0,
-        #with_lido_shift=true,
-        #with_inhibition=false,
-        g_nav1p7=0.0,
-        g_nav1p8=30.0*(1.0-inhib),
+        C_lidocaine=shift,
+        with_lido_shift=true,
+        with_inhibition=false,
+        #g_nav1p7=0.0,
+        #g_nav1p8=30.0*(1.0-inhib),
         )
 
     u0 = get_u0()
@@ -37,7 +38,7 @@ function main()
     t,V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP,I_noise,n_test,l_test = ODE.simulation(u0, (0.0, duration), p)
     print("--------------- End Simulation ---------------\n")
 
-    I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, I_Leak, I_ext = give_currents(t,V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP, p)
+    I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, I_Leak, I_ext, dV_dt = give_currents(t,V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP, p)
     peaks_idx, n_peak, w_peaks = get_peaks(t, V;  min_h=-5.0, min_proms=10.0)
     t_spikes = t[peaks_idx]
 
@@ -48,14 +49,20 @@ function main()
     # --- Plots --- #
 
     # 400 1700
-    xlimits = (400, 850)
+    xlimits = (400, 1700)
 
     if with_plot
         plt_all = plot_all(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp, t_spikes,
-                                I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, I_Leak, I_ext, I_noise, p
+                                I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, I_Leak, I_ext, I_noise, dV_dt, p
                                     ; xlimits=xlimits)
         display(plt_all)
         savefig(plt_all, "plots/plot_all.pdf")
+
+        plt_traj = plot(V, dV_dt, color=:black, label="")
+        xlabel!(plt_traj, "Voltage (mV)")
+        ylabel!(plt_traj, "dV/dt (mV/s)")
+        display(plt_traj)
+        savefig(plt_traj, "plots/plot_traj.pdf")
     end
 
     # p_freq = scatter(t_spikes[1:end-1], freqs)

@@ -60,9 +60,11 @@ function give_currents(t,V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP, p)
     IAHP = g_AHP .* (z_AHP.^1) .* (V .- E_k)
     ILeak = g_Leak .* (V .- E_Leak)
 
-    I_ext = p.I0 .+ pulse.(t, p.stim_on, p.stim_off) .* p.Excitation
+    Iext = p.I0 .+ pulse.(t, p.stim_on, p.stim_off) .* p.Excitation
 
-    return INaV1p3, INaV1p7, INaV1p8, IKdr, IKm, IAHP, ILeak, I_ext
+    dV_dt = (Iext .- INaV1p3 .- INaV1p7 .- INaV1p8 .- IKdr .- IKm .- ILeak .- IAHP) ./ p.C
+
+    return INaV1p3, INaV1p7, INaV1p8, IKdr, IKm, IAHP, ILeak, Iext, dV_dt
     
 end
 

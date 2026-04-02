@@ -1,8 +1,6 @@
 include("../DIV0/params.jl")
 include("../DIV7/params.jl")
 
-
-
 function ss_currents(p, V)
 
     g_nav1p3 = p.g_nav1p3
@@ -47,8 +45,7 @@ function ss_currents(p, V)
     ILeak = g_Leak .* (V .- E_Leak)
     Iext = p.I0 .+ p.Excitation
 
-    # without the factor /C
-    dV_dt = Iext .- INaV1p3 .- INaV1p7 .- INaV1p8 .- IKdr .- IKm .- ILeak .- IAHP
+    dV_dt = (Iext .- INaV1p3 .- INaV1p7 .- INaV1p8 .- IKdr .- IKm .- ILeak .- IAHP) ./ p.C
 
     return INaV1p3, INaV1p7, INaV1p8, IKdr, IKm, IAHP, ILeak, Iext, dV_dt
     
@@ -59,8 +56,8 @@ function plot_ss_shift(V, vec, labels; title="title")
     plt = plot(xlabel="Voltage (mV)", ylabel= "(-)", legendfontsize=7, legend=:bottomright, title="$title steady states")
     with_lido_shift=true
     for (i,(value,label)) in enumerate(zip(vec,labels))
-        plot!(plt, V, ODE.m_inf_1_8.(V; C_lido=value, with_lido_shift=with_lido_shift), label=label, linestyle = :solid, color=palette(:default)[i])
-        plot!(plt, V, ODE.h_inf_1_8.(V; C_lido=value, with_lido_shift=with_lido_shift), label="", linestyle = :dash, color=palette(:default)[i])
+        plot!(plt, V, ODE.m_inf_1_7.(V; C_lido=value, with_lido_shift=with_lido_shift), label=label, linestyle = :solid, color=palette(:default)[i])
+        plot!(plt, V, ODE.h_inf_1_7.(V; C_lido=value, with_lido_shift=with_lido_shift), label="", linestyle = :dash, color=palette(:default)[i])
     end
     display(plt)
     savefig(plt, "plots/shifted_ss.png")
@@ -68,13 +65,13 @@ end
 
 function plot_ss_current(V, vec, labels; title="title")
 
-    get_param = DIV0_parameter
+    get_param = DIV7_parameter
     amp = 100
     stim_on = 500.0
     stim_length = 1000.0
 
     plt_I = plot(xlabel="Voltage (mV)", ylabel= "Current (uA/cm2)", legendfontsize=7, legend=:bottomright, title="$title steady state current")
-    plot!(plt_I, ylim=(-10,15))
+    #plot!(plt_I, ylim=(-10,15))
 
     for (i,(value,label)) in enumerate(zip(vec,labels))
         p = param = get_param(amp, stim_on, stim_length;
@@ -85,9 +82,9 @@ function plot_ss_current(V, vec, labels; title="title")
         INaV1p3, INaV1p7, INaV1p8, IKdr, IKm, IAHP, ILeak, Iext, dV_dt = ss_currents(p, V)
 
         # plot!(plt_I, V, INaV1p3, label="", linestyle=:dot, color=palette(:default)[i], alpha=1)
-        # plot!(plt_I, V, INaV1p7, label="", linestyle=:dash, color=palette(:default)[i], alpha=1)
+        # plot!(plt_I, V, INaV1p7, label=label, linestyle=:dash, color=palette(:default)[i], alpha=1)
         # plot!(plt_I, V, INaV1p8, label=label, color=palette(:default)[i], alpha=1)
-        plot!(plt_I, V, dV_dt, label=label, color=palette(:default)[i], alpha=1)
+        # plot!(plt_I, V, dV_dt, label=label, color=palette(:default)[i], alpha=1)
     end
 
     p_k = param = get_param(amp, stim_on, stim_length;)
@@ -108,15 +105,15 @@ function main()
     #lido_concentrations = [0.0, 1.0, 10.0, 50.0, 100.0, 500.0, 1000.0]
     #inhibs = [0.0,  0.3, 0.5, 0.9, 0.93, 1.0]
 
-    V = -40.0:0.5:0.0
-    shifts = 0.0:2:14.0
+    V = -130.0:0.5:70.0
+    shifts = 0.0:2.5:25.0
 
     vec = shifts
     labels = ["$value mV" for value in vec]
 
-    title = "NaV1.8"
+    title = "NaV1.7"
 
-    #plot_ss_shift(V, vec, labels; title=title)
+    plot_ss_shift(V, vec, labels; title=title)
     plot_ss_current(V, vec, labels; title=title)
 end
 

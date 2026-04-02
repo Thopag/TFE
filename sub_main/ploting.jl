@@ -54,7 +54,7 @@ function plot_voltage(t, V, amp, peaks_idx; given_p=nothing, with_peak=false, sa
 end
 
 function plot_all(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp, t_spikes,
-                            I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, I_Leak, I_ext, I_noise, p
+                            I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, I_Leak, I_ext, I_noise, dV_dt, p
                                 ; xlimits=(400, 1700))
 
     n_fig = 3
@@ -81,15 +81,19 @@ function plot_all(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp, t_spik
     # plot!(plt[variable], t, nm, label=L"n_{m}", linestyle = :solid, color=:purple, alpha=alpha)
     # plot!(plt[variable], t, z_AHP, label=L"z_{AHP}", linestyle = :solid, color=:brown, alpha=alpha)
 
-    channel = 2
-    ylabel!(plt[channel], "Channel Availability (%)")
-    #plot!(plt[channel], ylims=(0,50))
-    plot!(plt[channel], t, m3.^3 .* h3 .* 100, color=:blue, label=L"NaV_{1.3}")
-    plot!(plt[channel], t, m7.^3 .* h7 .* 100, color=:red, label=L"NaV_{1.7}")
-    plot!(plt[channel], t, m8.^3 .* h8 .* 100, color=:green, label=L"NaV_{1.8}")
-    plot!(plt[channel], t, ndr.^3 .* ldr .* 100, color=:orange, label=L"K_{dr}", alpha=alpha)
-    plot!(plt[channel], t, nm .* 100, color=:purple, label=L"K_{m}", alpha=alpha)
-    plot!(plt[channel], t, z_AHP .* 100, color=:brown, label=L"K_{AHP}", alpha=alpha)
+    # channel = 2
+    # ylabel!(plt[channel], "Channel Availability (%)")
+    # #plot!(plt[channel], ylims=(0,50))
+    # plot!(plt[channel], t, m3.^3 .* h3 .* 100, color=:blue, label=L"NaV_{1.3}")
+    # plot!(plt[channel], t, m7.^3 .* h7 .* 100, color=:red, label=L"NaV_{1.7}")
+    # plot!(plt[channel], t, m8.^3 .* h8 .* 100, color=:green, label=L"NaV_{1.8}")
+    # plot!(plt[channel], t, ndr.^3 .* ldr .* 100, color=:orange, label=L"K_{dr}", alpha=alpha)
+    # plot!(plt[channel], t, nm .* 100, color=:purple, label=L"K_{m}", alpha=alpha)
+    # plot!(plt[channel], t, z_AHP .* 100, color=:brown, label=L"K_{AHP}", alpha=alpha)
+
+    i_dV_dt = 2
+    ylabel!(plt[i_dV_dt], "dV_dt (mV/s)")
+    plot!(plt[i_dV_dt], t, dV_dt, color=:black, label="")
 
     current = 3
     ylabel!(plt[current], "Current (uA/cm2)", legendfontsize=6, legend = :bottomright)

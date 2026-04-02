@@ -1,7 +1,7 @@
 include("DIV0/params.jl")
 include("DIV7/params.jl")
 
-folder = "DIV0"
+folder = "DIV7"
 
 if folder == "DIV0"
     get_param = DIV0_parameter
@@ -105,9 +105,9 @@ function main()
 
     # -------- param vectors -------- #
 
-    amps = [0.0, 50.0]#0.0:1.0:300.0
+    amps = 0.0:2.5:300.0
 
-    shifts = 0.0:1.0:14.0
+    shifts = 0.0:2.5:25.0
 
     #lido_concentrations = [0.0, 1.0, 10.0, 50.0, 100.0, 500.0, 1000.0]
     #lido_concentrations = 10 .^ range(log10(1), log10(1000), length=15)
