@@ -105,7 +105,7 @@ function main()
 
     # -------- param vectors -------- #
 
-    amps = 0.0:1.0:300.0
+    amps = [0.0, 50.0]#0.0:1.0:300.0
 
     shifts = 0.0:1.0:14.0
 
@@ -181,7 +181,7 @@ function main()
         bar!(p_pattern, analysed_values, fill(i+0.5, length(analysed_values)), fillto=fill(i-0.45, length(analysed_values)), 
                                                                         lw=0, linecolor=:match, bar_width=(analysed_values[1]-analysed_values[2])*1.05, label="", color=pattern_color)
 
-        scatter!(p_plan, analysed_values, fill(cycling_param, length(analysed_values)), markersize=12, color=pattern_color, markerstrokecolor = :match, label="")
+        scatter!(p_plan, analysed_values, fill(cycling_param, length(analysed_values)), markersize=12, color=pattern_color, label="", markerstrokecolor = :match, markerstrokewidth = 0.0)
 
     end
 
