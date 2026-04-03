@@ -97,7 +97,7 @@ function plot_ss_current(V, vec, labels; title="title")
     # plot!(plt_I, V, .-IKdr .-IKm .- IAHP, label=L"- I_{K}", color=:black)
     # plot!(plt_I, V, ILeak, color=:black, label=L"I_{Leak}")
 
-    display(plt_I)
+    #display(plt_I)
     savefig(plt_I, "plots/ss_current.svg")
 
 end
