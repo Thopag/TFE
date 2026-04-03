@@ -56,7 +56,7 @@ function main()
                                 I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, I_Leak, I_ext, I_noise, dV_dt, p
                                     ; xlimits=xlimits)
         # display(plt_all)
-        savefig(plt_all, "plots/plot_all.pdf")
+        savefig(plt_all, "plots/plot_all.svg")
 
         plt_traj = plot(V, dV_dt, color=:black, label="")
         xlabel!(plt_traj, "Voltage (mV)")
@@ -65,7 +65,7 @@ function main()
         plot!(plt_traj, ylim=(-25,25))
         plot!(plt_traj, xlim=(-50,-25))
         # display(plt_traj)
-        savefig(plt_traj, "plots/plot_traj.pdf")
+        savefig(plt_traj, "plots/plot_traj.svg")
     end
 
     # p_freq = scatter(t_spikes[1:end-1], freqs)

@@ -69,7 +69,7 @@ function parameter_analyses(params, analysed_values; duration = 1700.0,
         println("Display plot sample")
         plot!(p_volt, title="$folder $title samples")
         display(p_volt)
-        savefig(p_volt, "plots/$(folder)_$(param_name)_$(title)-V_sample.pdf")
+        savefig(p_volt, "plots/$(folder)_$(param_name)_$(title)-V_sample.svg")
     end
 
     println("\n----------------------------------------------------\n")
@@ -199,14 +199,14 @@ function main()
     # display(p_pattern)
     # display(p_rheo)
     # display(p_plan)
-    savefig(p_peaks, "plots/peaks-curve.pdf")
-    savefig(p_freqs, "plots/F-I-curve.pdf")
-    savefig(p_height, "plots/first_peak.pdf")
-    savefig(p_width, "plots/first_width.pdf")
+    savefig(p_peaks, "plots/peaks-curve.svg")
+    savefig(p_freqs, "plots/F-I-curve.svg")
+    savefig(p_height, "plots/first_peak.svg")
+    savefig(p_width, "plots/first_width.svg")
 
-    savefig(p_pattern, "plots/pattern.pdf")
-    savefig(p_rheo, "plots/rheobases.pdf")
-    savefig(p_plan, "plots/heat_plan.pdf")
+    savefig(p_pattern, "plots/pattern.svg")
+    savefig(p_rheo, "plots/rheobases.svg")
+    savefig(p_plan, "plots/heat_plan.svg")
 
 end
 

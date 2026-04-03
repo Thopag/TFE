@@ -60,7 +60,7 @@ function plot_ss_shift(V, vec, labels; title="title")
         plot!(plt, V, ODE.h_inf_1_7.(V; C_lido=value, with_lido_shift=with_lido_shift), label="", linestyle = :dash, color=palette(:default)[i])
     end
     display(plt)
-    savefig(plt, "plots/shifted_ss.pdf")
+    savefig(plt, "plots/shifted_ss.svg")
 end
 
 function plot_ss_current(V, vec, labels; title="title")
@@ -98,7 +98,7 @@ function plot_ss_current(V, vec, labels; title="title")
     # plot!(plt_I, V, ILeak, color=:black, label=L"I_{Leak}")
 
     display(plt_I)
-    savefig(plt_I, "plots/ss_current.pdf")
+    savefig(plt_I, "plots/ss_current.svg")
 
 end
 

@@ -45,7 +45,7 @@ function plot_voltage(t, V, amp, peaks_idx; given_p=nothing, with_peak=false, sa
     end
 
     if save == true
-        savefig(p, "plots/plot_voltage.pdf")
+        savefig(p, "plots/plot_voltage.svg")
         print("save plot voltage\n")
         display(p)
     end
@@ -151,9 +151,9 @@ function plot_analyses(all_analysed_values, all_peaks_count, all_freqs, all_patt
     display(p_peaks)
     display(p_freqs)
     display(p_window)
-    savefig(p_peaks, "plots/peaks-curve.pdf")
-    savefig(p_freqs, "plots/F-I-curve.pdf")
-    savefig(p_window, "plots/window-curve.pdf")
+    savefig(p_peaks, "plots/peaks-curve.svg")
+    savefig(p_freqs, "plots/F-I-curve.svg")
+    savefig(p_window, "plots/window-curve.svg")
 
 
     println("------ End plots ------")
@@ -174,7 +174,7 @@ function plot_param_plan(all_params, all_pattern_vec, labels; title="")
     end
 
     display(plt)
-    savefig(plt, "plots/$(title)-param_plan.pdf")
+    savefig(plt, "plots/$(title)-param_plan.svg")
 
 end
 

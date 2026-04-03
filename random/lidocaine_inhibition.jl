@@ -37,7 +37,7 @@ function plot_hill()
 
     # plot!(plt, D, lidocain_Na.(D) .* 100, label="Na", linestyle = :solid, color=:purple)
     # plot!(plt, D, lidocain_K.(D) .* 100, label="K", linestyle = :solid, color=:brown)
-    # savefig(plt, "plots/lidocaine_inibition.pdf")
+    # savefig(plt, "plots/lidocaine_inibition.svg")
     display(plt)
 end
 
@@ -100,7 +100,7 @@ function plot_ss_inhib()
     # plot!(plt, V, lidocain_1_3.(V), label="lidocaine 1.3", linestyle = :dash, color=:orange)
     # plot!(plt, V, ODE_DIV0.h_inf_1_3.(V), label=L"h_{∞} Na 1.3", linestyle = :dash, color=:blue)
 
-    # savefig(plt, "plots/ss_inhib.pdf")
+    # savefig(plt, "plots/ss_inhib.svg")
     display(plt)
 end
 
@@ -136,9 +136,9 @@ function plot_conduct_inhib()
     display(plt_1p3)
     display(plt_1p7)
     display(plt_1p8)
-    savefig(plt_1p3, "plots/plt_1p3.pdf")
-    savefig(plt_1p7, "plots/plt_1p7.pdf")
-    savefig(plt_1p8, "plots/plt_1p8.pdf")
+    savefig(plt_1p3, "plots/plt_1p3.svg")
+    savefig(plt_1p7, "plots/plt_1p7.svg")
+    savefig(plt_1p8, "plots/plt_1p8.svg")
 
 end
 
