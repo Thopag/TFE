@@ -1,7 +1,7 @@
 include("DIV0/params.jl")
 include("DIV7/params.jl")
 
-folder = "DIV7"
+folder = "DIV0"
 
 if folder == "DIV0"
     get_param = DIV0_parameter
@@ -78,7 +78,7 @@ function parameter_analyses(params, analysed_values; duration = 1700.0,
 end
 
 function parameter_selection(analysed_values;
-    amp = 55,
+    amp = 100,
     stim_on = 500.0,                # ms
     stim_length = 1000.0,           # ms
     kwargs...
@@ -86,11 +86,13 @@ function parameter_selection(analysed_values;
     params = Vector{Parameters}()
 
     for i in analysed_values
-        param = get_param(i, stim_on, stim_length;
-        #C_lidocaine=i,
+        param = get_param(amp, stim_on, stim_length;
+        #C_lidocaine=0.0,
         with_lido_shift=true,
         with_inhibition=false,
         #g_nav1p7=0.0,
+        #g_nav1p3=0.0,
+        g_nav1p8=30.0 *(1-i),
         kwargs...)
 
         push!(params, param)
@@ -107,7 +109,7 @@ function main()
 
     amps = 0.0:2.5:300.0
 
-    shifts = 0.0:2.5:25.0
+    shifts =  0.0:0.5:14.0
 
     #lido_concentrations = [0.0, 1.0, 10.0, 50.0, 100.0, 500.0, 1000.0]
     #lido_concentrations = 10 .^ range(log10(1), log10(1000), length=15)
@@ -115,12 +117,12 @@ function main()
     # g_nav1p7_s = [0.0, 30.0, 90.0, 150.0, 640.0, 1000.0, 10000.0]
     # g_nav1p8_s = [0.0, 3.0, 9.0, 15.0, 64.0, 100.0, 1000.0]
 
-    # inhib = [0.0,  1.0]
+    inhib =  0.0:0.05:1.0
 
     # -------- labels -------- #
 
-    x_lab = "amp (pA)"
-    cycling_param_label = "Shift (mV)"
+    x_lab = "inhibition (%)"
+    cycling_param_label = "shift (mV)"
 
     # labels = ["$C_lido" for C_lido in lido_concentrations]
     # labels = ["$(i*100)" for i in inhib]
@@ -131,7 +133,7 @@ function main()
 
     # -------- Set parameter variation -------- #
 
-    analysed_values = amps
+    analysed_values = inhib
     cycling_vec = shifts
 
     # -------- Set up ploting -------- #
@@ -157,7 +159,7 @@ function main()
     for (i, (cycling_param, label)) in enumerate(zip(cycling_vec, labels))
 
         # --------------------------------------------- Change param here !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        params = parameter_selection(analysed_values;C_lidocaine=cycling_param) 
+        params = parameter_selection(analysed_values;C_lidocaine=cycling_param)#g_nav1p8= 0.2 *(1-cycling_param)) 
         peaks_count, freqs, pattern_vec, first_peak_height, first_peak_width = parameter_analyses(params, analysed_values; 
                                                                             with_plot_sample=plot_sample, title="$(cycling_param)") #, unit="mS/cm2", param_name="g_nav1p7")
 
@@ -181,7 +183,7 @@ function main()
         bar!(p_pattern, analysed_values, fill(i+0.5, length(analysed_values)), fillto=fill(i-0.45, length(analysed_values)), 
                                                                         lw=0, linecolor=:match, bar_width=(analysed_values[1]-analysed_values[2])*1.05, label="", color=pattern_color)
 
-        scatter!(p_plan, analysed_values, fill(cycling_param, length(analysed_values)), markersize=12, color=pattern_color, label="", markerstrokecolor = :match, markerstrokewidth = 0.0)
+        scatter!(p_plan, analysed_values, fill(cycling_param, length(analysed_values)), markersize=7, color=pattern_color, label="", markerstrokecolor = :match, markerstrokewidth = 0.0)
 
     end
 

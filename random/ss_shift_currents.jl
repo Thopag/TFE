@@ -60,18 +60,20 @@ function plot_ss_shift(V, vec, labels; title="title")
         plot!(plt, V, ODE.h_inf_1_7.(V; C_lido=value, with_lido_shift=with_lido_shift), label="", linestyle = :dash, color=palette(:default)[i])
     end
     display(plt)
-    savefig(plt, "plots/shifted_ss.png")
+    savefig(plt, "plots/shifted_ss.pdf")
 end
 
 function plot_ss_current(V, vec, labels; title="title")
 
-    get_param = DIV7_parameter
+    get_param = DIV0_parameter
     amp = 100
     stim_on = 500.0
     stim_length = 1000.0
 
-    plt_I = plot(xlabel="Voltage (mV)", ylabel= "Current (uA/cm2)", legendfontsize=7, legend=:bottomright, title="$title steady state current")
-    #plot!(plt_I, ylim=(-10,15))
+    plt_I = plot(xlabel="Voltage (mV)", ylabel= "Current (uA/cm2)", legendfontsize=7, legend=:bottomleft, title="$title steady state current")
+    plot!(plt_I, ylim=(-25,1))
+    # plot!(plt_I, ylim=(-10,15))
+    # plot!(plt_I, xlim=(-50,0))
 
     for (i,(value,label)) in enumerate(zip(vec,labels))
         p = param = get_param(amp, stim_on, stim_length;
@@ -83,20 +85,20 @@ function plot_ss_current(V, vec, labels; title="title")
 
         # plot!(plt_I, V, INaV1p3, label="", linestyle=:dot, color=palette(:default)[i], alpha=1)
         # plot!(plt_I, V, INaV1p7, label=label, linestyle=:dash, color=palette(:default)[i], alpha=1)
-        # plot!(plt_I, V, INaV1p8, label=label, color=palette(:default)[i], alpha=1)
+        plot!(plt_I, V, INaV1p8, label=label, color=palette(:default)[i], alpha=1)
         # plot!(plt_I, V, dV_dt, label=label, color=palette(:default)[i], alpha=1)
     end
 
     p_k = param = get_param(amp, stim_on, stim_length;)
     INaV1p3, INaV1p7, INaV1p8, IKdr, IKm, IAHP, ILeak, Iext, dV_dt = ss_currents(p_k, V)
-    # plot!(plt_I, V, .-IKdr, label=L"- I_{Kdr}", color=:black)
-    # plot!(plt_I, V, .-IKm, label=L"- I_{KM}", linestyle = :dash, color=:black)
-    # plot!(plt_I, V, .- IAHP, color=:brown, label=L"I_{AHP}")
+    plot!(plt_I, V, .-IKdr, label=L"- I_{Kdr}", linestyle = :dot, color=:black)
+    plot!(plt_I, V, .-IKm, label=L"- I_{KM}", linestyle = :dash, color=:black)
+    plot!(plt_I, V, .- IAHP, color=:black, label=L"- I_{AHP}")
     # plot!(plt_I, V, .-IKdr .-IKm .- IAHP, label=L"- I_{K}", color=:black)
     # plot!(plt_I, V, ILeak, color=:black, label=L"I_{Leak}")
 
     display(plt_I)
-    savefig(plt_I, "plots/ss_current.png")
+    savefig(plt_I, "plots/ss_current.pdf")
 
 end
 
@@ -106,14 +108,14 @@ function main()
     #inhibs = [0.0,  0.3, 0.5, 0.9, 0.93, 1.0]
 
     V = -130.0:0.5:70.0
-    shifts = 0.0:2.5:25.0
+    shifts = 0.0:2:14.0
 
     vec = shifts
     labels = ["$value mV" for value in vec]
 
-    title = "NaV1.7"
+    title = "NaV1.8"
 
-    plot_ss_shift(V, vec, labels; title=title)
+    #plot_ss_shift(V, vec, labels; title=title)
     plot_ss_current(V, vec, labels; title=title)
 end
 

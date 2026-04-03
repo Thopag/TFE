@@ -93,6 +93,7 @@ function plot_all(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp, t_spik
 
     i_dV_dt = 2
     ylabel!(plt[i_dV_dt], "dV_dt (mV/s)")
+    plot!(plt[i_dV_dt], ylims=(-5, 5))
     plot!(plt[i_dV_dt], t, dV_dt, color=:black, label="")
 
     current = 3
