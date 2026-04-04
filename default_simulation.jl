@@ -1,7 +1,7 @@
 include("DIV0/params.jl")
 include("DIV7/params.jl")
 
-folder = "DIV0"
+folder = "DIV7"
 
 if folder == "DIV0"
     get_param = DIV0_parameter
@@ -15,18 +15,18 @@ function main()
 
     with_plot = true
 
-    amp = 100.0                    # pA
+    amp = 10.0                    # pA
     duration = 1700.0             # ms
     stim_on = 500.0               # ms
     stim_length = 1000.0          # ms
 
-    inhib = 1.0
+    inhib = 0.3
     shift = 5.0
     p = param = get_param(amp, stim_on, stim_length;
         C_lidocaine=shift,
-        with_lido_shift=true,
+        #with_lido_shift=true,
         with_inhibition=false,
-        #g_nav1p7=0.0,
+        g_nav1p7=35.0*(1.0-inhib),
         #g_nav1p8=30.0*(1.0-inhib),
         )
 
@@ -55,15 +55,15 @@ function main()
         plt_all = plot_all(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp, t_spikes,
                                 I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, I_Leak, I_ext, I_noise, dV_dt, p
                                     ; xlimits=xlimits)
-        # display(plt_all)
+        display(plt_all)
         savefig(plt_all, "plots/plot_all.svg")
 
         plt_traj = plot(V, dV_dt, color=:black, label="")
         xlabel!(plt_traj, "Voltage (mV)")
         ylabel!(plt_traj, "dV/dt (mV/s)")
 
-        plot!(plt_traj, ylim=(-25,25))
-        plot!(plt_traj, xlim=(-50,-25))
+        # plot!(plt_traj, ylim=(-25,25))
+        # plot!(plt_traj, xlim=(-50,-25))
         # display(plt_traj)
         savefig(plt_traj, "plots/plot_traj.svg")
     end

@@ -78,7 +78,7 @@ function parameter_analyses(params, analysed_values; duration = 1700.0,
 end
 
 function parameter_selection(analysed_values;
-    amp = 150,
+    amp = 1200,
     stim_on = 500.0,                # ms
     stim_length = 1000.0,           # ms
     kwargs...
@@ -102,7 +102,7 @@ function parameter_selection(analysed_values;
 end
 
 function main()
-    
+
     plot_sample = false
 
     # -------- param vectors -------- #

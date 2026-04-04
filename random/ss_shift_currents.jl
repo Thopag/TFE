@@ -65,15 +65,18 @@ end
 
 function plot_ss_current(V, vec, labels; title="title")
 
-    get_param = DIV0_parameter
+    get_param = DIV7_parameter
     amp = 100
     stim_on = 500.0
     stim_length = 1000.0
 
+    ys = (-10,1)
+
     plt_I = plot(xlabel="Voltage (mV)", ylabel= "Current (uA/cm2)", legendfontsize=7, legend=:bottomleft, title="$title steady state current")
-    plot!(plt_I, ylim=(-25,1))
-    # plot!(plt_I, ylim=(-10,15))
-    # plot!(plt_I, xlim=(-50,0))
+
+    plt_sum = plot(xlabel="Voltage (mV)", ylabel= "Current (uA/cm2)", legendfontsize=7, legend=:bottomleft, title="$title steady state current sums")
+    # plot!(plt_I, ylim=ys)
+    # plot!(plt_sum, ylim=ys)
 
     for (i,(value,label)) in enumerate(zip(vec,labels))
         p = param = get_param(amp, stim_on, stim_length;
@@ -83,22 +86,35 @@ function plot_ss_current(V, vec, labels; title="title")
             )
         INaV1p3, INaV1p7, INaV1p8, IKdr, IKm, IAHP, ILeak, Iext, dV_dt = ss_currents(p, V)
 
+        # plot!(plt_I, [], [], label=label, color=palette(:default)[i], alpha=1)
+
         # plot!(plt_I, V, INaV1p3, label="", linestyle=:dot, color=palette(:default)[i], alpha=1)
-        # plot!(plt_I, V, INaV1p7, label=label, linestyle=:dash, color=palette(:default)[i], alpha=1)
-        plot!(plt_I, V, INaV1p8, label=label, color=palette(:default)[i], alpha=1)
+        # plot!(plt_I, V, INaV1p7, label="", linestyle=:dash, color=palette(:default)[i], alpha=1)
+        # plot!(plt_I, V, INaV1p8, label="", color=palette(:default)[i], alpha=1)
+
         # plot!(plt_I, V, dV_dt, label=label, color=palette(:default)[i], alpha=1)
+
+        plot!(plt_sum, V, INaV1p8 .+ INaV1p7 .+ INaV1p3, label=label, color=palette(:default)[i], alpha=1)
     end
 
     p_k = param = get_param(amp, stim_on, stim_length;)
     INaV1p3, INaV1p7, INaV1p8, IKdr, IKm, IAHP, ILeak, Iext, dV_dt = ss_currents(p_k, V)
-    plot!(plt_I, V, .-IKdr, label=L"- I_{Kdr}", linestyle = :dot, color=:black)
-    plot!(plt_I, V, .-IKm, label=L"- I_{KM}", linestyle = :dash, color=:black)
-    plot!(plt_I, V, .- IAHP, color=:black, label=L"- I_{AHP}")
-    # plot!(plt_I, V, .-IKdr .-IKm .- IAHP, label=L"- I_{K}", color=:black)
+
+    # plot!(plt_I, V, .-IKdr, label=L"- I_{Kdr}", linestyle = :dot, color=:black)
+    # plot!(plt_I, V, .-IKm, label=L"- I_{KM}", linestyle = :dash, color=:black)
+    # plot!(plt_I, V, .- IAHP, color=:black, label=L"- I_{AHP}")
+
+    plot!(plt_I, V, INaV1p3, label="NaV 1.3", linestyle=:dot, color=:blue, alpha=1)
+    plot!(plt_I, V, INaV1p7, label="NaV 1.7", linestyle=:dash, color=:red, alpha=1)
+    plot!(plt_I, V, INaV1p8, label="NaV 1.8", color=:green, alpha=1)
+
     # plot!(plt_I, V, ILeak, color=:black, label=L"I_{Leak}")
+
+    plot!(plt_sum, V, .- IAHP .-IKm .- IKdr, color=:black, label=L"- I_{K}")
 
     #display(plt_I)
     savefig(plt_I, "plots/ss_current.svg")
+    savefig(plt_sum, "plots/sums_ss_current.svg")
 
 end
 
@@ -109,11 +125,12 @@ function main()
 
     V = -130.0:0.5:70.0
     shifts = 0.0:2:14.0
+    inhibs = 0.0:0.1:1.0
 
     vec = shifts
     labels = ["$value mV" for value in vec]
 
-    title = "NaV1.8"
+    title = ""
 
     #plot_ss_shift(V, vec, labels; title=title)
     plot_ss_current(V, vec, labels; title=title)
