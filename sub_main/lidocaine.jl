@@ -33,13 +33,13 @@ end
 # 4 mV shift at 100 µM (Chevrier et al. 2004)
 function inact_1_8_shift(C)
     #return - ( (4.8 / (1 + exp(-14.16 * (log10(C) - log10(77))))) + 0)
-    return -C * 1.0
+    return -C * 0.4
 end
 
 # 1.8 activation
 function act_1_8_shift(C)
     #return (-6.8 / (1 + exp(8.73 * (log10(C) - log10(56.5))))) + 6.8
-    return C * 0.0
+    return C * 0.6
 end
 
 # ----------------- Lidocaine conductance inhibition ----------------- #

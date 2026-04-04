@@ -78,7 +78,7 @@ function parameter_analyses(params, analysed_values; duration = 1700.0,
 end
 
 function parameter_selection(analysed_values;
-    amp = 100,
+    amp = 150,
     stim_on = 500.0,                # ms
     stim_length = 1000.0,           # ms
     kwargs...
@@ -117,7 +117,7 @@ function main()
     # g_nav1p7_s = [0.0, 30.0, 90.0, 150.0, 640.0, 1000.0, 10000.0]
     # g_nav1p8_s = [0.0, 3.0, 9.0, 15.0, 64.0, 100.0, 1000.0]
 
-    inhib =  0.0:0.05:1.0
+    inhib =  0.0:0.025:1.0
 
     # -------- labels -------- #
 
@@ -136,6 +136,8 @@ function main()
     analysed_values = inhib
     cycling_vec = shifts
 
+    heatmap_data = zeros(length(analysed_values), length(cycling_vec))
+
     # -------- Set up ploting -------- #
 
     cycling_value_rheobases = Vector{String}()
@@ -151,7 +153,7 @@ function main()
     p_pattern = plot(xlabel=x_lab, ylabel= cycling_param_label, title="Pattern $folder", yticks = (1:length(labels), labels), legend=:topright, legendfontsize=7)
     for (c, l) in zip(Ploting.colors_list, Ploting.label_list)
         scatter!(p_pattern, [], [], marker=:square, color = c, label = l, markersize = 4)
-        scatter!(p_plan, [], [], marker=:circle, color = c, label = l, markersize = 4)
+        #scatter!(p_plan, [], [], marker=:square, color = c, label = l, markersize = 4)
     end
 
     # -------- Parameter looping -------- #
@@ -183,14 +185,25 @@ function main()
         bar!(p_pattern, analysed_values, fill(i+0.5, length(analysed_values)), fillto=fill(i-0.45, length(analysed_values)), 
                                                                         lw=0, linecolor=:match, bar_width=(analysed_values[1]-analysed_values[2])*1.05, label="", color=pattern_color)
 
-        scatter!(p_plan, analysed_values, fill(cycling_param, length(analysed_values)), markersize=7, color=pattern_color, label="", markerstrokecolor = :match, markerstrokewidth = 0.0)
-
+        #scatter!(p_plan, analysed_values, fill(cycling_param, length(analysed_values)), marker=:square, markersize=3, color=pattern_color, label="")
+        heatmap_data[:, i] = pattern_vec
     end
 
     # -------- Finish Ploting -------- #
 
     bar!(p_rheo, cycling_value_rheobases, rheobases, label="")
     annotate!(cycling_value_rheobases, rheobases ./ 2, text.(string.(rheobases), :center, :center, :white, 7))
+
+    number_pattern = length(Ploting.label_list) - 1
+    heatmap!(p_plan, analysed_values, cycling_vec, heatmap_data', clims = (-0.5, number_pattern + 0.5), colorbar=false, fillcolor = Ploting.pattern_palette, interpolate=true)
+    # With colorbar
+    flag_colors = Dict( 0:number_pattern .=> Ploting.label_list )
+    data2 = collect(range((0.0,number_pattern)..., 100))
+    sdic = sort(flag_colors, by=first)
+    p_cbar = heatmap([1], data2, [data2;;], colorbar=false, c=Ploting.pattern_palette, xaxis=false, tick_direction=:out,
+                ymirror=true, yticks=(keys(sdic), values(sdic)))
+    l = @layout [a{0.95w} b]
+    p_plan = plot(p_plan, p_cbar, layout=l)
 
     # display(p_peaks)
     # display(p_freqs)

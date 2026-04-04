@@ -24,6 +24,8 @@ markers_list = [:circle, :utriangle, :dtriangle, :diamond, :square]
 # red3 : Spiking
 colors_list = [:midnightblue, :darkgreen, :yellowgreen, :orange, :red3]
 
+pattern_palette = cgrad(colors_list, categorical = true)
+
 function empty_voltage_plot(; xlimits=(400, 1700))
     p = plot(xlims=xlimits, xlabel="Time (ms)", ylabel= "Voltage (mV)")
     return p
