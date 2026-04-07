@@ -68,20 +68,20 @@ function plot_all(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp, t_spik
     plot!(plt[voltage], t, V, color= :black, label=L"%$amp pA")
     #vline!(plt[voltage], t_spikes, color=:red, label="peaks")
 
-    # variable = 4
-    # ylabel!(plt[variable], "Variable (-)")
-    # #plot!(plt[variable], ylims=(0, 0.25))
-    # plot!(plt[variable], legend = :bottomright)
-    # plot!(plt[variable], t, m3, label=L"m_{3}", linestyle = :solid, color=:blue, alpha=alpha)
-    # plot!(plt[variable], t, h3, label=L"h_{3}", linestyle = :dash, color=:blue, alpha=alpha)
-    # plot!(plt[variable], t, m7, label=L"m_{7}", linestyle = :solid, color=:red, alpha=alpha)
-    # plot!(plt[variable], t, h7, label=L"h_{7}", linestyle = :dash, color=:red, alpha=alpha)
-    # plot!(plt[variable], t, m8, label=L"m_{8}", linestyle = :solid, color=:green)
-    # plot!(plt[variable], t, h8, label=L"h_{8}", linestyle = :dash, color=:green)
-    # plot!(plt[variable], t, ndr, label=L"n_{dr}", linestyle = :solid, color=:orange, alpha=alpha)
-    # plot!(plt[variable], t, ldr, label=L"l_{dr}", linestyle = :dash, color=:orange, alpha=alpha)
-    # plot!(plt[variable], t, nm, label=L"n_{m}", linestyle = :solid, color=:purple, alpha=alpha)
-    # plot!(plt[variable], t, z_AHP, label=L"z_{AHP}", linestyle = :solid, color=:brown, alpha=alpha)
+    variable = 2
+    ylabel!(plt[variable], "Variable (-)")
+    #plot!(plt[variable], ylims=(0, 0.25))
+    plot!(plt[variable], legend = :bottomright)
+    plot!(plt[variable], t, m3, label=L"m_{3}", linestyle = :solid, color=:blue, alpha=alpha)
+    plot!(plt[variable], t, h3, label=L"h_{3}", linestyle = :dash, color=:blue, alpha=alpha)
+    plot!(plt[variable], t, m7, label=L"m_{7}", linestyle = :solid, color=:red, alpha=alpha)
+    plot!(plt[variable], t, h7, label=L"h_{7}", linestyle = :dash, color=:red, alpha=alpha)
+    plot!(plt[variable], t, m8, label=L"m_{8}", linestyle = :solid, color=:green)
+    plot!(plt[variable], t, h8, label=L"h_{8}", linestyle = :dash, color=:green)
+    plot!(plt[variable], t, ndr, label=L"n_{dr}", linestyle = :solid, color=:orange, alpha=alpha)
+    plot!(plt[variable], t, ldr, label=L"l_{dr}", linestyle = :dash, color=:orange, alpha=alpha)
+    plot!(plt[variable], t, nm, label=L"n_{m}", linestyle = :solid, color=:purple, alpha=alpha)
+    plot!(plt[variable], t, z_AHP, label=L"z_{AHP}", linestyle = :solid, color=:brown, alpha=alpha)
 
     # channel = 2
     # ylabel!(plt[channel], "Channel Availability (%)")
@@ -93,41 +93,41 @@ function plot_all(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp, t_spik
     # plot!(plt[channel], t, nm .* 100, color=:purple, label=L"K_{m}")
     # plot!(plt[channel], t, z_AHP .* 100, color=:brown, label=L"K_{AHP}")
 
-    i_dV_dt = 3
-    ylabel!(plt[i_dV_dt], "dV_dt (mV/s)")
-    plot!(plt[i_dV_dt], ylims=(-0.2, 0.5))
-    plot!(plt[i_dV_dt], t, dV_dt, color=:black, label="")
+    current = 3
+    ylabel!(plt[current], "Current (uA/cm2)", legendfontsize=6, legend = :bottomright)
+    plot!(plt[current], ylims=(-(p.I0 + p.Excitation)*1.1, (p.I0 + p.Excitation)*1.1))
+    #plot!(plt[current], ylims=(-10, 1))
+    plot!(plt[current], t, I_NaV1p3, color=:blue, label=L"I_{NaV1.3}", alpha=alpha)
+    plot!(plt[current], t, I_NaV1p7, color=:red, label=L"I_{NaV1.7}", alpha=alpha)
+    plot!(plt[current], t, I_NaV1p8, color=:green, label=L"I_{NaV1.8}")
+    plot!(plt[current], t, I_Kdr, color=:orange, label=L"I_{Kdr}", alpha=alpha)
+    plot!(plt[current], t, I_Km, color=:purple, label=L"I_{KM}", alpha=alpha)
+    plot!(plt[current], t, I_AHP, color=:brown, label=L"I_{AHP}", alpha=alpha)
+    plot!(plt[current], t, I_Leak, color=:black, label=L"I_{Leak}", alpha=alpha)
+    plot!(plt[current], t, I_ext, color=:black, linestyle = :dash, label=L"I_{ext}")
+    #plot!(p[current], t, I_noise, color=:pink, label=L"I_{noise}")
 
-    # current = 4
-    # ylabel!(plt[current], "Current (uA/cm2)", legendfontsize=6, legend = :bottomright)
-    # plot!(plt[current], ylims=(-(p.I0 + p.Excitation)*1.1, (p.I0 + p.Excitation)*1.1))
-    # #plot!(plt[current], ylims=(-10, 1))
-    # plot!(plt[current], t, I_NaV1p3, color=:blue, label=L"I_{NaV1.3}", alpha=alpha)
-    # plot!(plt[current], t, I_NaV1p7, color=:red, label=L"I_{NaV1.7}", alpha=alpha)
-    # plot!(plt[current], t, I_NaV1p8, color=:green, label=L"I_{NaV1.8}")
-    # plot!(plt[current], t, I_Kdr, color=:orange, label=L"I_{Kdr}", alpha=alpha)
-    # plot!(plt[current], t, I_Km, color=:purple, label=L"I_{KM}", alpha=alpha)
-    # plot!(plt[current], t, I_AHP, color=:brown, label=L"I_{AHP}", alpha=alpha)
-    # plot!(plt[current], t, I_Leak, color=:black, label=L"I_{Leak}", alpha=alpha)
-    # plot!(plt[current], t, I_ext, color=:black, linestyle = :dash, label=L"I_{ext}")
-    # #plot!(p[current], t, I_noise, color=:pink, label=L"I_{noise}")
+    # current_bis = 2
+    # ylabel!(plt[current_bis], "Current (uA/cm2)", legendfontsize=6, legend = :bottomright)
+    # plot!(plt[current_bis], ylims=(-0.2, 0.01))
+    # #plot!(plt[current_bis], ylims=(-10, 1))
+    # plot!(plt[current_bis], t, I_NaV1p3, color=:blue, label=L"I_{NaV1.3}", alpha=alpha)
+    # plot!(plt[current_bis], t, I_NaV1p7, color=:red, label=L"I_{NaV1.7}", alpha=alpha)
+    # plot!(plt[current_bis], t, I_NaV1p8, color=:green, label=L"I_{NaV1.8}", alpha=alpha)
+    # plot!(plt[current_bis], t, .- I_Kdr, color=:orange, label=L"-I_{Kdr}", alpha=alpha)
+    # plot!(plt[current_bis], t, .- I_Km, color=:purple, label=L"-I_{KM}", alpha=alpha)
+    # plot!(plt[current_bis], t, .- I_AHP, color=:brown, label=L"-I_{AHP}", alpha=alpha)
 
-    current_bis = 2
-    ylabel!(plt[current_bis], "Current (uA/cm2)", legendfontsize=6, legend = :bottomright)
-    plot!(plt[current_bis], ylims=(-0.2, 0.01))
-    #plot!(plt[current_bis], ylims=(-10, 1))
-    plot!(plt[current_bis], t, I_NaV1p3, color=:blue, label=L"I_{NaV1.3}", alpha=alpha)
-    plot!(plt[current_bis], t, I_NaV1p7, color=:red, label=L"I_{NaV1.7}", alpha=alpha)
-    plot!(plt[current_bis], t, I_NaV1p8, color=:green, label=L"I_{NaV1.8}", alpha=alpha)
-    plot!(plt[current_bis], t, .- I_Kdr, color=:orange, label=L"-I_{Kdr}", alpha=alpha)
-    plot!(plt[current_bis], t, .- I_Km, color=:purple, label=L"-I_{KM}", alpha=alpha)
-    plot!(plt[current_bis], t, .- I_AHP, color=:brown, label=L"-I_{AHP}", alpha=alpha)
-
-    plot!(plt[current_bis], t, I_NaV1p3 .+ I_NaV1p7 .+ I_NaV1p8, color=:pink, label=L"I_{Na}")
-    plot!(plt[current_bis], t, .- I_Kdr .- I_Km .- I_AHP, color=:black, label=L"- I_{K}")
-    plot!(plt[current_bis], t, .- I_Kdr .- I_Km .- I_AHP, color=:black, linestyle = :dash, label=L"- I_{K&leak}")
+    # plot!(plt[current_bis], t, I_NaV1p3 .+ I_NaV1p7 .+ I_NaV1p8, color=:pink, label=L"I_{Na}")
+    # plot!(plt[current_bis], t, .- I_Kdr .- I_Km .- I_AHP, color=:black, label=L"- I_{K}")
+    # plot!(plt[current_bis], t, .- I_Kdr .- I_Km .- I_AHP, color=:black, linestyle = :dash, label=L"- I_{K&leak}")
     # plot!(plt[current_bis], t, I_Leak, color=:black, label=L"I_{Leak}", alpha=alpha)
     # plot!(plt[current_bis], t, I_ext, color=:black, linestyle = :dash, label=L"I_{ext}")
+
+    # i_dV_dt = 3
+    # ylabel!(plt[i_dV_dt], "dV_dt (mV/s)")
+    # plot!(plt[i_dV_dt], ylims=(-0.2, 0.5))
+    # plot!(plt[i_dV_dt], t, dV_dt, color=:black, label="")
 
     # noise = 5
     # plot!(plt[noise], t, I_noise, color=:black, label=L"I_{noise}")
@@ -137,12 +137,6 @@ function plot_all(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp, t_spik
     # ylabel!(plt[global_current], "Current (uA/cm2)")
     # plot!(plt[global_current], t, I_NaV1p3 .+ I_NaV1p7 .+ I_NaV1p8, color=:red, label="Sodium")
     # plot!(plt[global_current], t, I_Kdr .+ I_Km .+ I_AHP, color=:blue , label="Potassium")
-
-    # dV_dt = 5
-    # ylabel!(plt[dV_dt], "dV/dt * C (mV/s)")
-    # plot!(plt[dV_dt], ylims=(-1.2, 1.2))
-    # # NO NOISE TERM HERE
-    # plot!(plt[dV_dt], t, I_ext .- I_NaV1p3 .- I_NaV1p7 .- I_NaV1p8 .- I_Kdr .- I_Km .- I_Leak .- I_AHP, color=:black, label="")
 
     plot!(plt[n_fig], xaxis = "Time (ms)", ticks = :native)
 

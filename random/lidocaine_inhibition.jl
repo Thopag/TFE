@@ -142,6 +142,40 @@ function plot_conduct_inhib()
 
 end
 
+function lido_shift_inhib_traj()
+
+    plt = plot(ylabel="Shift (mV)", xlabel= "inhib (%)", label="", title="", ylim=(-0.5,15), xlim=(-0.05,1))
+
+    test_point = [0.0, 1.0, 10.0, 100.0, 1000.0]
+    lido_concentrations = 10 .^ range(log10(0.01), log10(2000), length=1000)
+
+    results = get_lidocaine_inhibition.(lido_concentrations)
+    remaining_1_3 = [r[1] for r in results]
+    remaining_1_7 = [r[2] for r in results]
+    remaining_1_8 = [r[3] for r in results]
+
+    lido_shifts = .- inact_1_8_shift.(lido_concentrations) .+ act_1_8_shift.(lido_concentrations)
+
+    plot!(plt, 1.0 .- remaining_1_8, lido_shifts, color=:black, label="Seperation", linewidth = 2)
+
+    plot!(plt, 1.0 .- remaining_1_8, .- inact_1_8_shift.(lido_concentrations), color=:red, linestyle=:dash, label="Inactivation", linewidth = 2)
+
+    plot!(plt, 1.0 .- remaining_1_8, .+ act_1_8_shift.(lido_concentrations), color=:red, label="Activation", linewidth = 2)
+
+    results = get_lidocaine_inhibition.(test_point)
+    remaining_1_3 = [r[1] for r in results]
+    remaining_1_7 = [r[2] for r in results]
+    remaining_1_8 = [r[3] for r in results]
+
+    lido_shifts = .- inact_1_8_shift.(test_point) .+ act_1_8_shift.(test_point)
+    scatter!(plt, 1.0 .- remaining_1_8, lido_shifts, color=:black, label="")
+
+    savefig(plt, "plots/lido_inhib_shift.svg")
+
+end
+
 #plot_conduct_inhib()
 
 #print(1 .- get_lidocaine_inhibition(1000))
+
+lido_shift_inhib_traj()

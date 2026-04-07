@@ -78,7 +78,7 @@ function parameter_analyses(params, analysed_values; duration = 1700.0,
 end
 
 function parameter_selection(analysed_values;
-    amp = 50,
+    amp = 179,
     stim_on = 500.0,                # ms
     stim_length = 1000.0,           # ms
     kwargs...
@@ -86,11 +86,11 @@ function parameter_selection(analysed_values;
     params = Vector{Parameters}()
 
     for i in analysed_values
-        param = get_param(amp, stim_on, stim_length;
+        param = get_param(i, stim_on, stim_length;
         #C_lidocaine=0.0,
         #with_lido_shift=true,
         with_inhibition=false,
-        g_nav1p7=35.0 *(1-i),
+        #g_nav1p7=35.0 *(1-i),
         #g_nav1p3=0.35 *(1-i),
         #g_nav1p8=0.2 *(1-i),
         kwargs...)
@@ -117,13 +117,13 @@ function main()
     # g_nav1p7_s = [0.0, 30.0, 90.0, 150.0, 640.0, 1000.0, 10000.0]
     # g_nav1p8_s = [0.0, 3.0, 9.0, 15.0, 64.0, 100.0, 1000.0]
 
-    #inhib =  0.0:0.025:1.0
-    inhib =  [0.0:0.05:0.9; 0.91:0.01:1.0]
+    inhib =  [0.0, 1.0]
+    #inhib =  [0.0:0.05:0.9; 0.91:0.01:1.0]
 
     # -------- labels -------- #
 
-    x_lab = "inhibition NaV 1.7 (%)"
-    cycling_param_label = "inhibition NaV 1.3 (%)"
+    x_lab = "amp (pA)"
+    cycling_param_label = "inhibition NaV 1.7 (%)"
 
     # labels = ["$C_lido" for C_lido in lido_concentrations]
     labels = ["$(i*100)" for i in inhib]
@@ -134,7 +134,7 @@ function main()
 
     # -------- Set parameter variation -------- #
 
-    analysed_values = inhib
+    analysed_values = amps
     cycling_vec = inhib
 
     heatmap_data = zeros(length(analysed_values), length(cycling_vec))
@@ -162,7 +162,7 @@ function main()
     for (i, (cycling_param, label)) in enumerate(zip(cycling_vec, labels))
 
         # --------------------------------------------- Change param here !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        params = parameter_selection(analysed_values;g_nav1p3= 0.35 *(1-cycling_param))
+        params = parameter_selection(analysed_values;g_nav1p7= 35.0 *(1-cycling_param))
         peaks_count, freqs, pattern_vec, first_peak_height, first_peak_width = parameter_analyses(params, analysed_values; 
                                                                             with_plot_sample=plot_sample, title="$(cycling_param)") #, unit="mS/cm2", param_name="g_nav1p7")
 

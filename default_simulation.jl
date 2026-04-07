@@ -15,12 +15,12 @@ function main()
 
     with_plot = true
 
-    amp = 10.0                    # pA
+    amp = 181.0                    # pA
     duration = 1700.0             # ms
     stim_on = 500.0               # ms
     stim_length = 1000.0          # ms
 
-    inhib = 0.3
+    inhib = 1.0
     shift = 5.0
     p = param = get_param(amp, stim_on, stim_length;
         C_lidocaine=shift,
