@@ -79,7 +79,7 @@ function plot_ss_current(V, vec, labels; title="title")
     # plot!(plt_sum, ylim=ys)
 
     for (i,(value,label)) in enumerate(zip(vec,labels))
-        p = param = get_param(amp, stim_on, stim_length;
+        p  = get_param(amp, stim_on, stim_length;
             C_lidocaine=value,
             with_lido_shift=true,
             with_inhibition=false,
