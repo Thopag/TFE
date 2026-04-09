@@ -50,7 +50,7 @@ end
 
 # ---- #
 
-function h_inf_1_3(V; with_DIV0=true, with_original = true, C_lido=0, with_lido_shift=false)
+function h_inf_1_3(V; with_DIV0=false, with_original = true, C_lido=0, with_lido_shift=false)
     # Lidocaine effect
     lido_shift = 0.0
     if with_lido_shift
@@ -59,7 +59,7 @@ function h_inf_1_3(V; with_DIV0=true, with_original = true, C_lido=0, with_lido_
     return alpha_h_1_3(V; with_DIV0=with_DIV0, lido_shift=lido_shift) / (alpha_h_1_3(V; with_DIV0=with_DIV0, lido_shift=lido_shift) + beta_h_1_3(V; with_DIV0=with_DIV0, lido_shift=lido_shift))
 end
 
-function tau_h_1_3(V; with_DIV0=true, with_original = true, C_lido=0, with_lido_shift=false)
+function tau_h_1_3(V; with_DIV0=false, with_original = true, C_lido=0, with_lido_shift=false)
     # Lidocaine effect
     lido_shift = 0.0
     if with_lido_shift

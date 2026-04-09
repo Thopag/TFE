@@ -136,7 +136,7 @@ function DIV0_parameter_default(amp, stim_on, stim_length)
 
     # --- Parameter struct --- #
 
-    with_DIV0 = true
+    with_DIV0 = false #true
 
     p = Parameters(
         I0, stim_on, stim_off, Excitation, C,

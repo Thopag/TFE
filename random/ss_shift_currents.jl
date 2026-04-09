@@ -97,7 +97,7 @@ function plot_ss_current(V, vec, labels; title="title")
         plot!(plt_sum, V, INaV1p8 .+ INaV1p7 .+ INaV1p3, label=label, color=palette(:default)[i], alpha=1)
     end
 
-    p_k = param = get_param(amp, stim_on, stim_length;)
+    p_k = get_param(amp, stim_on, stim_length;)
     INaV1p3, INaV1p7, INaV1p8, IKdr, IKm, IAHP, ILeak, Iext, dV_dt = ss_currents(p_k, V)
 
     # plot!(plt_I, V, .-IKdr, label=L"- I_{Kdr}", linestyle = :dot, color=:black)
