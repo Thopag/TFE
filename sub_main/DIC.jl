@@ -51,7 +51,7 @@ function DIC(p)
     dV_dot_m_1_7(V) = - (p.g_nav1p7 * 3 * (ODE.m_inf_1_7(V)^2) * ODE.h_inf_1_7(V) * (V - p.E_Na)) / p.C
 
     dV_dot_h_1_8(V) = - (p.g_nav1p8 * (ODE.m_inf_1_8(V)^3) * (V - p.E_Na)) / p.C
-    dV_dot_m_1_8(V) = - (p.g_nav1p3 * 3 * (ODE.m_inf_1_8(V)^2) * ODE.h_inf_1_8(V) * (V - p.E_Na)) / p.C
+    dV_dot_m_1_8(V) = - (p.g_nav1p8 * 3 * (ODE.m_inf_1_8(V)^2) * ODE.h_inf_1_8(V) * (V - p.E_Na)) / p.C
 
     dV_dot_l_K_dr(V) = - (p.g_Kdr * (ODE.n_inf_K_dr(V)^3) * (V - p.E_k)) / p.C
     dV_dot_n_K_dr(V) = - (p.g_Kdr * 3 * (ODE.n_inf_K_dr(V)^2) * ODE.l_inf_K_dr(V) * (V - p.E_k)) / p.C
@@ -129,9 +129,9 @@ function DIC(p)
         plot!(plt_us, V, (1 .- w_su) .* r   , label=label, color=c, linestyle=s, alpha=alpha)
     end
 
-    plot!(plt_f, V, g_f, color=:black, label="g_f", alpha=0.3)
-    plot!(plt_s, V, g_s, color=:black, label="g_s", alpha=0.3)
-    plot!(plt_us, V, g_us, color=:black, label="g_us", alpha=0.3)
+    plot!(plt_f, V, g_f, color=:black, label="g_f", alpha=0.7)
+    plot!(plt_s, V, g_s, color=:black, label="g_s", alpha=0.7)
+    plot!(plt_us, V, g_us, color=:black, label="g_us", alpha=0.7)
 
     savefig(plt_f, "plots/g_f.svg")
     savefig(plt_s, "plots/g_s.svg")
@@ -142,7 +142,7 @@ end
 
 function main()
 
-    get_param = DIV0_parameter
+    get_param = DIV7_parameter
     amp = 100
     stim_on = 500.0
     stim_length = 1000.0
