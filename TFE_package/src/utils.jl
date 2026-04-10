@@ -1,8 +1,3 @@
-module Utils
-
-using Peaks
-using Statistics
-
 export Parameters, give_currents, pulse, get_peaks, instant_freqs, global_pattern, window_count
 
 # --------------------------- Parameters struct --------------------------- #
@@ -159,6 +154,4 @@ function global_pattern(t_spikes, n_peak, begin_stim, end_stim; window_width=100
     end
     
     return f_global, first_count, pattern
-end
-
 end

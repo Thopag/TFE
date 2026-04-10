@@ -1,6 +1,3 @@
-include("../DIV0/params.jl")
-include("../DIV7/params.jl")
-
 using ForwardDiff
 
 function tau_f(V)
@@ -40,23 +37,46 @@ end
 function DIC(p)
     V = -100.0:0.5:50.0
 
-    D = 0.0
+    D = 20.0
 
     g_f = zeros(eltype(V), size(V))
     g_s = zeros(eltype(V), size(V))
     g_us = zeros(eltype(V), size(V))
 
-    dV_dot_h_1_3(V) = - (p.g_nav1p3 * (ODE.m_inf_1_3(V; C_lido=D, with_lido_shift=true)^3) * (V - p.E_Na)) / p.C
-    dV_dot_m_1_3(V) = - (p.g_nav1p3 * 3 * (ODE.m_inf_1_3(V; C_lido=D, with_lido_shift=true)^2) * ODE.h_inf_1_3(V; C_lido=D, with_lido_shift=true) * (V - p.E_Na)) / p.C
+    h_inf_1p3(V) = ODE.h_inf_1_3(V; C_lido=D, with_lido_shift=true)
+    m_inf_1p3(V) = ODE.m_inf_1_3(V; C_lido=D, with_lido_shift=true)
 
-    dV_dot_h_1_7(V) = - (p.g_nav1p7 * (ODE.m_inf_1_7(V; C_lido=D, with_lido_shift=true)^3) * (V - p.E_Na)) / p.C
-    dV_dot_m_1_7(V) = - (p.g_nav1p7 * 3 * (ODE.m_inf_1_7(V; C_lido=D, with_lido_shift=true)^2) * ODE.h_inf_1_7(V; C_lido=D, with_lido_shift=true) * (V - p.E_Na)) / p.C
+    h_inf_1p7(V) = ODE.h_inf_1_7(V; C_lido=D, with_lido_shift=true)
+    m_inf_1p7(V) = ODE.m_inf_1_7(V; C_lido=D, with_lido_shift=true)
 
-    dV_dot_h_1_8(V) = - (p.g_nav1p8 * (ODE.m_inf_1_8(V; C_lido=D, with_lido_shift=true)^3) * (V - p.E_Na)) / p.C
-    dV_dot_m_1_8(V) = - (p.g_nav1p8 * 3 * (ODE.m_inf_1_8(V; C_lido=D, with_lido_shift=true)^2) * ODE.h_inf_1_8(V; C_lido=D, with_lido_shift=true) * (V - p.E_Na)) / p.C
+    h_inf_1p8(V) = ODE.h_inf_1_8(V; C_lido=D, with_lido_shift=true)
+    m_inf_1p8(V) = ODE.m_inf_1_8(V; C_lido=D, with_lido_shift=true)
 
-    dV_dot_l_K_dr(V) = - (p.g_Kdr * (ODE.n_inf_K_dr(V)^3) * (V - p.E_k)) / p.C
-    dV_dot_n_K_dr(V) = - (p.g_Kdr * 3 * (ODE.n_inf_K_dr(V)^2) * ODE.l_inf_K_dr(V) * (V - p.E_k)) / p.C
+    l_inf_Kdr = ODE.l_inf_K_dr
+    n_inf_Kdr = ODE.n_inf_K_dr
+
+    n_inf_KM = ODE.n_inf_K_M
+
+    z_K_AHP_inf = ODE.z_AHP_inf
+
+    vec_xi_inf = [h_inf_1p3, m_inf_1p3,
+                h_inf_1p7, m_inf_1p7,
+                h_inf_1p8, m_inf_1p8,
+                l_inf_Kdr, n_inf_Kdr,
+                n_inf_KM,
+                z_K_AHP_inf]
+
+    dV_dot_h_1_3(V) = - (p.g_nav1p3 * (m_inf_1p3(V)^3) * (V - p.E_Na)) / p.C
+    dV_dot_m_1_3(V) = - (p.g_nav1p3 * 3 * (m_inf_1p3(V)^2) * h_inf_1p3(V) * (V - p.E_Na)) / p.C
+
+    dV_dot_h_1_7(V) = - (p.g_nav1p7 * (m_inf_1p7(V)^3) * (V - p.E_Na)) / p.C
+    dV_dot_m_1_7(V) = - (p.g_nav1p7 * 3 * (m_inf_1p7(V)^2) * h_inf_1p7(V) * (V - p.E_Na)) / p.C
+
+    dV_dot_h_1_8(V) = - (p.g_nav1p8 * (m_inf_1p8(V)^3) * (V - p.E_Na)) / p.C
+    dV_dot_m_1_8(V) = - (p.g_nav1p8 * 3 * (m_inf_1p8(V)^2) * h_inf_1p8(V) * (V - p.E_Na)) / p.C
+
+    dV_dot_l_K_dr(V) = - (p.g_Kdr * (n_inf_Kdr(V)^3) * (V - p.E_k)) / p.C
+    dV_dot_n_K_dr(V) = - (p.g_Kdr * 3 * (n_inf_Kdr(V)^2) * l_inf_Kdr(V) * (V - p.E_k)) / p.C
 
     dV_dot_n_K_M(V) = - (p.g_Km * (V - p.E_k)) / p.C
 
@@ -68,13 +88,6 @@ function DIC(p)
                 dV_dot_l_K_dr, dV_dot_n_K_dr,
                 dV_dot_n_K_M,
                 dV_dot_z_AHP]
-
-    vec_xi_inf = [ODE.h_inf_1_3, ODE.m_inf_1_3,
-                ODE.h_inf_1_7, ODE.m_inf_1_7,
-                ODE.h_inf_1_8, ODE.m_inf_1_8,
-                ODE.l_inf_K_dr, ODE.n_inf_K_dr,
-                ODE.n_inf_K_M,
-                ODE.z_AHP_inf]
 
     vec_tau = [ODE.tau_h_1_3, ODE.tau_m_1_3,
                 ODE.tau_h_1_7, ODE.tau_m_1_7,
@@ -140,6 +153,8 @@ function DIC(p)
     savefig(plt_us, "plots/g_us.svg")
     savefig(plt_derivs, "plots/derivs.svg")
     savefig(plt_ss, "plots/steady_states.svg")
+
+    display(plt_ss)
 end
 
 function main()

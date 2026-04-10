@@ -1,6 +1,3 @@
-include("DIV0/params.jl")
-include("DIV7/params.jl")
-
 folder = "DIV7"
 
 if folder == "DIV0"

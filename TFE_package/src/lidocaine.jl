@@ -1,5 +1,3 @@
-module Lidocaine
-
 export get_lidocaine_inhibition, inact_1_3_shift, act_1_3_shift, inact_1_7_shift, act_1_7_shift, inact_1_8_shift, act_1_8_shift
 
 # ----------------- Lidocaine shifting steady states ----------------- #
@@ -7,7 +5,7 @@ export get_lidocaine_inhibition, inact_1_3_shift, act_1_3_shift, inact_1_7_shift
 # 1.3 inactivation
 function inact_1_3_shift(C)
     #return - ((-21.4 / (1 + exp(3.17 * (log10(C) - log10(120))))) + 21.4)
-    return -C * 0.0
+    return -C * 1.0
 end
 
 # 1.3 activation
@@ -20,7 +18,7 @@ end
 # 10.6 mV shift at 100 µM (Chevrier et al. 2004)
 function inact_1_7_shift(C)
     #return - ( (-24.2 / (1 + exp(3.17 * (log10(C) - log10(120))))) + 24.2)
-    return -C * 1.0
+    return -C * 0.0
 end
 
 # 1.7 activation
@@ -63,6 +61,4 @@ function get_lidocaine_inhibition(C)
     remaining_1_7 = 1.0 - lidocain_1_7_channel(C)
     remaining_1_8 = 1.0 - lidocain_1_8_channel(C)
     return remaining_1_3, remaining_1_7, remaining_1_8
-end
-
 end

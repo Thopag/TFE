@@ -1,10 +1,4 @@
-__precompile__(true)
-module Ploting
-
-using Plots, LaTeXStrings
-#plotlyjs()
-
-export empty_voltage_plot, plot_voltage, plot_all, plot_analyses, plot_param_plan
+export empty_voltage_plot, plot_voltage, plot_all
 
 # Pattern :
 
@@ -141,54 +135,4 @@ function plot_all(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp, t_spik
     plot!(plt[n_fig], xaxis = "Time (ms)", ticks = :native)
 
     return plt
-end
-
-function plot_analyses(all_analysed_values, all_peaks_count, all_freqs, all_pattern_vec, all_first_window_count, all_label; xlabel="amp pA")
-
-    println("------ Start plots ------")
-
-    p_peaks = plot(xlabel=xlabel, ylabel= "Peaks count (-)", title="peaks count")
-    p_freqs = plot(xlabel=xlabel, ylabel= "Frequence (Hz)", title="FI curve")
-    p_window = plot(xlabel=xlabel, ylabel= "Peaks count (-)", title="First window count")
-
-    for (analysed_values, peaks_count, freqs, pattern_vec, first_window_count, label) in zip(all_analysed_values, all_peaks_count, all_freqs, all_pattern_vec, all_first_window_count, all_label)
-
-        pattern_form = markers_list[pattern_vec .+ 1]
-
-        plot!(p_peaks, analysed_values, peaks_count         , marker=pattern_form, markersize=2, linealpha=0.5, markeralpha=0.7, label=label)
-        plot!(p_freqs, analysed_values, freqs               , marker=pattern_form, markersize=2, linealpha=0.5, markeralpha=0.7, label=label)
-        plot!(p_window, analysed_values, first_window_count , marker=pattern_form, markersize=2, linealpha=0.5, markeralpha=0.7, label=label)
-
-    end
-
-    display(p_peaks)
-    display(p_freqs)
-    display(p_window)
-    savefig(p_peaks, "plots/peaks-curve.svg")
-    savefig(p_freqs, "plots/F-I-curve.svg")
-    savefig(p_window, "plots/window-curve.svg")
-
-
-    println("------ End plots ------")
-end
-
-function plot_param_plan(all_params, all_pattern_vec, labels; title="")
-
-    plt = plot(xlabel="g NaV 1.7 mS/cm2", ylabel= "g NaV 1.8 mS/cm2", title=title)
-
-    for (params, pattern_vec, label) in zip(all_params, all_pattern_vec, labels)
-
-        pattern_form = markers_list[pattern_vec .+ 1]
-        g_nav1p7_s = [p.g_nav1p7 for p in params]
-        g_nav1p8_s = [p.g_nav1p8 for p in params]
-
-        plot!(plt, g_nav1p7_s, g_nav1p8_s, marker=pattern_form, markersize=3, linealpha=0.5, markeralpha=0.9, label=label)
-    
-    end
-
-    display(plt)
-    savefig(plt, "plots/$(title)-param_plan.svg")
-
-end
-
 end

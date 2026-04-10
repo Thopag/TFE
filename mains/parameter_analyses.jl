@@ -1,7 +1,4 @@
-include("DIV0/params.jl")
-include("DIV7/params.jl")
-
-folder = "DIV7"
+folder = "DIV0"
 
 if folder == "DIV0"
     get_param = DIV0_parameter
@@ -107,7 +104,7 @@ function main()
 
     # -------- param vectors -------- #
 
-    amps = 0.0:2.5:300.0
+    amps = 0.0:100:300.0
 
     shifts =  0.0:0.5:14.0
 

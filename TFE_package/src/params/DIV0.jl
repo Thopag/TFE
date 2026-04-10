@@ -1,3 +1,4 @@
+export DIV0_u0, DIV0_parameter
 
 function DIV0_parameter(amp, stim_on, stim_length; 
 

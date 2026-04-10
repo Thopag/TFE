@@ -1,4 +1,6 @@
 
+export DIV7_u0, DIV7_parameter
+
 function DIV7_parameter(amp, stim_on, stim_length;
 
     # ** Na conductances
