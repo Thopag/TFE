@@ -40,18 +40,20 @@ end
 function DIC(p)
     V = -100.0:0.5:50.0
 
+    D = 0.0
+
     g_f = zeros(eltype(V), size(V))
     g_s = zeros(eltype(V), size(V))
     g_us = zeros(eltype(V), size(V))
 
-    dV_dot_h_1_3(V) = - (p.g_nav1p3 * (ODE.m_inf_1_3(V)^3) * (V - p.E_Na)) / p.C
-    dV_dot_m_1_3(V) = - (p.g_nav1p3 * 3 * (ODE.m_inf_1_3(V)^2) * ODE.h_inf_1_3(V) * (V - p.E_Na)) / p.C
+    dV_dot_h_1_3(V) = - (p.g_nav1p3 * (ODE.m_inf_1_3(V; C_lido=D, with_lido_shift=true)^3) * (V - p.E_Na)) / p.C
+    dV_dot_m_1_3(V) = - (p.g_nav1p3 * 3 * (ODE.m_inf_1_3(V; C_lido=D, with_lido_shift=true)^2) * ODE.h_inf_1_3(V; C_lido=D, with_lido_shift=true) * (V - p.E_Na)) / p.C
 
-    dV_dot_h_1_7(V) = - (p.g_nav1p7 * (ODE.m_inf_1_7(V)^3) * (V - p.E_Na)) / p.C
-    dV_dot_m_1_7(V) = - (p.g_nav1p7 * 3 * (ODE.m_inf_1_7(V)^2) * ODE.h_inf_1_7(V) * (V - p.E_Na)) / p.C
+    dV_dot_h_1_7(V) = - (p.g_nav1p7 * (ODE.m_inf_1_7(V; C_lido=D, with_lido_shift=true)^3) * (V - p.E_Na)) / p.C
+    dV_dot_m_1_7(V) = - (p.g_nav1p7 * 3 * (ODE.m_inf_1_7(V; C_lido=D, with_lido_shift=true)^2) * ODE.h_inf_1_7(V; C_lido=D, with_lido_shift=true) * (V - p.E_Na)) / p.C
 
-    dV_dot_h_1_8(V) = - (p.g_nav1p8 * (ODE.m_inf_1_8(V)^3) * (V - p.E_Na)) / p.C
-    dV_dot_m_1_8(V) = - (p.g_nav1p8 * 3 * (ODE.m_inf_1_8(V)^2) * ODE.h_inf_1_8(V) * (V - p.E_Na)) / p.C
+    dV_dot_h_1_8(V) = - (p.g_nav1p8 * (ODE.m_inf_1_8(V; C_lido=D, with_lido_shift=true)^3) * (V - p.E_Na)) / p.C
+    dV_dot_m_1_8(V) = - (p.g_nav1p8 * 3 * (ODE.m_inf_1_8(V; C_lido=D, with_lido_shift=true)^2) * ODE.h_inf_1_8(V; C_lido=D, with_lido_shift=true) * (V - p.E_Na)) / p.C
 
     dV_dot_l_K_dr(V) = - (p.g_Kdr * (ODE.n_inf_K_dr(V)^3) * (V - p.E_k)) / p.C
     dV_dot_n_K_dr(V) = - (p.g_Kdr * 3 * (ODE.n_inf_K_dr(V)^2) * ODE.l_inf_K_dr(V) * (V - p.E_k)) / p.C
@@ -142,7 +144,7 @@ end
 
 function main()
 
-    get_param = DIV7_parameter
+    get_param = DIV0_parameter
     amp = 100
     stim_on = 500.0
     stim_length = 1000.0
