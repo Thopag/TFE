@@ -3,8 +3,8 @@ using Pkg
 
 Pkg.activate("./TFE_package")
 
-Pkg.resolve()
-Pkg.instantiate()
+# Pkg.resolve()
+# Pkg.instantiate()
 
 using TFE_package
 const TFE = TFE_package

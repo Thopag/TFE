@@ -34,23 +34,20 @@ function get_weights(V, tau_xi)
     return w_fs, w_su
 end
 
-function DIC(p)
-    V = -100.0:0.5:50.0
-
-    D = 20.0
+function DIC(V, p; shift=0.0, with_plot=false)
 
     g_f = zeros(eltype(V), size(V))
     g_s = zeros(eltype(V), size(V))
     g_us = zeros(eltype(V), size(V))
 
-    h_inf_1p3(V) = ODE.h_inf_1_3(V; C_lido=D, with_lido_shift=true)
-    m_inf_1p3(V) = ODE.m_inf_1_3(V; C_lido=D, with_lido_shift=true)
+    h_inf_1p3(V) = ODE.h_inf_1_3(V; C_lido=shift, with_lido_shift=true)
+    m_inf_1p3(V) = ODE.m_inf_1_3(V; C_lido=shift, with_lido_shift=true)
 
-    h_inf_1p7(V) = ODE.h_inf_1_7(V; C_lido=D, with_lido_shift=true)
-    m_inf_1p7(V) = ODE.m_inf_1_7(V; C_lido=D, with_lido_shift=true)
+    h_inf_1p7(V) = ODE.h_inf_1_7(V; C_lido=shift, with_lido_shift=true)
+    m_inf_1p7(V) = ODE.m_inf_1_7(V; C_lido=shift, with_lido_shift=true)
 
-    h_inf_1p8(V) = ODE.h_inf_1_8(V; C_lido=D, with_lido_shift=true)
-    m_inf_1p8(V) = ODE.m_inf_1_8(V; C_lido=D, with_lido_shift=true)
+    h_inf_1p8(V) = ODE.h_inf_1_8(V; C_lido=shift, with_lido_shift=true)
+    m_inf_1p8(V) = ODE.m_inf_1_8(V; C_lido=shift, with_lido_shift=true)
 
     l_inf_Kdr = ODE.l_inf_K_dr
     n_inf_Kdr = ODE.n_inf_K_dr
@@ -115,49 +112,58 @@ function DIC(p)
                 :solid,
                 :solid]
 
-    plt_f = plot(xlabel="Voltage (mV)", title="g_f")
-    plt_s = plot(xlabel="Voltage (mV)", title="g_s")
-    plt_us = plot(xlabel="Voltage (mV)", title="g_us")
-    plt_derivs = plot(xlabel="Voltage (mV)", title="Steady states Derivatives")
-    plt_ss = plot(xlabel="Voltage (mV)", title="Steady states", legend=:bottomright)
-    alpha = 0.6
+    if with_plot
+        plt_f = plot(xlabel="Voltage (mV)", title="g_f")
+        plt_s = plot(xlabel="Voltage (mV)", title="g_s")
+        plt_us = plot(xlabel="Voltage (mV)", title="g_us")
+        plt_derivs = plot(xlabel="Voltage (mV)", title="Steady states Derivatives")
+        plt_ss = plot(xlabel="Voltage (mV)", title="Steady states", legend=:bottomright)
+        alpha = 0.6
+    end
 
     for (tau, dV_dot_dxi, xi_inf, label, c, s) in zip(vec_tau, vec_dV_dot_dxi, vec_xi_inf, labels, colors, style)
         w_fs, w_su = get_weights(V, tau)
-
-        # plot steady states
-        plot!(plt_ss, V, xi_inf.(V), label=label, color=c, linestyle=s)
 
         # Make derivative
         dxi_inf_dV(x) = ForwardDiff.derivative(a -> xi_inf(a), x)
         r = dV_dot_dxi.(V) .* dxi_inf_dV.(V)
 
-        # check derivative
-        plot!(plt_derivs, V, dxi_inf_dV.(V), label=label, color=c, linestyle=s)
-
         g_f = g_f   .+ w_fs .* r
         g_s = g_s   .+ (w_su .- w_fs) .* r
         g_us = g_us .+ (1 .- w_su) .* r
 
-        plot!(plt_f , V, w_fs .* r           , label=label, color=c, linestyle=s, alpha=alpha)
-        plot!(plt_s , V, (w_su .- w_fs) .* r , label=label, color=c, linestyle=s, alpha=alpha)
-        plot!(plt_us, V, (1 .- w_su) .* r   , label=label, color=c, linestyle=s, alpha=alpha)
+        if with_plot
+            # plot steady states
+            plot!(plt_ss, V, xi_inf.(V), label=label, color=c, linestyle=s)
+
+            # check derivative
+            plot!(plt_derivs, V, dxi_inf_dV.(V), label=label, color=c, linestyle=s)
+
+            plot!(plt_f , V, w_fs .* r           , label=label, color=c, linestyle=s, alpha=alpha)
+            plot!(plt_s , V, (w_su .- w_fs) .* r , label=label, color=c, linestyle=s, alpha=alpha)
+            plot!(plt_us, V, (1 .- w_su) .* r   , label=label, color=c, linestyle=s, alpha=alpha)
+        end
     end
 
-    plot!(plt_f, V, g_f, color=:black, label="g_f", alpha=0.7)
-    plot!(plt_s, V, g_s, color=:black, label="g_s", alpha=0.7)
-    plot!(plt_us, V, g_us, color=:black, label="g_us", alpha=0.7)
+    if with_plot
+        plot!(plt_f, V, g_f, color=:black, label="g_f", alpha=0.7)
+        plot!(plt_s, V, g_s, color=:black, label="g_s", alpha=0.7)
+        plot!(plt_us, V, g_us, color=:black, label="g_us", alpha=0.7)
 
-    savefig(plt_f, "plots/g_f.svg")
-    savefig(plt_s, "plots/g_s.svg")
-    savefig(plt_us, "plots/g_us.svg")
-    savefig(plt_derivs, "plots/derivs.svg")
-    savefig(plt_ss, "plots/steady_states.svg")
+        savefig(plt_f, "plots/g_f.svg")
+        savefig(plt_s, "plots/g_s.svg")
+        savefig(plt_us, "plots/g_us.svg")
+        savefig(plt_derivs, "plots/derivs.svg")
+        savefig(plt_ss, "plots/steady_states.svg")
+    end
 
-    display(plt_ss)
+    return g_f, g_s, g_us
 end
 
 function main()
+    V = -100.0:0.5:50.0
+
+    titre = "1.8 | 60 % act | 40 % inact |"
 
     get_param = DIV0_parameter
     amp = 100
@@ -165,7 +171,21 @@ function main()
     stim_length = 1000.0
     p  = get_param(amp, stim_on, stim_length;)
 
-    DIC(p)
+    plt_f = plot(xlabel="Voltage (mV)", title="$title g_f")
+    plt_s = plot(xlabel="Voltage (mV)", title="$title g_s")
+    plt_us = plot(xlabel="Voltage (mV)", title="$title g_us")
+
+    shifts = 0.0:2:14.0
+    shifts = [0.0]
+    for shift in shifts
+        g_f, g_s, g_us = DIC(V, p; shift=shift, with_plot=true)
+        plot!(plt_f, V, g_f, label="$shift", alpha=1)
+        plot!(plt_s, V, g_s, label="$shift", alpha=1)
+        plot!(plt_us, V, g_us, label="$shift", alpha=1)
+    end
+    savefig(plt_f, "plots/all_g_f.svg")
+    savefig(plt_s, "plots/all_g_s.svg")
+    savefig(plt_us, "plots/all_g_us.svg")
 end
 
 main()
