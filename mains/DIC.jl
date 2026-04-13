@@ -163,9 +163,9 @@ end
 function main()
     V = -100.0:0.5:50.0
 
-    titre = "1.8 | 60 % act | 40 % inact |"
+    title = "1.7 | inact |"
 
-    get_param = DIV0_parameter
+    get_param = DIV7_parameter
     amp = 100
     stim_on = 500.0
     stim_length = 1000.0
@@ -175,10 +175,10 @@ function main()
     plt_s = plot(xlabel="Voltage (mV)", title="$title g_s")
     plt_us = plot(xlabel="Voltage (mV)", title="$title g_us")
 
-    shifts = 0.0:2:14.0
-    shifts = [0.0]
+    shifts = 0.0:5.0:25.0
+    #shifts = [0.0]
     for shift in shifts
-        g_f, g_s, g_us = DIC(V, p; shift=shift, with_plot=true)
+        g_f, g_s, g_us = DIC(V, p; shift=shift, with_plot=false)
         plot!(plt_f, V, g_f, label="$shift", alpha=1)
         plot!(plt_s, V, g_s, label="$shift", alpha=1)
         plot!(plt_us, V, g_us, label="$shift", alpha=1)
