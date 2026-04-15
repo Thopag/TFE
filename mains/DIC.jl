@@ -113,9 +113,9 @@ function DIC(V, p; shift=0.0, with_plot=false)
                 :solid]
 
     if with_plot
-        plt_f = plot(xlabel="Voltage (mV)", title="g_f")
-        plt_s = plot(xlabel="Voltage (mV)", title="g_s")
-        plt_us = plot(xlabel="Voltage (mV)", title="g_us")
+        plt_f = plot(xlabel="Voltage (mV)", title="g fast")
+        plt_s = plot(xlabel="Voltage (mV)", title="g slow")
+        plt_us = plot(xlabel="Voltage (mV)", title="g ultra slow")
         plt_derivs = plot(xlabel="Voltage (mV)", title="Steady states Derivatives")
         plt_ss = plot(xlabel="Voltage (mV)", title="Steady states", legend=:bottomright)
         alpha = 0.6
@@ -162,30 +162,49 @@ end
 
 function main()
     V = -100.0:0.5:50.0
-
-    title = "1.7 | inact |"
+ 
+    #title = "1.8 | 0 % inact | 100 % act |"
+    title = ""
 
     get_param = DIV7_parameter
-    amp = 100
+    amp = 5.0
     stim_on = 500.0
     stim_length = 1000.0
-    p  = get_param(amp, stim_on, stim_length;)
 
-    plt_f = plot(xlabel="Voltage (mV)", title="$title g_f")
-    plt_s = plot(xlabel="Voltage (mV)", title="$title g_s")
-    plt_us = plot(xlabel="Voltage (mV)", title="$title g_us")
+    plt_f = plot(xlabel="Voltage (mV)", title="$title g fast")
+    plt_s = plot(xlabel="Voltage (mV)", title="$title g slow")
+    plt_us = plot(xlabel="Voltage (mV)", title="$title g ultra slow")
+    # plt_test = plot(xlabel="Voltage (mV)", title="$title test")
 
     shifts = 0.0:5.0:25.0
-    #shifts = [0.0]
-    for shift in shifts
-        g_f, g_s, g_us = DIC(V, p; shift=shift, with_plot=false)
-        plot!(plt_f, V, g_f, label="$shift", alpha=1)
-        plot!(plt_s, V, g_s, label="$shift", alpha=1)
-        plot!(plt_us, V, g_us, label="$shift", alpha=1)
+    inhibs = 0.0:0.2:1.0
+    shifts = [0.0]
+    inhibs = [0.0]
+
+    for (shift, inhib) in zip(shifts, inhibs)
+        inhib = 0.0
+        shift = 0.0
+
+        p  = get_param(amp, stim_on, stim_length;
+            #g_nav1p7=35.0*(1-inhib),
+            #g_nav1p3=0.35*(1-inhib),
+            #g_nav1p8=0.2*(1-inhib),
+            #g_Km = 0.05
+            g_nav1p7=10.5,g_nav1p3=1.0,
+            )
+        g_f, g_s, g_us = DIC(V, p; shift=shift, with_plot=true)
+        plot!(plt_f, V, g_f, label="s = $shift | i = $inhib", alpha=1)
+        plot!(plt_s, V, g_s, label="s = $shift | i = $inhib", alpha=1)
+        plot!(plt_us, V, g_us, label="s = $shift | i = $inhib", alpha=1)
+
+        # Iext = p.I0 .+ p.Excitation
+        # ILeak = p.g_Leak .* (V .- p.E_Leak)
+        # plot!(plt_test, V, g_f .+ g_s .+ g_us .+ Iext .+ ILeak, label="s = $shift | i = $inhib", alpha=1)
     end
     savefig(plt_f, "plots/all_g_f.svg")
     savefig(plt_s, "plots/all_g_s.svg")
     savefig(plt_us, "plots/all_g_us.svg")
+    # savefig(plt_test, "plots/all_g_test.svg")
 end
 
 main()

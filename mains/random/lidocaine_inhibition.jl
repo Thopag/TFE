@@ -156,11 +156,10 @@ function lido_shift_inhib_traj()
 
     lido_shifts = .- inact_1_8_shift.(lido_concentrations) .+ act_1_8_shift.(lido_concentrations)
 
-    plot!(plt, 1.0 .- remaining_1_8, lido_shifts, color=:black, label="Seperation", linewidth = 2)
+    plot!(plt, 1.0 .- remaining_1_8, lido_shifts, color=:violet, label="Lidocaine", linewidth = 3)
 
-    plot!(plt, 1.0 .- remaining_1_8, .- inact_1_8_shift.(lido_concentrations), color=:red, linestyle=:dash, label="Inactivation", linewidth = 2)
-
-    plot!(plt, 1.0 .- remaining_1_8, .+ act_1_8_shift.(lido_concentrations), color=:red, label="Activation", linewidth = 2)
+    # plot!(plt, 1.0 .- remaining_1_8, .- inact_1_8_shift.(lido_concentrations), color=:cyan, linestyle=:dash, label="Inactivation", linewidth = 3)
+    # plot!(plt, 1.0 .- remaining_1_8, .+ act_1_8_shift.(lido_concentrations), color=:cyan, label="Activation", linewidth = 3)
 
     results = get_lidocaine_inhibition.(test_point)
     remaining_1_3 = [r[1] for r in results]
@@ -170,7 +169,8 @@ function lido_shift_inhib_traj()
     lido_shifts = .- inact_1_8_shift.(test_point) .+ act_1_8_shift.(test_point)
     scatter!(plt, 1.0 .- remaining_1_8, lido_shifts, color=:black, label="")
 
-    savefig(plt, "plots/lido_inhib_shift.svg")
+    savefig(plt, "plots/lido_inhib_shift.svg   +
+    ")
 
 end
 

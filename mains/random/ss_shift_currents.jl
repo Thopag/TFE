@@ -1,5 +1,3 @@
-include("../DIV0/params.jl")
-include("../DIV7/params.jl")
 
 function ss_currents(p, V)
 
@@ -86,18 +84,20 @@ function plot_ss_current(V, vec, labels; title="title")
             )
         INaV1p3, INaV1p7, INaV1p8, IKdr, IKm, IAHP, ILeak, Iext, dV_dt = ss_currents(p, V)
 
-        # plot!(plt_I, [], [], label=label, color=palette(:default)[i], alpha=1)
+        plot!(plt_I, [], [], label=label, color=palette(:default)[i], alpha=1)
 
-        # plot!(plt_I, V, INaV1p3, label="", linestyle=:dot, color=palette(:default)[i], alpha=1)
-        # plot!(plt_I, V, INaV1p7, label="", linestyle=:dash, color=palette(:default)[i], alpha=1)
-        # plot!(plt_I, V, INaV1p8, label="", color=palette(:default)[i], alpha=1)
+        plot!(plt_I, V, INaV1p3, label="", linestyle=:dot, color=palette(:default)[i], alpha=1)
+        plot!(plt_I, V, INaV1p7, label="", linestyle=:dash, color=palette(:default)[i], alpha=1)
+        plot!(plt_I, V, INaV1p8, label="", color=palette(:default)[i], alpha=1)
 
         # plot!(plt_I, V, dV_dt, label=label, color=palette(:default)[i], alpha=1)
 
-        plot!(plt_sum, V, INaV1p8 .+ INaV1p7 .+ INaV1p3, label=label, color=palette(:default)[i], alpha=1)
+        # plot!(plt_sum, V, INaV1p8 .+ INaV1p7 .+ INaV1p3, label=label, color=palette(:default)[i], alpha=1)
     end
 
-    p_k = get_param(amp, stim_on, stim_length;)
+    p_k = get_param(amp, stim_on, stim_length;
+    
+    )
     INaV1p3, INaV1p7, INaV1p8, IKdr, IKm, IAHP, ILeak, Iext, dV_dt = ss_currents(p_k, V)
 
     # plot!(plt_I, V, .-IKdr, label=L"- I_{Kdr}", linestyle = :dot, color=:black)
@@ -114,7 +114,7 @@ function plot_ss_current(V, vec, labels; title="title")
 
     #display(plt_I)
     savefig(plt_I, "plots/ss_current.svg")
-    savefig(plt_sum, "plots/sums_ss_current.svg")
+    #savefig(plt_sum, "plots/sums_ss_current.svg")
 
 end
 
@@ -123,11 +123,11 @@ function main()
     #lido_concentrations = [0.0, 1.0, 10.0, 50.0, 100.0, 500.0, 1000.0]
     #inhibs = [0.0,  0.3, 0.5, 0.9, 0.93, 1.0]
 
-    V = -130.0:0.5:70.0
+    V = -100.0:0.5:40.0
     shifts = 0.0:2:14.0
     inhibs = 0.0:0.1:1.0
 
-    vec = shifts
+    vec = []
     labels = ["$value mV" for value in vec]
 
     title = ""

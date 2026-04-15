@@ -5,7 +5,7 @@ export get_lidocaine_inhibition, inact_1_3_shift, act_1_3_shift, inact_1_7_shift
 # 1.3 inactivation
 function inact_1_3_shift(C)
     #return - ((-21.4 / (1 + exp(3.17 * (log10(C) - log10(120))))) + 21.4)
-    return -C * 0.0
+    return -C * 1.0
 end
 
 # 1.3 activation

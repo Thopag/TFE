@@ -1,4 +1,4 @@
-folder = "DIV0"
+folder = "DIV7"
 
 if folder == "DIV0"
     get_param = DIV0_parameter
@@ -42,6 +42,9 @@ function parameter_analyses(params, analysed_values; duration = 1700.0,
         #--------------------------------------PEAK DETECTION--------------------------------------#
         peaks_idx, n_peak, w_peaks = get_peaks(t, V;  min_h=-5.0, min_proms=10)
         t_spikes = t[peaks_idx]
+        # To avoid strange detection before stimulation (without Na current in DIV0 and 100 pA)
+        peaks_idx = peaks_idx[t_spikes .> param.stim_on]
+        t_spikes = t_spikes[t_spikes .> param.stim_on]
         freq, first_count, pattern = global_pattern(t_spikes, n_peak, param.stim_on, param.stim_off)
 
         peak_height = -65.0
@@ -104,7 +107,7 @@ function main()
 
     # -------- param vectors -------- #
 
-    amps = 0.0:100:300.0
+    amps = 0.0:1:300.0
 
     shifts =  0.0:0.5:14.0
 
@@ -114,20 +117,21 @@ function main()
     # g_nav1p7_s = [0.0, 30.0, 90.0, 150.0, 640.0, 1000.0, 10000.0]
     # g_nav1p8_s = [0.0, 3.0, 9.0, 15.0, 64.0, 100.0, 1000.0]
 
-    inhib =  [0.0, 1.0]
+    inhib =  [0.0]
     #inhib =  [0.0:0.05:0.9; 0.91:0.01:1.0]
 
     # -------- labels -------- #
 
     x_lab = "amp (pA)"
-    cycling_param_label = "inhibition NaV 1.7 (%)"
+    cycling_param_label = "_"
 
     # labels = ["$C_lido" for C_lido in lido_concentrations]
-    labels = ["$(i*100)" for i in inhib]
+    # labels = ["$(i*100)" for i in inhib]
     # labels = ["$amp pA" for amp in amps]
     # labels = ["$g" for g in g_nav1p7_s]
     # labels = ["$g" for g in g_nav1p8_s]
     # labels = ["$s" for s in shifts]
+    labels = ["_"]
 
     # -------- Set parameter variation -------- #
 
@@ -159,7 +163,7 @@ function main()
     for (i, (cycling_param, label)) in enumerate(zip(cycling_vec, labels))
 
         # --------------------------------------------- Change param here !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        params = parameter_selection(analysed_values;g_nav1p7= 35.0 *(1-cycling_param))
+        params = parameter_selection(analysed_values;g_nav1p7=10.5,g_nav1p3=1.0)
         peaks_count, freqs, pattern_vec, first_peak_height, first_peak_width = parameter_analyses(params, analysed_values; 
                                                                             with_plot_sample=plot_sample, title="$(cycling_param)") #, unit="mS/cm2", param_name="g_nav1p7")
 
@@ -210,8 +214,8 @@ function main()
     # display(p_pattern)
     # display(p_rheo)
     # display(p_plan)
-    savefig(p_peaks, "plots/peaks-curve.svg")
-    savefig(p_freqs, "plots/F-I-curve.svg")
+    # savefig(p_peaks, "plots/peaks-curve.svg")
+    # savefig(p_freqs, "plots/F-I-curve.svg")
     savefig(p_height, "plots/first_peak.svg")
     savefig(p_width, "plots/first_width.svg")
 
