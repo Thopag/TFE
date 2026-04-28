@@ -6,8 +6,8 @@ export get_lidocaine_inhibition, inact_1_3_shift, act_1_3_shift, inact_1_7_shift
 # 20 mV shift at 1000 µM (Sheets et al. 2008)
 # 20.7 mV shift at 1000 µM (Lenkowski et al. 2003)
 function inact_1_3_shift(C)
-    #return - ((-21.4 / (1 + exp(3.17 * (log10(C) - log10(120))))) + 21.4)
-    return -C * 1.0
+    return - ((-21.4 / (1 + exp(3.17 * (log10(C) - log10(120))))) + 21.4)
+    #return -C * 1.0
 end
 
 # 1.3 activation
@@ -19,8 +19,8 @@ end
 # 23 mV shift at 1000 µM (Sheets et al. 2008)
 # 10.6 mV shift at 100 µM (Chevrier et al. 2004)
 function inact_1_7_shift(C)
-    #return - ( (-24.2 / (1 + exp(3.17 * (log10(C) - log10(120))))) + 24.2)
-    return -C * 1.0
+    return - ( (-24.2 / (1 + exp(3.17 * (log10(C) - log10(120))))) + 24.2)
+    #return -C * 1.0
 end
 
 # 1.7 activation
@@ -32,14 +32,14 @@ end
 # 4.8 mV shift at 1000 µM (Sheets et al. 2008)
 # 4 mV shift at 100 µM (Chevrier et al. 2004)
 function inact_1_8_shift(C)
-    #return - ( (4.8 / (1 + exp(-14.16 * (log10(C) - log10(77))))) + 0)
-    return -C * 0.0
+    return - ( (4.8 / (1 + exp(-14.16 * (log10(C) - log10(77))))) + 0)
+    #return -C * 0.0
 end
 
 # 1.8 activation
 function act_1_8_shift(C)
-    #return (-6.8 / (1 + exp(8.73 * (log10(C) - log10(56.5))))) + 6.8
-    return C * 0.0
+    return (-6.8 / (1 + exp(8.73 * (log10(C) - log10(56.5))))) + 6.8
+    #return C * 0.0
 end
 
 # ----------------- Lidocaine conductance inhibition ----------------- #

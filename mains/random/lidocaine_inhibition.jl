@@ -1,5 +1,4 @@
 
-
 # ------------------- CONDUCTANCE INHIBITION ------------------- #
 
 hill(D, f_max, IC50, h, y0) = y0 + (f_max * D^h) / (IC50^h + D^h)
@@ -18,38 +17,6 @@ lidocain_1_8_channel(D) = hill(D, 0.9698, 118.31, 1.06, 4.78 / 100)
 # Fundamental Properties of local Anesthetics: Half-Maximal Blocking Concentrations for Tonic Block of Na+ and K+ Channels in Peripheral Nerve
 lidocain_Na(D) = hill(D, 1, 204, 0.99, 0)
 lidocain_K(D) = hill(D, 0.8, 1118, 1.22, 0)
-
-function plot_hill()
-
-    D = 10 .^ range(log10(0.1), log10(100000), length=100)
-
-    plt = plot(xlabel="Lidocaine (µM)", ylabel= "inhibition (%)") 
-    plot!(plt, xaxis=:log10, xlims=(0.1, 10000), legend=:topleft)
-
-    # plot!(plt, D, lidocain_1_7_resting_inib.(D) .* 100, label="NaV 1.7 resting", linestyle = :dot, color=:red)
-    # plot!(plt, D, lidocain_1_7_inact_inib.(D) .* 100, label="NaV 1.7 inact", linestyle = :dash, color=:red)
-    plot!(plt, D, lidocain_1_7_channel.(D) .* 100, label="NaV 1.7 channel", linestyle = :solid, color=:red)
-
-    # plot!(plt, D, lidocain_1_3_resting_inib.(D) .* 100, label="NaV 1.3 resting", linestyle = :dot, color=:blue)
-    # plot!(plt, D, lidocain_1_3_inact_inib.(D) .* 100, label="NaV 1.3 inact", linestyle = :dash, color=:blue)
-
-    plot!(plt, D, lidocain_1_8_channel.(D) .* 100, label="NaV 1.8 channel", linestyle = :solid, color=:green)
-
-    # plot!(plt, D, lidocain_Na.(D) .* 100, label="Na", linestyle = :solid, color=:purple)
-    # plot!(plt, D, lidocain_K.(D) .* 100, label="K", linestyle = :solid, color=:brown)
-    # savefig(plt, "plots/lidocaine_inibition.svg")
-    display(plt)
-end
-
-function pro()
-    g(x) = round(100*lidocain_1_8_channel(x), digits=2)
-    println(g(1))
-    println(g(10))
-    println(g(50))
-    println(g(100))
-    println(g(500))
-    println(g(1000))
-end
 
 # ------------------- STEADY STATE INHIBITION OLD ARTICLE------------------- #
 
@@ -169,8 +136,7 @@ function lido_shift_inhib_traj()
     lido_shifts = .- inact_1_8_shift.(test_point) .+ act_1_8_shift.(test_point)
     scatter!(plt, 1.0 .- remaining_1_8, lido_shifts, color=:black, label="")
 
-    savefig(plt, "plots/lido_inhib_shift.svg   +
-    ")
+    savefig(plt, "plots/lido_inhib_shift.svg   +")
 
 end
 
@@ -178,4 +144,4 @@ end
 
 #print(1 .- get_lidocaine_inhibition(1000))
 
-lido_shift_inhib_traj()
+#lido_shift_inhib_traj()
