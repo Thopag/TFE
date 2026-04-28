@@ -3,6 +3,8 @@ export get_lidocaine_inhibition, inact_1_3_shift, act_1_3_shift, inact_1_7_shift
 # ----------------- Lidocaine shifting steady states ----------------- #
 
 # 1.3 inactivation
+# 20 mV shift at 1000 µM (Sheets et al. 2008)
+# 20.7 mV shift at 1000 µM (Lenkowski et al. 2003)
 function inact_1_3_shift(C)
     #return - ((-21.4 / (1 + exp(3.17 * (log10(C) - log10(120))))) + 21.4)
     return -C * 1.0
