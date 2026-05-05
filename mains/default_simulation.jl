@@ -41,7 +41,7 @@ function main()
     t_spikes = t[peaks_idx]
 
     freq, first_count, pattern = global_pattern(t_spikes, n_peak, p.stim_on, p.stim_off; window_width=100)
-    pred_pattern = Ploting.label_list[pattern+1]
+    pred_pattern = Ploting.pattern_list[pattern+1]
     println("Predicted pattern : $pred_pattern")
 
     # --- Plots --- #

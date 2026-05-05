@@ -67,17 +67,17 @@ function get_peaks(t, x; min_h=-5.0, min_proms=10.0, max_w=Inf)
 
     peaks = findmaxima(x)
     if length(peaks[1]) == 0
-        return peaks[1], 0, []
+        return peaks[1], []
     end
     r = peaks[1]
     peaks = peakheights(peaks; min=min_h)
     if length(peaks[1]) == 0
-        return r, 0, []
+        return r, []
     end
     r = peaks[1]
     peaks = peakproms(peaks; min=min_proms)
     if length(peaks) == 0
-        return r, 0, []
+        return r, []
     end
     peaks_idx, h, data, proms, w, edges = peakwidths(peaks)
 
@@ -91,7 +91,7 @@ function get_peaks(t, x; min_h=-5.0, min_proms=10.0, max_w=Inf)
 
     w_peaks = w[w .< max_w]
 
-    return peaks_idx, length(peaks_idx), w_peaks
+    return peaks_idx, w_peaks
 end
 
 function instant_freqs(t_spikes, n_peak)
@@ -135,7 +135,7 @@ function global_pattern(t_spikes, n_peak, begin_stim, end_stim; window_width=100
         pattern = 0
         return f_global, first_count, pattern
     end
-    
+
     if n_peak == 1
         pattern = 1
         return f_global, first_count, pattern

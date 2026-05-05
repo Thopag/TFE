@@ -107,9 +107,9 @@ function main()
 
     # -------- param vectors -------- #
 
-    amps = 0.0:1:300.0
+    amps = 0.0:100:300.0
 
-    shifts =  0.0:0.5:14.0
+    shifts =  0.0:7:14.0
 
     #lido_concentrations = [0.0, 1.0, 10.0, 50.0, 100.0, 500.0, 1000.0]
     #lido_concentrations = 10 .^ range(log10(1), log10(1000), length=15)
@@ -153,7 +153,7 @@ function main()
 
     p_plan = plot(xlabel=x_lab, ylabel=cycling_param_label, title="Heat map $folder", legend=:topright, legendfontsize=7)#, yscale=:log10)
     p_pattern = plot(xlabel=x_lab, ylabel= cycling_param_label, title="Pattern $folder", yticks = (1:length(labels), labels), legend=:topright, legendfontsize=7)
-    for (c, l) in zip(Ploting.colors_list, Ploting.label_list)
+    for (c, l) in zip(Ploting.colors_list, Ploting.pattern_list)
         scatter!(p_pattern, [], [], marker=:square, color = c, label = l, markersize = 4)
         #scatter!(p_plan, [], [], marker=:square, color = c, label = l, markersize = 4)
     end
@@ -196,10 +196,10 @@ function main()
     bar!(p_rheo, cycling_value_rheobases, rheobases, label="")
     annotate!(cycling_value_rheobases, rheobases ./ 2, text.(string.(rheobases), :center, :center, :white, 7))
 
-    number_pattern = length(Ploting.label_list) - 1
+    number_pattern = length(Ploting.pattern_list) - 1
     heatmap!(p_plan, analysed_values, cycling_vec, heatmap_data', clims = (-0.5, number_pattern + 0.5), colorbar=false, fillcolor = Ploting.pattern_palette, interpolate=true)
     # With colorbar
-    flag_colors = Dict( 0:number_pattern .=> Ploting.label_list )
+    flag_colors = Dict( 0:number_pattern .=> Ploting.pattern_list )
     data2 = collect(range((0.0,number_pattern)..., 100))
     sdic = sort(flag_colors, by=first)
     p_cbar = heatmap([1], data2, [data2;;], colorbar=false, c=Ploting.pattern_palette, xaxis=false, tick_direction=:out,

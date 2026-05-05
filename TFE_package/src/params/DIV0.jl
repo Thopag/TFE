@@ -3,17 +3,17 @@ export DIV0_u0, DIV0_parameter
 function DIV0_parameter(amp, stim_on, stim_length; 
 
     # ** Na conductances
-    g_nav1p3 = 0.0,
-    g_nav1p8 = 30.0,
+    g_nav1p3 = 0.0,                 # [mS/cm2]
     g_nav1p7 = 3.0,
+    g_nav1p8 = 30.0,
 
     # ** Leak conducatance
     g_Leak = 0.025,
 
     # ** K conductance
-    g_AHP = 2.5,
-    g_Km = 0.05,
     g_Kdr = 3.5,
+    g_Km = 0.05,
+    g_AHP = 2.5,
 
     # Reversal Potential 
     E_Na = 50.0,                          # [mV]
@@ -58,9 +58,9 @@ function DIV0_parameter(amp, stim_on, stim_length;
 
     stim_off = stim_on + stim_length    # [ms]
 
-    Ihold = -3
-    I0 = (Ihold*(10^-6))/(CellArea*(10^-8))
-    Excitation = ((amp * (10^-6)) / (CellArea * (10^-8)))
+    Ihold = -3              # [pA] 
+    I0 = (Ihold*(10^-6))/(CellArea*(10^-8))                 # [µA/cm^2] 
+    Excitation = ((amp * (10^-6)) / (CellArea * (10^-8)))   # [µA/cm^2]
 
     # --- Parameter struct --- #
 

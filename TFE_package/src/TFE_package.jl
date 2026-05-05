@@ -2,6 +2,7 @@ module TFE_package
 
 using Plots, LaTeXStrings, DifferentialEquations, Peaks, Statistics
 
+include("constants.jl")
 include("utils.jl")
 include("lidocaine.jl")
 include("ODEs.jl")

@@ -19,11 +19,11 @@ function plot_max_conductance_inhibition()
     savefig(plt, "plots/report/lidocaine_max_conductance_inhibition.pdf")
 end
 
-#plot_max_conductance_inhibition()
+plot_max_conductance_inhibition()
 
 #-------------------------------------------------------------------------#
 
-function plot_max_conductance_inhibition()
+function lidocaine_shift()
 
     lido_concentrations = 10 .^ range(log10(0.1), log10(10000), length=100)
 
@@ -44,4 +44,4 @@ function plot_max_conductance_inhibition()
     savefig(plt, "plots/report/lidocaine_shift_$label.pdf")
 end
 
-plot_max_conductance_inhibition()
+#lidocaine_shift()

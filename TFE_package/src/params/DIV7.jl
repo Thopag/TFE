@@ -4,17 +4,17 @@ export DIV7_u0, DIV7_parameter
 function DIV7_parameter(amp, stim_on, stim_length;
 
     # ** Na conductances
-    g_nav1p3 = 0.35,
-    g_nav1p8 = 0.2,
+    g_nav1p3 = 0.35,                 # [mS/cm2]
     g_nav1p7 = 35.0,
+    g_nav1p8 = 0.2,
 
     # ** Leak conductance
     g_Leak = 0.035,
 
     # ** K conductances
-    g_AHP =  2.5,
-    g_Km = 0.5,
     g_Kdr = 3.5,
+    g_Km = 0.5,
+    g_AHP =  2.5,
 
     # Reversal Potential 
     E_Na = 50.0,                            # [mV]
