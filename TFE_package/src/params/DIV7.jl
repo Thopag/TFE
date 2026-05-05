@@ -159,7 +159,7 @@ end
 
 function DIV7_u0()
 
-    u0 = zeros(14)
+    u0 = zeros(12)
 
     u0[1] = -70.0         # V
     u0[2] = 0.0           # m3
@@ -173,9 +173,6 @@ function DIV7_u0()
     u0[10] = 0.0          # nm 
     u0[11] = 0.0          # z_AHP
     u0[12] = 0.0          # Inoise
-
-    u0[13] = 0.0          # n_test
-    u0[14] = 0.6487       # l_test
 
     return u0
 end

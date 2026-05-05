@@ -1,4 +1,4 @@
-export Parameters, give_currents, pulse, get_peaks, instant_freqs, global_pattern, window_count
+export Parameters, give_currents, pulse, get_peaks, instant_freqs, global_pattern, window_count, parameter_analyse
 
 # --------------------------- Parameters struct --------------------------- #
 
@@ -67,17 +67,17 @@ function get_peaks(t, x; min_h=-5.0, min_proms=10.0, max_w=Inf)
 
     peaks = findmaxima(x)
     if length(peaks[1]) == 0
-        return peaks[1], []
+        return peaks[1], 0, []
     end
     r = peaks[1]
     peaks = peakheights(peaks; min=min_h)
     if length(peaks[1]) == 0
-        return r, []
+        return r, 0, []
     end
     r = peaks[1]
     peaks = peakproms(peaks; min=min_proms)
     if length(peaks) == 0
-        return r, []
+        return r, 0, []
     end
     peaks_idx, h, data, proms, w, edges = peakwidths(peaks)
 
@@ -91,7 +91,7 @@ function get_peaks(t, x; min_h=-5.0, min_proms=10.0, max_w=Inf)
 
     w_peaks = w[w .< max_w]
 
-    return peaks_idx, w_peaks
+    return peaks_idx, length(peaks_idx), w_peaks
 end
 
 function instant_freqs(t_spikes, n_peak)
@@ -126,22 +126,20 @@ function global_pattern(t_spikes, n_peak, begin_stim, end_stim; window_width=100
     4 : Spikling
     """
     freqs = instant_freqs(t_spikes, n_peak)
-    #counts =  window_count(t_spikes, begin_stim, end_stim; window_width=window_width)
-
-    first_count = 404 #counts[1]
     f_global = mean(freqs)
+
+    #counts =  window_count(t_spikes, begin_stim, end_stim; window_width=window_width)
+    #first_count = 404 #counts[1]
     
     if n_peak == 0
         pattern = 0
-        return f_global, first_count, pattern
-    end
-
-    if n_peak == 1
+        return f_global, pattern
+    elseif n_peak == 1
         pattern = 1
-        return f_global, first_count, pattern
+        return f_global, pattern
     elseif n_peak == 2
         pattern = 2
-        return f_global, first_count, pattern
+        return f_global, pattern
     end
 
     # Do not verify if length freq > 0
@@ -153,5 +151,65 @@ function global_pattern(t_spikes, n_peak, begin_stim, end_stim; window_width=100
         pattern = 3
     end
     
-    return f_global, first_count, pattern
+    return f_global, pattern
+end
+
+function parameter_analyse(param_sets, u0; duration = 1700.0)
+
+    L = length(param_sets)
+    VEC_peak_count = Vector{Int}(undef, L)
+    VEC_freq = Vector{Float32}(undef, L)
+    VEC_pattern = Vector{Int}(undef, L)
+    VEC_first_peak_h = Vector{Float32}(undef, L)
+    VEC_first_peak_w = Vector{Float32}(undef, L)
+
+    for (i,param_set) in enumerate(param_sets)
+        print("\rProgress: $(round(((i-1)/L*100), digits=2)) %")
+
+        # -- Make Simulation -- #
+
+        t,V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP,Inoise = simulation(u0, (0.0, duration), param_set)
+
+        # ---- Peak Detection ---- #
+
+        # Peak detection
+        peaks_idx, peak_count, w_peaks = get_peaks(t, V;  min_h=-5.0, min_proms=10)
+        t_spikes = t[peaks_idx]
+
+        # Remove wrong peak detection that appear before stimulation
+        # Strangly happend with the configuration: DIV0 at 100 pA without Na current
+        peaks_idx = peaks_idx[t_spikes .> param_set.stim_on]
+        t_spikes = t_spikes[t_spikes .> param_set.stim_on]
+
+        if peak_count > 0
+            peak_count = length(peaks_idx)
+        end
+ 
+        freq, pattern = global_pattern(t_spikes, peak_count, param_set.stim_on, param_set.stim_off)
+        
+        # Default values
+        first_peak_height = -65.0
+        first_peak_width = 0.0
+
+        # "length(peaks_idx)" is use instead of "peak_count",
+        # because peaks_idx can contain peaks even if peak_count==0
+        if length(peaks_idx) > 0
+            first_peak_height = V[peaks_idx[1]]
+        end
+
+        # if not, w_peaks = [] (see global_pattern() function)
+        if pattern > 0
+            first_peak_width = w_peaks[1]
+        end
+
+        VEC_peak_count[i]   = peak_count
+        VEC_freq[i]         = freq
+        VEC_pattern[i]      = pattern
+        VEC_first_peak_h[i] = first_peak_height
+        VEC_first_peak_w[i] = first_peak_width
+    end
+
+    print("\r")
+
+    return VEC_peak_count, VEC_freq, VEC_pattern, VEC_first_peak_h, VEC_first_peak_w
 end

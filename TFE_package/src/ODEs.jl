@@ -111,18 +111,6 @@ function ODE_system(du,u,p,t)
 
     du[11] = dot_x(V, z_AHP, z_AHP_inf, tau_z_AHP)
 
-    ##################
-    q10=3^((25-30)/10)
-    ninf = alpha_n_K_dr(V)/(beta_n_K_dr(V)+alpha_n_K_dr(V))
-    taun = 1/(q10*0.03*(beta_n_K_dr(V)+alpha_n_K_dr(V)))
-
-    linf = alpha_l_K_dr(V)/(beta_l_K_dr(V)+alpha_l_K_dr(V))
-    taul = 1/(q10*0.001*(beta_l_K_dr(V)+alpha_l_K_dr(V)))
-
-    du[13] = (ninf - u[13])/taun
-    du[14] = (linf - u[14])/taul
-    ##################
-
     return
 end
 
@@ -144,8 +132,6 @@ function stochastic_part(du,u,p,t)
     du[9] = 0.0
     du[10] = 0.0
     du[11] = 0.0
-    du[13] = 0.0
-    du[14] = 0.0
 
     if with_noise
         du[12] = sigma_noise * sqrt(2.0 / tau_noise)
@@ -181,8 +167,6 @@ function simulation(u0, tspan, p)
     nm     = sol[10, :]
     z_AHP  = sol[11, :]
     Inoise = sol[12, :]
-    n_test  = sol[13, :]
-    l_test = sol[14, :]
 
-    return t,V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP,Inoise,n_test,l_test
+    return t,V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP,Inoise
 end
