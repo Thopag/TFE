@@ -1,6 +1,9 @@
 export DIV0_u0, DIV0_parameter
 
-function DIV0_parameter(amp, stim_on, stim_length; 
+function DIV0_parameter(amp;
+    
+    stim_on = 500.0,                # [ms]
+    stim_length = 1000.0,           # [ms]
 
     # ** Na conductances
     g_nav1p3 = 0.0,                 # [mS/cm2]
@@ -66,8 +69,8 @@ function DIV0_parameter(amp, stim_on, stim_length;
 
     with_DIV0 = true
 
-    p = Parameters(
-        I0, stim_on, stim_off, Excitation, C,
+    p = Model_Parameters(
+        amp, I0, stim_on, stim_off, Excitation, C,
         g_nav1p3, g_nav1p7, g_nav1p8, E_Na,
         g_Kdr, g_Km, g_AHP, E_k,
         g_Leak, E_Leak,
@@ -139,7 +142,7 @@ function DIV0_parameter_default(amp, stim_on, stim_length)
 
     with_DIV0 = false #true
 
-    p = Parameters(
+    p = Model_Parameters(
         I0, stim_on, stim_off, Excitation, C,
         g_nav1p3, g_nav1p7, g_nav1p8, E_Na,
         g_Kdr, g_Km, g_AHP, E_k,

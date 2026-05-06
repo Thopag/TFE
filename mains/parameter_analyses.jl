@@ -1,6 +1,6 @@
 
 ############################ PARAMETER SET TYPE ############################
-folder = "DIV0"
+folder = "DIV7"
 ############################ PARAMETER SET TYPE ############################
 
 if folder == "DIV0"
@@ -12,17 +12,15 @@ elseif folder == "DIV7"
 end
 
 function parameter_creation(VEC_intra_parameter;
-    stim_on = 500.0,                # ms
-    stim_length = 1000.0,           # ms
     kwargs...
     )
 
     amp = 404
-    params = Vector{Parameters}()
+    params = Vector{Model_Parameters}()
     for intra_parameter in VEC_intra_parameter
-        param = get_param(intra_parameter, stim_on, stim_length;
+        param = get_param(intra_parameter;
         with_lido_shift=true,
-        with_inhibition=false,
+        #with_inhibition=false,
         #C_lidocaine=0.0,
         #g_nav1p7=35.0 *(1-i),
         #g_nav1p3=0.35 *(1-i),
@@ -39,8 +37,8 @@ function main()
 
     # -------- param vectors -------- #
 
-    amps = 0.0:50.0:300.0
-    C_lido = [0.0, 10.0, 100.0, 1000.0]
+    amps = 0.0:1.0:300.0
+    C_lido = [0.0] #, 10.0, 100.0, 1000.0]
 
     # -------- Set parameter variation -------- #
 
@@ -82,8 +80,10 @@ function main()
     u0 = get_u0()
     for (i, (inter_parameter, label)) in enumerate(zip(VEC_inter_parameter, inter_labels))
 
-        # --------------------------------------------- Change param here !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        params = parameter_creation(VEC_intra_parameter;g_nav1p7=10.5,C_lidocaine=inter_parameter)
+        params = parameter_creation(VEC_intra_parameter;
+        #"""###################### PARAMETER ######################"""#   
+                    C_lidocaine=inter_parameter)
+        #"""#######################################################"""#  
 
         println("\n------ Start parameter analyse ------")
         println("Inter value : $inter_parameter -- $((i-1)/n_col*100) % is done")
@@ -120,14 +120,14 @@ function main()
     # display(p_rheo)
     # display(p_plan)
 
-    savefig(p_peaks, "plots/peaks-curve.svg")
-    savefig(p_freqs, "plots/F-I-curve.svg")
-    savefig(p_height, "plots/first_peak.svg")
-    savefig(p_width, "plots/first_width.svg")
+    savefig(p_peaks, "plots/parameter_analyses/peaks-curve.svg")
+    savefig(p_freqs, "plots/parameter_analyses/F-I-curve.svg")
+    savefig(p_height, "plots/parameter_analyses/first_peak.svg")
+    savefig(p_width, "plots/parameter_analyses/first_width.svg")
 
-    savefig(p_pattern, "plots/pattern.svg")
-    savefig(p_rheo, "plots/rheobases.svg")
-    savefig(p_plan, "plots/heat_plan.svg")
+    savefig(p_pattern, "plots/parameter_analyses/pattern.svg")
+    savefig(p_rheo, "plots/parameter_analyses/rheobases.svg")
+    savefig(p_plan, "plots/parameter_analyses/heat_plan.svg")
 
     println("---- End Plots ----")
 

@@ -1,8 +1,9 @@
-export Parameters, give_currents, pulse, get_peaks, instant_freqs, global_pattern, window_count, parameter_analyse
+export Model_Parameters, give_currents, pulse, get_peaks, instant_freqs, global_pattern, window_count, parameter_analyse
 
 # --------------------------- Parameters struct --------------------------- #
 
-struct Parameters{T}
+struct Model_Parameters{T}
+    amp::T
     I0::T
     stim_on::T
     stim_off::T

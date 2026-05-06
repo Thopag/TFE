@@ -1,6 +1,6 @@
 
 ############################ PARAMETER SET TYPE ############################
-folder = "DIV7"
+folder = "DIV0"
 ############################ PARAMETER SET TYPE ############################
 
 if folder == "DIV0"
@@ -17,18 +17,18 @@ function main()
 
     amp = 50.0                   # pA
     duration = 1700.0             # ms
-    stim_on = 500.0               # ms
-    stim_length = 1000.0          # ms
+    stim_on = 0.0               # ms
+    stim_length = 1700.0          # ms
 
     inhib = 0.9
     shift = 0.0
-    p = get_param(amp, stim_on, stim_length;
-        C_lidocaine=shift,
+    p = get_param(amp; stim_on=stim_on, stim_length=stim_length,
+        #C_lidocaine=shift,
         #with_lido_shift=true,
-        with_inhibition=false,
+        #with_inhibition=false,
         #g_nav1p7=35.0*(1.0-inhib),
         #g_nav1p8=30.0*(1.0-inhib)
-        g_nav1p7=10.5,g_nav1p3=1.0
+        #g_nav1p7=10.5,g_nav1p3=1.0
         )
 
     u0 = get_u0()
@@ -68,8 +68,8 @@ function main()
         display(plt_all)
         # display(plt_traj)
 
-        savefig(plt_all, "plots/plot_all.png")
-        savefig(plt_traj, "plots/plot_traj.svg")
+        savefig(plt_all, "plots/single_simulation/plot_all.png")
+        savefig(plt_traj, "plots/single_simulation/plot_traj.svg")
     end
 
     # p_freq = scatter(t_spikes[1:end-1], freqs)
