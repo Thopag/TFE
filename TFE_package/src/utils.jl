@@ -1,4 +1,4 @@
-export Model_Parameters, give_currents, pulse, get_peaks, instant_freqs, global_pattern, window_count, parameter_analyse
+export Model_Parameters, give_currents, steady_state_currents, pulse, get_peaks, instant_freqs, global_pattern, window_count, parameter_analyse
 
 # --------------------------- Parameters struct --------------------------- #
 
@@ -33,7 +33,9 @@ function pulse(t, ti, tf)
     return (ti <= t <= tf) ? 1.0 : 0.0
 end
 
-function give_currents(t,V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP, p)
+# --------------------------- Get Currents --------------------------- #
+
+function give_currents(t,V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP,p)
 
     g_nav1p3 = p.g_nav1p3
     g_nav1p7 = p.g_nav1p7
@@ -63,6 +65,56 @@ function give_currents(t,V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP, p)
     return INaV1p3, INaV1p7, INaV1p8, IKdr, IKm, IAHP, ILeak, Iext, dV_dt
     
 end
+
+function steady_state_currents(p, V)
+
+    g_nav1p3 = p.g_nav1p3
+    g_nav1p7 = p.g_nav1p7
+    g_nav1p8 = p.g_nav1p8
+    E_Na = p.E_Na
+
+    g_Kdr = p.g_Kdr
+    g_Km = p.g_Km
+    g_AHP = p.g_AHP
+    E_k = p.E_k
+
+    g_Leak = p.g_Leak
+    E_Leak = p.E_Leak
+    with_lido_shift = p.with_lido_shift
+
+    C_lido = p.C_lidocaine
+
+    m3 = m_inf_1_3.(V; C_lido=C_lido, with_lido_shift=with_lido_shift)
+    h3 = h_inf_1_3.(V; C_lido=C_lido, with_lido_shift=with_lido_shift)
+
+    m7 = m_inf_1_7.(V; C_lido=C_lido, with_lido_shift=with_lido_shift)
+    h7 = h_inf_1_7.(V; C_lido=C_lido, with_lido_shift=with_lido_shift)
+
+    m8 = m_inf_1_8.(V; C_lido=C_lido, with_lido_shift=with_lido_shift)
+    h8 = h_inf_1_8.(V; C_lido=C_lido, with_lido_shift=with_lido_shift)
+
+    nm = n_inf_K_M.(V)
+
+    ndr = n_inf_K_dr.(V)
+    ldr = l_inf_K_dr.(V)
+
+    z_AHP = z_AHP_inf.(V)
+
+    INaV1p3 = g_nav1p3 .* (m3.^3) .* h3 .* (V .- E_Na)
+    INaV1p7 = g_nav1p7 .* (m7.^3) .* h7 .* (V .- E_Na)
+    INaV1p8 = g_nav1p8 .* (m8.^3) .* h8 .* (V .- E_Na)
+    IKdr = g_Kdr .* (ndr.^3) .* ldr .* (V .- E_k)
+    IKm = g_Km .* nm .* (V .- E_k)
+    IAHP = g_AHP .* (z_AHP.^1) .* (V .- E_k)
+    ILeak = g_Leak .* (V .- E_Leak)
+    Iext = p.I0 .+ p.Excitation
+
+    dV_dt = (Iext .- INaV1p3 .- INaV1p7 .- INaV1p8 .- IKdr .- IKm .- ILeak .- IAHP) ./ p.C
+
+    return INaV1p3, INaV1p7, INaV1p8, IKdr, IKm, IAHP, ILeak, Iext, dV_dt
+end
+
+# --------------------------- Pattern Detection --------------------------- #
 
 function get_peaks(t, x; min_h=-5.0, min_proms=10.0, max_w=Inf)
 

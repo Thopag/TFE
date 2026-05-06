@@ -1,15 +1,15 @@
-using ForwardDiff
+export DIC
 
 function tau_f(V)
-    return ODE.tau_m_1_7(V)
+    return tau_m_1_7(V)
 end
 
 function tau_s(V)
-    return ODE.tau_n_K_dr(V)
+    return tau_n_K_dr(V)
 end
 
 function tau_us(V)
-    return ODE.tau_l_K_dr(V)
+    return tau_l_K_dr(V)
 end
 
 function get_weights(V, tau_xi)
@@ -34,27 +34,29 @@ function get_weights(V, tau_xi)
     return w_fs, w_su
 end
 
-function DIC(V, p; shift=0.0, with_plot=false)
+function DIC(V, p; with_plot=false)
 
     g_f = zeros(eltype(V), size(V))
     g_s = zeros(eltype(V), size(V))
     g_us = zeros(eltype(V), size(V))
 
-    h_inf_1p3(V) = ODE.h_inf_1_3(V; C_lido=shift, with_lido_shift=true)
-    m_inf_1p3(V) = ODE.m_inf_1_3(V; C_lido=shift, with_lido_shift=true)
+    C_lido = p.C_lidocaine
 
-    h_inf_1p7(V) = ODE.h_inf_1_7(V; C_lido=shift, with_lido_shift=true)
-    m_inf_1p7(V) = ODE.m_inf_1_7(V; C_lido=shift, with_lido_shift=true)
+    h_inf_1p3(V) = h_inf_1_3(V; C_lido=C_lido, with_lido_shift=p.with_lido_shift)
+    m_inf_1p3(V) = m_inf_1_3(V; C_lido=C_lido, with_lido_shift=p.with_lido_shift)
 
-    h_inf_1p8(V) = ODE.h_inf_1_8(V; C_lido=shift, with_lido_shift=true)
-    m_inf_1p8(V) = ODE.m_inf_1_8(V; C_lido=shift, with_lido_shift=true)
+    h_inf_1p7(V) = h_inf_1_7(V; C_lido=C_lido, with_lido_shift=p.with_lido_shift)
+    m_inf_1p7(V) = m_inf_1_7(V; C_lido=C_lido, with_lido_shift=p.with_lido_shift)
 
-    l_inf_Kdr = ODE.l_inf_K_dr
-    n_inf_Kdr = ODE.n_inf_K_dr
+    h_inf_1p8(V) = h_inf_1_8(V; C_lido=C_lido, with_lido_shift=p.with_lido_shift)
+    m_inf_1p8(V) = m_inf_1_8(V; C_lido=C_lido, with_lido_shift=p.with_lido_shift)
 
-    n_inf_KM = ODE.n_inf_K_M
+    l_inf_Kdr = l_inf_K_dr
+    n_inf_Kdr = n_inf_K_dr
 
-    z_K_AHP_inf = ODE.z_AHP_inf
+    n_inf_KM = n_inf_K_M
+
+    z_K_AHP_inf = z_AHP_inf
 
     vec_xi_inf = [h_inf_1p3, m_inf_1p3,
                 h_inf_1p7, m_inf_1p7,
@@ -86,12 +88,12 @@ function DIC(V, p; shift=0.0, with_plot=false)
                 dV_dot_n_K_M,
                 dV_dot_z_AHP]
 
-    vec_tau = [ODE.tau_h_1_3, ODE.tau_m_1_3,
-                ODE.tau_h_1_7, ODE.tau_m_1_7,
-                ODE.tau_h_1_8, ODE.tau_m_1_8,
-                ODE.tau_l_K_dr, ODE.tau_n_K_dr,
-                ODE.tau_n_K_M,
-                ODE.tau_z_AHP]
+    vec_tau = [tau_h_1_3, tau_m_1_3,
+                tau_h_1_7, tau_m_1_7,
+                tau_h_1_8, tau_m_1_8,
+                tau_l_K_dr, tau_n_K_dr,
+                tau_n_K_M,
+                tau_z_AHP]
 
     labels = ["h 1.3", "m 1.3",
                 "h 1.7", "m 1.7",
@@ -150,61 +152,12 @@ function DIC(V, p; shift=0.0, with_plot=false)
         plot!(plt_s, V, g_s, color=:black, label="g_s", alpha=0.7)
         plot!(plt_us, V, g_us, color=:black, label="g_us", alpha=0.7)
 
-        savefig(plt_f, "plots/g_f.svg")
-        savefig(plt_s, "plots/g_s.svg")
-        savefig(plt_us, "plots/g_us.svg")
-        savefig(plt_derivs, "plots/derivs.svg")
-        savefig(plt_ss, "plots/steady_states.svg")
+        savefig(plt_f, "plots/DIC/g_f.svg")
+        savefig(plt_s, "plots/DIC/g_s.svg")
+        savefig(plt_us, "plots/DIC/g_us.svg")
+        savefig(plt_derivs, "plots/DIC/derivs.svg")
+        savefig(plt_ss, "plots/DIC/steady_states.svg")
     end
 
     return g_f, g_s, g_us
 end
-
-function main()
-    V = -100.0:0.5:50.0
- 
-    #title = "1.8 | 0 % inact | 100 % act |"
-    title = ""
-
-    get_param = DIV7_parameter
-    amp = 5.0
-    stim_on = 500.0
-    stim_length = 1000.0
-
-    plt_f = plot(xlabel="Voltage (mV)", title="$title g fast")
-    plt_s = plot(xlabel="Voltage (mV)", title="$title g slow")
-    plt_us = plot(xlabel="Voltage (mV)", title="$title g ultra slow")
-    # plt_test = plot(xlabel="Voltage (mV)", title="$title test")
-
-    shifts = 0.0:5.0:25.0
-    inhibs = 0.0:0.2:1.0
-    shifts = [0.0]
-    inhibs = [0.0]
-
-    for (shift, inhib) in zip(shifts, inhibs)
-        inhib = 0.0
-        shift = 0.0
-
-        p  = get_param(amp, stim_on, stim_length;
-            #g_nav1p7=35.0*(1-inhib),
-            #g_nav1p3=0.35*(1-inhib),
-            #g_nav1p8=0.2*(1-inhib),
-            #g_Km = 0.05
-            g_nav1p7=10.5,g_nav1p3=1.0,
-            )
-        g_f, g_s, g_us = DIC(V, p; shift=shift, with_plot=true)
-        plot!(plt_f, V, g_f, label="s = $shift | i = $inhib", alpha=1)
-        plot!(plt_s, V, g_s, label="s = $shift | i = $inhib", alpha=1)
-        plot!(plt_us, V, g_us, label="s = $shift | i = $inhib", alpha=1)
-
-        # Iext = p.I0 .+ p.Excitation
-        # ILeak = p.g_Leak .* (V .- p.E_Leak)
-        # plot!(plt_test, V, g_f .+ g_s .+ g_us .+ Iext .+ ILeak, label="s = $shift | i = $inhib", alpha=1)
-    end
-    savefig(plt_f, "plots/all_g_f.svg")
-    savefig(plt_s, "plots/all_g_s.svg")
-    savefig(plt_us, "plots/all_g_us.svg")
-    # savefig(plt_test, "plots/all_g_test.svg")
-end
-
-main()

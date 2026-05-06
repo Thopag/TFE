@@ -1,10 +1,20 @@
-export plot_all, plot_parameter_analyses
+export plot_all, plot_parameter_analyses, sodium_palettes
 
 const pattern_list   = ["No spike"    , "Single spike", "Two spikes", "Transient" , "Spiking" ]
 const markers_list   = [:circle       , :utriangle    , :dtriangle  , :diamond    , :square   ]
 const colors_list    = [:midnightblue , :darkgreen    , :yellowgreen, :orange     , :red3     ]
 
 const pattern_palette = cgrad(colors_list, categorical = true)
+
+function sodium_palettes(L; dark=0.9, light=0.4)
+
+    reds = [get(colorschemes[:Reds], i) for i in range(dark, stop=light, length=L)]
+    blues = [get(colorschemes[:Blues], i) for i in range(dark, stop=light, length=L)]
+    greens = [get(colorschemes[:Greens], i) for i in range(dark, stop=light, length=L)]
+    greys = [get(colorschemes[:Greys], i) for i in range(dark, stop=light, length=L)]
+    
+    return reds, blues, greens, greys
+end
 
 function plot_all(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp, t_spikes,
                             I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, I_Leak, I_ext, I_noise, dV_dt, p

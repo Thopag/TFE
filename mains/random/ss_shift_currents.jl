@@ -1,5 +1,5 @@
 
-function ss_currents(p, V)
+function steady_state_currents(p, V)
 
     g_nav1p3 = p.g_nav1p3
     g_nav1p7 = p.g_nav1p7
@@ -13,13 +13,12 @@ function ss_currents(p, V)
 
     g_Leak = p.g_Leak
     E_Leak = p.E_Leak
-    with_original=p.with_original
     with_lido_shift = p.with_lido_shift
 
     C_lido = p.C_lidocaine
 
     m3 = ODE.m_inf_1_3.(V; C_lido=C_lido, with_lido_shift=with_lido_shift)
-    h3 = ODE.h_inf_1_3.(V; C_lido=C_lido, with_lido_shift=with_lido_shift, with_DIV0=p.with_DIV0)
+    h3 = ODE.h_inf_1_3.(V; C_lido=C_lido, with_lido_shift=with_lido_shift)
 
     m7 = ODE.m_inf_1_7.(V; C_lido=C_lido, with_lido_shift=with_lido_shift)
     h7 = ODE.h_inf_1_7.(V; C_lido=C_lido, with_lido_shift=with_lido_shift)
@@ -46,7 +45,6 @@ function ss_currents(p, V)
     dV_dt = (Iext .- INaV1p3 .- INaV1p7 .- INaV1p8 .- IKdr .- IKm .- ILeak .- IAHP) ./ p.C
 
     return INaV1p3, INaV1p7, INaV1p8, IKdr, IKm, IAHP, ILeak, Iext, dV_dt
-    
 end
 
 function plot_ss_shift(V, vec, labels; title="title")
