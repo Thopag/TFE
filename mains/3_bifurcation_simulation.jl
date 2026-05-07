@@ -80,7 +80,7 @@ function main()
     println("\r################ End Looping ################ ")
 
     #display(plt_bif)
-    savefig(plt_bif, "plots/bifurcation/bifurcation.svg")
+    savefig(plt_bif, "plots/bifurcation/bifurcation.pdf")
 end
 
 main()

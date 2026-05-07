@@ -120,14 +120,14 @@ function main()
     # display(p_rheo)
     # display(p_plan)
 
-    savefig(p_peaks, "plots/parameter_analyses/peaks-curve.svg")
-    savefig(p_freqs, "plots/parameter_analyses/F-I-curve.svg")
-    savefig(p_height, "plots/parameter_analyses/first_peak.svg")
-    savefig(p_width, "plots/parameter_analyses/first_width.svg")
+    savefig(p_peaks, "plots/parameter_analyses/peaks-curve.pdf")
+    savefig(p_freqs, "plots/parameter_analyses/F-I-curve.pdf")
+    savefig(p_height, "plots/parameter_analyses/first_peak.pdf")
+    savefig(p_width, "plots/parameter_analyses/first_width.pdf")
 
-    savefig(p_pattern, "plots/parameter_analyses/pattern.svg")
-    savefig(p_rheo, "plots/parameter_analyses/rheobases.svg")
-    savefig(p_plan, "plots/parameter_analyses/heat_plan.svg")
+    savefig(p_pattern, "plots/parameter_analyses/pattern.pdf")
+    savefig(p_rheo, "plots/parameter_analyses/rheobases.pdf")
+    savefig(p_plan, "plots/parameter_analyses/heat_plan.pdf")
 
     println("---- End Plots ----")
 

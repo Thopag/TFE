@@ -55,7 +55,7 @@ function main()
     # plot!(plt, V, INaV1p7, label="NaV 1.7", color=:red, alpha=1)
     # plot!(plt, V, INaV1p8, label="NaV 1.8", color=:green, alpha=1)
 
-    savefig(plt, "plots/ss_current/ss_current.svg")
+    savefig(plt, "plots/ss_current/ss_current.pdf")
 end
 
 main()

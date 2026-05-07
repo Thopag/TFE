@@ -69,7 +69,7 @@ function main()
         # display(plt_traj)
 
         savefig(plt_all, "plots/single_simulation/plot_all.png")
-        savefig(plt_traj, "plots/single_simulation/plot_traj.svg")
+        savefig(plt_traj, "plots/single_simulation/plot_traj.pdf")
     end
 
     # p_freq = scatter(t_spikes[1:end-1], freqs)

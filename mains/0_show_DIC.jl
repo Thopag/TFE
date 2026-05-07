@@ -45,9 +45,9 @@ function main()
         plot!(plt_s, V, g_s, label=changing_label)
         plot!(plt_us, V, g_us, label=changing_label)
     end
-    savefig(plt_f, "plots/DIC/all_g_f.svg")
-    savefig(plt_s, "plots/DIC/all_g_s.svg")
-    savefig(plt_us, "plots/DIC/all_g_us.svg")
+    savefig(plt_f, "plots/DIC/all_g_f.pdf")
+    savefig(plt_s, "plots/DIC/all_g_s.pdf")
+    savefig(plt_us, "plots/DIC/all_g_us.pdf")
 end
 
 main()

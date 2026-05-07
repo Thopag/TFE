@@ -152,11 +152,11 @@ function DIC(V, p; with_plot=false)
         plot!(plt_s, V, g_s, color=:black, label="g_s", alpha=0.7)
         plot!(plt_us, V, g_us, color=:black, label="g_us", alpha=0.7)
 
-        savefig(plt_f, "plots/DIC/g_f.svg")
-        savefig(plt_s, "plots/DIC/g_s.svg")
-        savefig(plt_us, "plots/DIC/g_us.svg")
-        savefig(plt_derivs, "plots/DIC/derivs.svg")
-        savefig(plt_ss, "plots/DIC/steady_states.svg")
+        savefig(plt_f, "plots/DIC/g_f.pdf")
+        savefig(plt_s, "plots/DIC/g_s.pdf")
+        savefig(plt_us, "plots/DIC/g_us.pdf")
+        savefig(plt_derivs, "plots/DIC/derivs.pdf")
+        savefig(plt_ss, "plots/DIC/steady_states.pdf")
     end
 
     return g_f, g_s, g_us
