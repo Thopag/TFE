@@ -6,12 +6,12 @@ const colors_list    = [:midnightblue , :darkgreen    , :yellowgreen, :orange   
 
 const pattern_palette = cgrad(colors_list, categorical = true)
 
-function sodium_palettes(L; dark=0.9, light=0.4)
+function sodium_palettes(L; dark=0.95, light=0.4)
 
-    reds = [get(colorschemes[:Reds], i) for i in range(dark, stop=light, length=L)]
-    blues = [get(colorschemes[:Blues], i) for i in range(dark, stop=light, length=L)]
-    greens = [get(colorschemes[:Greens], i) for i in range(dark, stop=light, length=L)]
-    greys = [get(colorschemes[:Greys], i) for i in range(dark, stop=light, length=L)]
+    reds = [get(colorschemes[:Reds], i) for i in range(light, stop=dark, length=L)]
+    blues = [get(colorschemes[:Blues], i) for i in range(light, stop=dark, length=L)]
+    greens = [get(colorschemes[:Greens], i) for i in range(light, stop=dark, length=L)]
+    greys = [get(colorschemes[:Greys], i) for i in range(light, stop=dark, length=L)]
     
     return reds, blues, greens, greys
 end
@@ -20,7 +20,7 @@ function plot_all(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp, t_spik
                             I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, I_Leak, I_ext, I_noise, dV_dt, p
                                 ; xlimits=(400, 1700))
 
-    n_fig = 3
+    n_fig = 1
     alpha = 0.3
     plt = plot(layout = (n_fig, 1), link = :x, xlims=xlimits, size = (1000, 900), xaxis = nothing)
 
@@ -29,20 +29,20 @@ function plot_all(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp, t_spik
     plot!(plt[voltage], t, V, color= :black, label=L"%$amp pA")
     #vline!(plt[voltage], t_spikes, color=:red, label="peaks")
 
-    variable = 2
-    ylabel!(plt[variable], "Variable (-)")
-    #plot!(plt[variable], ylims=(0, 0.25))
-    plot!(plt[variable], legend = :bottomright)
-    plot!(plt[variable], t, m3, label=L"m_{3}", linestyle = :solid, color=:blue, alpha=alpha)
-    plot!(plt[variable], t, h3, label=L"h_{3}", linestyle = :dash, color=:blue, alpha=alpha)
-    plot!(plt[variable], t, m7, label=L"m_{7}", linestyle = :solid, color=:red, alpha=alpha)
-    plot!(plt[variable], t, h7, label=L"h_{7}", linestyle = :dash, color=:red, alpha=alpha)
-    plot!(plt[variable], t, m8, label=L"m_{8}", linestyle = :solid, color=:green, alpha=alpha)
-    plot!(plt[variable], t, h8, label=L"h_{8}", linestyle = :dash, color=:green, alpha=alpha)
-    plot!(plt[variable], t, ndr, label=L"n_{dr}", linestyle = :solid, color=:orange)
-    plot!(plt[variable], t, ldr, label=L"l_{dr}", linestyle = :dash, color=:orange)
-    plot!(plt[variable], t, nm, label=L"n_{m}", linestyle = :solid, color=:purple)
-    plot!(plt[variable], t, z_AHP, label=L"z_{AHP}", linestyle = :solid, color=:brown, alpha=alpha)
+    # variable = 2
+    # ylabel!(plt[variable], "Variable (-)")
+    # #plot!(plt[variable], ylims=(0, 0.25))
+    # plot!(plt[variable], legend = :bottomright)
+    # plot!(plt[variable], t, m3, label=L"m_{3}", linestyle = :solid, color=:blue, alpha=alpha)
+    # plot!(plt[variable], t, h3, label=L"h_{3}", linestyle = :dash, color=:blue, alpha=alpha)
+    # plot!(plt[variable], t, m7, label=L"m_{7}", linestyle = :solid, color=:red, alpha=alpha)
+    # plot!(plt[variable], t, h7, label=L"h_{7}", linestyle = :dash, color=:red, alpha=alpha)
+    # plot!(plt[variable], t, m8, label=L"m_{8}", linestyle = :solid, color=:green, alpha=alpha)
+    # plot!(plt[variable], t, h8, label=L"h_{8}", linestyle = :dash, color=:green, alpha=alpha)
+    # plot!(plt[variable], t, ndr, label=L"n_{dr}", linestyle = :solid, color=:orange)
+    # plot!(plt[variable], t, ldr, label=L"l_{dr}", linestyle = :dash, color=:orange)
+    # plot!(plt[variable], t, nm, label=L"n_{m}", linestyle = :solid, color=:purple)
+    # plot!(plt[variable], t, z_AHP, label=L"z_{AHP}", linestyle = :solid, color=:brown, alpha=alpha)
 
     # channel = 2
     # ylabel!(plt[channel], "Channel Availability (%)")
@@ -54,19 +54,19 @@ function plot_all(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp, t_spik
     # plot!(plt[channel], t, nm .* 100, color=:purple, label=L"K_{m}")
     # plot!(plt[channel], t, z_AHP .* 100, color=:brown, label=L"K_{AHP}")
 
-    current = 3 
-    ylabel!(plt[current], "Current (uA/cm2)", legendfontsize=6, legend = :bottomright)
-    #plot!(plt[current], ylims=(-(p.I0 + p.Excitation)*1.1, (p.I0 + p.Excitation)*1.1))
-    plot!(plt[current], ylims=(-20, 20))
-    plot!(plt[current], t, I_NaV1p3, color=:blue, label=L"I_{NaV1.3}", alpha=alpha)
-    plot!(plt[current], t, I_NaV1p7, color=:red, label=L"I_{NaV1.7}", alpha=alpha)
-    plot!(plt[current], t, I_NaV1p8, color=:green, label=L"I_{NaV1.8}", alpha=alpha)
-    plot!(plt[current], t, I_Kdr, color=:orange, label=L"I_{Kdr}")
-    plot!(plt[current], t, I_Km, color=:purple, label=L"I_{KM}")
-    plot!(plt[current], t, I_AHP, color=:brown, label=L"I_{AHP}", alpha=alpha)
-    plot!(plt[current], t, I_Leak, color=:black, label=L"I_{Leak}", alpha=alpha)
-    plot!(plt[current], t, I_ext, color=:black, linestyle = :dash, label=L"I_{ext}")
-    #plot!(p[current], t, I_noise, color=:pink, label=L"I_{noise}")
+    # current = 3 
+    # ylabel!(plt[current], "Current (uA/cm2)", legendfontsize=6, legend = :bottomright)
+    # #plot!(plt[current], ylims=(-(p.I0 + p.Excitation)*1.1, (p.I0 + p.Excitation)*1.1))
+    # plot!(plt[current], ylims=(-20, 20))
+    # plot!(plt[current], t, I_NaV1p3, color=:blue, label=L"I_{NaV1.3}", alpha=alpha)
+    # plot!(plt[current], t, I_NaV1p7, color=:red, label=L"I_{NaV1.7}", alpha=alpha)
+    # plot!(plt[current], t, I_NaV1p8, color=:green, label=L"I_{NaV1.8}", alpha=alpha)
+    # plot!(plt[current], t, I_Kdr, color=:orange, label=L"I_{Kdr}")
+    # plot!(plt[current], t, I_Km, color=:purple, label=L"I_{KM}")
+    # plot!(plt[current], t, I_AHP, color=:brown, label=L"I_{AHP}", alpha=alpha)
+    # plot!(plt[current], t, I_Leak, color=:black, label=L"I_{Leak}", alpha=alpha)
+    # plot!(plt[current], t, I_ext, color=:black, linestyle = :dash, label=L"I_{ext}")
+    # #plot!(p[current], t, I_noise, color=:pink, label=L"I_{noise}")
 
     # current_bis = 2
     # ylabel!(plt[current_bis], "Current (uA/cm2)", legendfontsize=6, legend = :bottomright)
@@ -109,14 +109,14 @@ function plot_parameter_analyses(VEC_intra_parameter, VEC_inter_parameter,
 
     # ----- INIT ----- #
 
-    p_peaks = plot(xlabel=intra_axe_label, ylabel= "Peaks count (-)", title="peaks count")
-    p_freqs = plot(xlabel=intra_axe_label, ylabel= "Frequence (Hz)", title="FI curve")
-    p_height = plot(xlabel=intra_axe_label, ylabel= "Height (mV)", title="First peak height")
-    p_width = plot(xlabel=intra_axe_label, ylabel= "width (ms)", title="First peak width")
+    p_peaks = plot(xlabel=intra_axe_label, ylabel= "Peaks count (-)")
+    p_freqs = plot(xlabel=intra_axe_label, ylabel= "Frequence (Hz)")
+    p_height = plot(xlabel=intra_axe_label, ylabel= "Height (mV)")
+    p_width = plot(xlabel=intra_axe_label, ylabel= "width (ms)")
 
     p_rheo = plot(xlabel=inter_axe_label, ylabel="rheobase (pA)")
-    p_plan = plot(xlabel=intra_axe_label, ylabel=inter_axe_label, title="Heat map", legend=:topright, legendfontsize=7)#, yscale=:log10)
-    p_pattern = plot(xlabel=intra_axe_label, ylabel=inter_axe_label, title="Pattern", yticks = (1:length(inter_labels), inter_labels), legend=:topright, legendfontsize=7)
+    p_plan = plot(xlabel=intra_axe_label, ylabel=inter_axe_label, legend=:topright, legendfontsize=7)
+    p_pattern = plot(xlabel=intra_axe_label, ylabel=inter_axe_label, yticks = (1:length(inter_labels), inter_labels), legend=:topright, legendfontsize=7)
 
     # Add color legend
     for (c, l) in zip(colors_list, pattern_list)
@@ -132,11 +132,11 @@ function plot_parameter_analyses(VEC_intra_parameter, VEC_inter_parameter,
         pattern_form = markers_list[VEC_pattern .+ 1]
         pattern_color = colors_list[VEC_pattern .+ 1]
 
-        plot!(p_peaks, VEC_intra_parameter, VEC_peak_count      , marker=pattern_form, markersize=2, linealpha=0.5, markeralpha=0.7, label=inter_label, markerstrokecolor = :match, markerstrokewidth = 0.0)
-        plot!(p_freqs, VEC_intra_parameter, VEC_freq            , marker=pattern_form, markersize=2, linealpha=0.5, markeralpha=0.7, label=inter_label, markerstrokecolor = :match, markerstrokewidth = 0.0)
+        plot!(p_peaks, VEC_intra_parameter, VEC_peak_count      , marker=pattern_form, markersize=2, linealpha=0.5, markeralpha=0.9, label=inter_label, markerstrokecolor = :match, markerstrokewidth = 0.0)
+        plot!(p_freqs, VEC_intra_parameter, VEC_freq            , marker=pattern_form, markersize=2, linealpha=0.5, markeralpha=0.9, label=inter_label, markerstrokecolor = :match, markerstrokewidth = 0.0)
 
-        plot!(p_height, VEC_intra_parameter, VEC_first_peak_h   , marker=:circle     , markersize=2, linealpha=0.6, markeralpha=0.7, label=inter_label, markerstrokecolor = :match, markerstrokewidth = 0.0)
-        plot!(p_width, VEC_intra_parameter, VEC_first_peak_w    , marker=:circle     , markersize=2, linealpha=0.6, markeralpha=0.7, label=inter_label, markerstrokecolor = :match, markerstrokewidth = 0.0)
+        plot!(p_height, VEC_intra_parameter, VEC_first_peak_h   , marker=:circle     , markersize=2, linealpha=0.6, markeralpha=0.9, label=inter_label, markerstrokecolor = :match, markerstrokewidth = 0.0)
+        plot!(p_width, VEC_intra_parameter, VEC_first_peak_w    , marker=:circle     , markersize=2, linealpha=0.6, markeralpha=0.9, label=inter_label, markerstrokecolor = :match, markerstrokewidth = 0.0)
 
         bar!(p_pattern, VEC_intra_parameter, fill(i+0.5, length(VEC_intra_parameter)), fillto=fill(i-0.45, length(VEC_intra_parameter)), 
                                                                         lw=0, linecolor=:match, bar_width=(VEC_intra_parameter[1]-VEC_intra_parameter[2])*1.05, label="", color=pattern_color)
@@ -150,7 +150,25 @@ function plot_parameter_analyses(VEC_intra_parameter, VEC_inter_parameter,
 
     # --- Pattern Plan (Heatmap) --- #
     number_pattern = length(pattern_list) - 1
-    heatmap!(p_plan, VEC_intra_parameter, VEC_inter_parameter, M_pattern', clims = (-0.5, number_pattern + 0.5), colorbar=false, fillcolor = pattern_palette, interpolate=true)
+    heatmap!(p_plan, VEC_intra_parameter, VEC_inter_parameter, M_pattern', clims = (-0.5, number_pattern + 0.5), colorbar=false, fillcolor = pattern_palette, interpolate=false)
+
+    if length(VEC_intra_parameter) > 1
+        diff_x = VEC_intra_parameter[2]-VEC_intra_parameter[1]
+    else
+        diff_x = VEC_intra_parameter[1]
+    end
+    if length(VEC_inter_parameter) > 1
+        diff_y = VEC_inter_parameter[2]-VEC_inter_parameter[1]
+    else
+        diff_y = VEC_inter_parameter[1]
+    end
+
+    x_limits = (-diff_x/8, VEC_intra_parameter[end] + diff_x/8)
+    y_limits = (-diff_y/8, VEC_inter_parameter[end] + diff_y/8)
+
+    plot!(p_plan, xlims=x_limits, ylims=y_limits) #, yscale=:log10)
+
+    add_lido_shift_inhib_traj(p_plan)
 
     # Add pattern colorbar
     flag_colors = Dict( 0:number_pattern .=> pattern_list )

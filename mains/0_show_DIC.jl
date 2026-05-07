@@ -11,7 +11,7 @@ end
 
 function main()
 
-    V = -100.0:0.5:50.0
+    V = -120.0:0.5:60.0
 
     # -------- Set up -------- #
 
@@ -24,9 +24,11 @@ function main()
 
     with_extra_plot = false
 
-    plt_f = plot(xlabel="Voltage (mV)")
-    plt_s = plot(xlabel="Voltage (mV)")
-    plt_us = plot(xlabel="Voltage (mV)")
+    xticks = [-120, -90, -60, -30, 0, 30, 60]
+
+    plt_f = plot(xlabel="Voltage (mV)", ylabel="g fast", xticks = xticks)
+    plt_s = plot(xlabel="Voltage (mV)", ylabel="g slow", xticks = xticks)
+    plt_us = plot(xlabel="Voltage (mV)", ylabel="g ultra slow", xticks = xticks)
 
     for (shift, inhib) in changing_params
         #inhib = 0.0

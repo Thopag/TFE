@@ -1,6 +1,6 @@
 
 ############################ PARAMETER SET TYPE ############################
-folder = "DIV7"
+folder = "DIV0"
 ############################ PARAMETER SET TYPE ############################
 
 if folder == "DIV0"
@@ -28,9 +28,12 @@ function record_min_max(record_on, record_off, t, x; tol=1.0)
     return max, min, is_stable
 end
 
-function main()
+function main(;extra=0.0)
 
-    amps = 0.0:1:300.0
+    amps = 0.0:3:300.0
+
+    shift = 0.0
+    C_lido = 100.0
 
     # -------- Set up -------- #
 
@@ -40,13 +43,13 @@ function main()
 
     # -------- Timing set up -------- #
 
-    duration = 2500.0               # ms
+    duration = 1700.0               # ms
     stim_on = 500.0                 # ms
     stim_off = duration - 200
     stim_length = stim_off - stim_on
 
     # Time at which the max and min detection starts
-    record_on = stim_off - 400          # ms
+    record_on = stim_off - 350          # ms
     record_off = stim_off               # ms
 
     # -------- Plot Set up -------- #
@@ -66,7 +69,17 @@ function main()
     for (i,bifu_param) in enumerate(bifurcation_params)
         print("\rProgress: $(round(((i-1)/L*100), digits=2)) %")
 
-        p = get_param(bifu_param; stim_on=stim_on, stim_length=stim_length)
+        ########################################################################
+        p = get_param(bifu_param; stim_on=stim_on, stim_length=stim_length,
+            with_lido_shift=true,
+            with_inhibition=false,
+            C_lidocaine = C_lido,
+            #g_nav1p3 = 0.0,
+            #g_nav1p7 = 0.0,
+            #g_nav1p8 = 0.0,
+            )
+        ########################################################################
+
         t,V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP,I_noise = simulation(u0, (0.0, duration), p)
 
         max, min, is_stable = record_min_max(record_on, record_off, t, V)
@@ -80,7 +93,14 @@ function main()
     println("\r################ End Looping ################ ")
 
     #display(plt_bif)
-    savefig(plt_bif, "plots/bifurcation/bifurcation.pdf")
+    # 1p8_inac-act
+    savefig(plt_bif, "plots/bifurcation/bifurcation_$(folder)_C_lido_100.pdf")
 end
+
+# shifts = 0:2:14.0
+
+# for s in shifts
+#     main(;extra=s)
+# end
 
 main()

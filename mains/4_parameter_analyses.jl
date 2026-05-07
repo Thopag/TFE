@@ -1,6 +1,6 @@
 
 ############################ PARAMETER SET TYPE ############################
-folder = "DIV7"
+folder = "DIV0"
 ############################ PARAMETER SET TYPE ############################
 
 if folder == "DIV0"
@@ -15,16 +15,15 @@ function parameter_creation(VEC_intra_parameter;
     kwargs...
     )
 
-    amp = 404
+    amp = 100.0
     params = Vector{Model_Parameters}()
     for intra_parameter in VEC_intra_parameter
-        param = get_param(intra_parameter;
+        param = get_param(amp;
         with_lido_shift=true,
         #with_inhibition=false,
         #C_lidocaine=0.0,
-        #g_nav1p7=35.0 *(1-i),
-        #g_nav1p3=0.35 *(1-i),
-        #g_nav1p8=0.2 *(1-i),
+
+        g_nav1p8=30.0 *(1-intra_parameter),
         kwargs...)
 
         push!(params, param)
@@ -37,20 +36,23 @@ function main()
 
     # -------- param vectors -------- #
 
-    amps = 0.0:1.0:300.0
-    C_lido = [0.0] #, 10.0, 100.0, 1000.0]
+    amps = 0.0:50:300.0                     #"amp (pA)"
+    C_lido = [1.0, 10.0, 100.0, 1000.0]     #"Lidocaine (µM)"
+
+    shifts = 0:1.5:15.0
+    inhibs = 0:0.2:1.0
 
     # -------- Set parameter variation -------- #
 
-    VEC_intra_parameter = amps
-    VEC_inter_parameter = C_lido
+    VEC_intra_parameter = inhibs
+    VEC_inter_parameter = shifts
 
     # -------- label parameters -------- #
 
-    intra_axe_label = "amp (pA)"
-    inter_axe_label = "Lidocaine (µM)"
+    intra_axe_label = "inhibition (-)"
+    inter_axe_label = "shift (mV)"
 
-    inter_labels = ["$k" for k in C_lido]
+    inter_labels = ["$k" for k in VEC_inter_parameter]
 
     # -------- Set up results structure -------- #
     
@@ -82,11 +84,15 @@ function main()
 
         params = parameter_creation(VEC_intra_parameter;
         #"""###################### PARAMETER ######################"""#   
-                    C_lidocaine=inter_parameter)
+                    C_lidocaine=inter_parameter,
+                    #g_nav1p3 = 0.0,
+                    #g_nav1p7 = 0.0,
+                    #g_nav1p8 = 0.0,
+                    )
         #"""#######################################################"""#  
 
         println("\n------ Start parameter analyse ------")
-        println("Inter value : $inter_parameter -- $((i-1)/n_col*100) % is done")
+        println("Inter value : $inter_parameter -- $(round(((i-1)/n_col*100), digits=2)) % is done")
         VEC_peak_count, VEC_freq, VEC_pattern, VEC_first_peak_h, VEC_first_peak_w = parameter_analyse(params, u0;)
         println("------ End parameter analyses ------")
 

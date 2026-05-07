@@ -237,8 +237,6 @@ function parameter_analyse(param_sets, u0; duration = 1700.0)
         if peak_count > 0
             peak_count = length(peaks_idx)
         end
- 
-        freq, pattern = global_pattern(t_spikes, peak_count, param_set.stim_on, param_set.stim_off)
         
         # Default values
         first_peak_height = -65.0
@@ -250,10 +248,12 @@ function parameter_analyse(param_sets, u0; duration = 1700.0)
             first_peak_height = V[peaks_idx[1]]
         end
 
-        # if not, w_peaks = [] (see global_pattern() function)
-        if pattern > 0
+        # if not, w_peaks = [] (see get_peaks() function)
+        if peak_count > 0
             first_peak_width = w_peaks[1]
         end
+
+        freq, pattern = global_pattern(t_spikes, peak_count, param_set.stim_on, param_set.stim_off)
 
         VEC_peak_count[i]   = peak_count
         VEC_freq[i]         = freq

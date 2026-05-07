@@ -15,20 +15,22 @@ function main()
 
     with_plot = true
 
-    amp = 50.0                   # pA
+    amp = 130.0                   # pA
     duration = 1700.0             # ms
-    stim_on = 0.0               # ms
-    stim_length = 1700.0          # ms
+    stim_on = 500.0               # ms
+    stim_length = 1000.0          # ms
 
     inhib = 0.9
-    shift = 0.0
+    shift = 1000.0
     p = get_param(amp; stim_on=stim_on, stim_length=stim_length,
-        #C_lidocaine=shift,
-        #with_lido_shift=true,
+        with_lido_shift=true,
         #with_inhibition=false,
+        C_lidocaine=shift,
+    
         #g_nav1p7=35.0*(1.0-inhib),
         #g_nav1p8=30.0*(1.0-inhib)
         #g_nav1p7=10.5,g_nav1p3=1.0
+        #g_nav1p7 = 0.0,
         )
 
     u0 = get_u0()
@@ -51,7 +53,7 @@ function main()
     # --- Plots --- #
 
     # 400 1700
-    xlimits = (400, 1700)
+    xlimits = (0, 1700)
 
     if with_plot
         plt_all = plot_all(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp, t_spikes,
