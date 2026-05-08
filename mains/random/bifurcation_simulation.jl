@@ -94,7 +94,7 @@ function main(;extra=0.0)
 
     #display(plt_bif)
     # 1p8_inac-act
-    savefig(plt_bif, "plots/bifurcation/bifurcation_$(folder)_C_lido_100.pdf")
+    savefig(plt_bif, "plots/bifurcation/SIMULATION_bifurcation_$(folder).pdf")
 end
 
 # shifts = 0:2:14.0
