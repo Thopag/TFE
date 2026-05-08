@@ -1,7 +1,7 @@
 using BifurcationKit, Accessors
 
 ############################ PARAMETER SET TYPE ############################
-folder = "DIV7"
+folder = "DIV0"
 ############################ PARAMETER SET TYPE ############################
 
 if folder == "DIV0"
@@ -24,7 +24,7 @@ function main()
     opts = ContinuationPar(
         p_min = 0.0, 
         p_max = 300.0,
-        max_steps = 3000,
+        max_steps = 10000,
         dsmax = 0.1, 
         detect_bifurcation = 3,
     )
@@ -32,7 +32,6 @@ function main()
     br = continuation(prob, PALC(), opts)
 
     plot(br)
-    
 end
 
 main()

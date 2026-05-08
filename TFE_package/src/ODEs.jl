@@ -176,7 +176,8 @@ function ODE_system_bifurcation(u,p)
     du = similar(u)
     # --- parameters --- #
 
-    I_ext = p.I0 + p.Excitation
+    Excitation = ((p.amp * (10^-6)) / (p.CellArea * (10^-8))) 
+    I_ext = p.I0 + Excitation
     C = p.C
 
     g_nav1p3 = p.g_nav1p3

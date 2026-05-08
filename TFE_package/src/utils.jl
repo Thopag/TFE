@@ -4,6 +4,7 @@ export Model_Parameters, give_currents, steady_state_currents, pulse, get_peaks,
 
 struct Model_Parameters{T}
     amp::T
+    CellArea::T
     I0::T
     stim_on::T
     stim_off::T

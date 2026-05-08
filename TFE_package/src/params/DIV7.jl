@@ -70,7 +70,7 @@ function DIV7_parameter(amp;
     with_DIV0 = false
 
     p = Model_Parameters(
-        amp, I0, stim_on, stim_off, Excitation, C,
+        amp, CellArea, I0, stim_on, stim_off, Excitation, C,
         g_nav1p3, g_nav1p7, g_nav1p8, E_Na,
         g_Kdr, g_Km, g_AHP, E_k,
         g_Leak, E_Leak,
