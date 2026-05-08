@@ -12,7 +12,7 @@ function sodium_palettes(L; dark=0.95, light=0.4)
     blues = [get(colorschemes[:Blues], i) for i in range(light, stop=dark, length=L)]
     greens = [get(colorschemes[:Greens], i) for i in range(light, stop=dark, length=L)]
     greys = [get(colorschemes[:Greys], i) for i in range(light, stop=dark, length=L)]
-    
+
     return reds, blues, greens, greys
 end
 

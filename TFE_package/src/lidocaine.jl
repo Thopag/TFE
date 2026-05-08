@@ -2,7 +2,7 @@ export get_lidocaine_inhibition, inact_1_3_shift, act_1_3_shift, inact_1_7_shift
 
 # ----------------- Lidocaine shifting steady states ----------------- #
 
-shift_mode::Bool = false
+shift_mode::Bool = true
 
 shift_inact_1p3::Float64 = 0.0
 

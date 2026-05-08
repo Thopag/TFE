@@ -15,22 +15,25 @@ function main()
 
     # -------- Set up -------- #
 
-    shifts = [0.0, 7.0, 14.0]
-    inhibs = [0.0, 0.0, 0.0]
+    shifts = 0:2:14.0
+    inhibs = zeros(length(shifts))
 
     changing_params = zip(shifts, inhibs)
+    L = length(changing_params)
 
     # -------- Plot Set up -------- #
 
     with_extra_plot = false
 
     xticks = [-120, -90, -60, -30, 0, 30, 60]
+    #colors = [get(colorschemes[:nipy_spectral], i) for i in range(0.1, stop=0.9, length=L)]
+    colors = [get(colorschemes[:rainbow], i) for i in range(0.0, stop=1.0, length=L)]
 
     plt_f = plot(xlabel="Voltage (mV)", ylabel="g fast", xticks = xticks)
     plt_s = plot(xlabel="Voltage (mV)", ylabel="g slow", xticks = xticks)
     plt_us = plot(xlabel="Voltage (mV)", ylabel="g ultra slow", xticks = xticks)
 
-    for (shift, inhib) in changing_params
+    for (i,(shift, inhib)) in enumerate(changing_params)
         #inhib = 0.0
         #shift = 0.0
         changing_label = "s = $shift | i = $inhib"
@@ -43,9 +46,9 @@ function main()
             )
     
         g_f, g_s, g_us = DIC(V, p; with_plot=with_extra_plot)
-        plot!(plt_f, V, g_f, label=changing_label)
-        plot!(plt_s, V, g_s, label=changing_label)
-        plot!(plt_us, V, g_us, label=changing_label)
+        plot!(plt_f, V, g_f, label=changing_label, color=colors[i])
+        plot!(plt_s, V, g_s, label=changing_label, color=colors[i])
+        plot!(plt_us, V, g_us, label=changing_label, color=colors[i])
     end
     savefig(plt_f, "plots/DIC/all_g_f.pdf")
     savefig(plt_s, "plots/DIC/all_g_s.pdf")
