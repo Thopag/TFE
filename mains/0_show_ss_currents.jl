@@ -25,7 +25,7 @@ function main()
 
     alpha = 1
     xticks = [-120, -90, -60, -30, 0, 30, 60]
-    ylimits =  (-25, 0.5)
+    ylimits =  (-0.35, 0.02)
 
     plt = plot(xlabel=L"Voltage ($mV$)", ylabel= L"Steady State Current ($\mu A/cm^2$)", legendfontsize=7, legend=:bottomleft
                                         , xticks = xticks)
@@ -33,6 +33,18 @@ function main()
 
     reds, blues, greens, greys = sodium_palettes(L)
 
+    # -------- put default values -------- #
+    default_p = get_param(0.0)
+    INaV1p3, INaV1p7, INaV1p8, IKdr, IKm, IAHP, ILeak, Iext, dV_dt = steady_state_currents(default_p, V)
+    plot!(plt, V, .- IKdr, label=L"- K_{dr}", color=:orange, alpha=1, linewidth = 1.5)
+    plot!(plt, V, .- IKm, label=L"- K_{M}", color=:purple, alpha=1, linewidth = 1.5)
+    plot!(plt, V, .- IAHP, label=L"- K_{AHP}", color=:brown, alpha=1, linewidth = 1.5)
+
+    # plot!(plt, V, INaV1p3, label=L"NaV1.3", color=:blue, alpha=1)
+    # plot!(plt, V, INaV1p7, label=L"NaV1.7", color=:red, alpha=1)
+    # plot!(plt, V, INaV1p8, label=L"NaV1.8", color=:green, alpha=1)
+
+    # -------- Looping -------- #
     for (i,(shift, inhib)) in enumerate(changing_params)
         #inhib = 0.0
         #shift = 0.0
@@ -53,18 +65,7 @@ function main()
         plot!(plt, V, INaV1p8, label="", color=greens[i], alpha=alpha)
     end
 
-    # put default values
-    default_p = get_param(0.0)
-    INaV1p3, INaV1p7, INaV1p8, IKdr, IKm, IAHP, ILeak, Iext, dV_dt = steady_state_currents(default_p, V)
-    # plot!(plt, V, INaV1p3, label=L"NaV1.3", color=:blue, alpha=1)
-    # plot!(plt, V, INaV1p7, label=L"NaV1.7", color=:red, alpha=1)
-    # plot!(plt, V, INaV1p8, label=L"NaV1.8", color=:green, alpha=1)
-
-    plot!(plt, V, .- IKdr, label=L"- K_{dr}", color=:orange, alpha=1, linewidth = 1.5)
-    plot!(plt, V, .- IKm, label=L"- K_{M}", color=:purple, alpha=1, linewidth = 1.5)
-    plot!(plt, V, .- IAHP, label=L"- K_{AHP}", color=:brown, alpha=1, linewidth = 1.5)
-
-    savefig(plt, "plots/ss_current/ss_current.pdf")
+    savefig(plt, "plots/ss_current/ss_current_$(folder).pdf")
 end
 
 main()
