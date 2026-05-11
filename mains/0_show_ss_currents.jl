@@ -1,6 +1,6 @@
 
 ############################ PARAMETER SET TYPE ############################
-folder = "DIV0"
+folder = "DIV7"
 ############################ PARAMETER SET TYPE ############################
 
 if folder == "DIV0"
@@ -11,7 +11,7 @@ end
 
 function init_ss_currents(V, get_param)
     xticks = [-120, -90, -60, -30, 0, 30, 60]
-    ylimits =  (-25, 0.5)
+    ylimits =  (-0.30, 0.005)
 
     plt = plot(xlabel=L"Voltage ($mV$)", ylabel= L"Steady State Current ($\mu A/cm^2$)", legendfontsize=7, legend=:bottomleft
                                         , xticks = xticks)
@@ -45,11 +45,11 @@ function main()
     # -------- Set up -------- #
 
     shifts = 0:1:15.0
-    inhibs = [0.0, 0.3, 0.5, 0.7, 0.9, 0.925, 0.95, 0.975, 1.0]
+    inhibs = 0.0:0.1:1.0
 
-    changing_params = shifts
+    changing_params = inhibs
     L = length(changing_params)
-    file_prefix = "$(folder)_1.8_40_60_shifts_"
+    file_prefix = "$(folder)_inhibition_1_8_"
 
     # -------- Plot Set up -------- #
 
@@ -67,7 +67,9 @@ function main()
 
         p  = get_param(0.0;
         #"""###################### PARAMETER ######################"""#   
-                C_lidocaine=inter_parameter,
+                g_nav1p3 = 0.35 ,
+                g_nav1p7 = 35.0 ,
+                g_nav1p8 = 0.2 * (1.0-inter_parameter),
                 )
         #"""#######################################################"""#
     
@@ -77,6 +79,5 @@ function main()
     savefig(plt, "plots/ss_current/$(file_prefix)ss_current.pdf")
 end
 
-if abspath(PROGRAM_FILE) == @__FILE__
-    main()
-end
+
+main()

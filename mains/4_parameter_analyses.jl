@@ -56,7 +56,7 @@ function end_parameter_analyses(VEC_intra_parameter, VEC_inter_parameter,
                                                                                     , intra_axe_label, inter_axe_label, inter_labels)
 end
 
-function main()
+function main(;constant_amp=0.0)
 
     # -------- param vectors -------- #
 
@@ -66,7 +66,7 @@ function main()
     shifts = 0:0.5:15.0
     inhibs = 0:0.05:1.0
 
-    constant_amp = 25.0
+    constant_amp = constant_amp
 
     # ---------------- #
 
@@ -143,4 +143,7 @@ function main()
 
 end
 
-main()
+
+# for i in 50:25:300.0
+#     main(;constant_amp=i)
+# end

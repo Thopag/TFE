@@ -5,7 +5,7 @@ include("3_bifurcation_diagram.jl")
 include("4_parameter_analyses.jl")
 
 ############################ PARAMETER SET TYPE ############################
-parameter_set = "DIV0"
+parameter_set = "DIV7"
 ############################ PARAMETER SET TYPE ############################
 
 if parameter_set == "DIV0"
@@ -24,11 +24,11 @@ function main()
 
     # -------- Vectors -------- #
 
-    amps = 0.0:100:300.0                    # "amp (pA)"
+    amps = 0.0:2.5:300.0                    # "amp (pA)"
     C_lido = [1.0, 10.0, 100.0, 1000.0]     # "Lidocaine (µM)"
 
-    shifts = 0:5:15.0                       # "shift (mV)"
-    inhibs = [0.0, 0.3, 0.5, 0.7, 0.9, 0.925, 0.95, 0.975, 1.0]
+    shifts = 0:2.5:25.0                       # "shift (mV)"
+    inhibs = 0.0:0.1:1.0 #[0.0, 0.3, 0.5, 0.7, 0.9, 0.925, 0.95, 0.975, 1.0]
 
     # -------- Intra Parameter -------- #
 
@@ -52,7 +52,7 @@ function main()
 
     # -------- General Labeling -------- #
 
-    folder_name = "$(parameter_set)_test"
+    folder_name = "$(parameter_set)_shift_1_3_1_7" ######## FOLDER NAME ########
     file_prefix = "$(folder_name)_"
 
     println("%%%%%%%%%%%%%%%%%%%%%%% INFO %%%%%%%%%%%%%%%%%%%%%%%")
@@ -76,7 +76,7 @@ function main()
 
     plt_f, plt_s, plt_us, rainbow = init_DIC(L)
 
-    plt, color_specialpoint = init_bifurcation(intra_axe_label)
+    plt_bif, color_specialpoint = init_bifurcation(intra_axe_label)
 
     M_peak_count, M_freq, M_pattern, M_first_peak_h, M_first_peak_w, inter_with_rheobase, rheobases = init_parameter_analyses(VEC_intra_parameter, VEC_inter_parameter)
 
@@ -93,6 +93,9 @@ function main()
         params = map(intra_parameter -> get_param(intra_parameter;
         #"""###################### PARAMETER ######################"""#  
                     C_lidocaine=inter_parameter,
+                    # g_nav1p3 = 0.35 ,
+                    # g_nav1p7 = 35.0 ,
+                    # g_nav1p8 = 0.2* (1-inter_parameter),
                     )
         #"""#######################################################"""#
                     , VEC_intra_parameter)
@@ -100,6 +103,9 @@ function main()
         param = get_param(init_intra_parameter;
         #"""###################### PARAMETER ######################"""#  
                     C_lidocaine=inter_parameter,
+                    # g_nav1p3 = 0.35,
+                    # g_nav1p7 = 35.0,
+                    # g_nav1p8 = 0.2* (1-inter_parameter),
                     )
         #"""#######################################################"""# 
     
@@ -112,7 +118,7 @@ function main()
         println("------------DIC Done------------")
 
         println("-------Start Bifurcation--------")
-        iteration_bifurcation(plt, i, param, u0_bifurcation, lens_param, p_min, p_max, 
+        iteration_bifurcation(plt_bif, i, param, u0_bifurcation, lens_param, p_min, p_max, 
                                                     color_specialpoint, reds, blues)
         println("--------Bifurcation Done--------")
 
@@ -137,7 +143,7 @@ function main()
     println("-- Start Saving --")
 
     # -- Steady State Currents -- #
-    savefig(plt, "plots/ss_current/$(file_prefix)ss_current.pdf")
+    savefig(plt_ss_current, "plots/$(folder_name)/$(file_prefix)ss_current.pdf")
 
     # -- DIC -- #
     savefig(plt_f, "plots/$(folder_name)/$(file_prefix)all_g_f.pdf")
@@ -155,8 +161,8 @@ function main()
     savefig(p_plan, "plots/$(folder_name)/$(file_prefix)heat_plan.pdf")
 
     # -- Bifurcation -- #
-    savefig(plt, "plots/$(folder_name)/$(file_prefix)bifurcation.png")
-    savefig(plt, "plots/$(folder_name)/$(file_prefix)bifurcation.pdf")
+    savefig(plt_bif, "plots/$(folder_name)/$(file_prefix)bifurcation.png")
+    savefig(plt_bif, "plots/$(folder_name)/$(file_prefix)bifurcation.pdf")
 
     println("-- End Saving --")
 end

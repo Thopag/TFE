@@ -8,12 +8,12 @@ with_inhibition::Bool = false
 
 linear_mode::Bool = true
 
-shift_inact_1p3::Float64 = 0.0
+shift_inact_1p3::Float64 = 1.0
 
-shift_inact_1p7::Float64 = 0.0
+shift_inact_1p7::Float64 = 1.0
 
-shift_inact_1p8::Float64 = 0.4
-shift_act_1p8::Float64   = 0.6
+shift_inact_1p8::Float64 = 0.0
+shift_act_1p8::Float64   = 0.0
 
 function lidocaine_effect_setup()
     return "___________________________________
