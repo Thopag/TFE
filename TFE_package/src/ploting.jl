@@ -168,7 +168,7 @@ function plot_parameter_analyses(VEC_intra_parameter, VEC_inter_parameter,
 
     plot!(p_plan, xlims=x_limits, ylims=y_limits) #, yscale=:log10)
 
-    add_lido_shift_inhib_traj(p_plan)
+    #add_lido_shift_inhib_traj(p_plan)
 
     # Add pattern colorbar
     flag_colors = Dict( 0:number_pattern .=> pattern_list )

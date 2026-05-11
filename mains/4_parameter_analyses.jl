@@ -18,12 +18,10 @@ function parameter_creation(VEC_intra_parameter;
     amp = 100.0
     params = Vector{Model_Parameters}()
     for intra_parameter in VEC_intra_parameter
-        param = get_param(amp;
+        param = get_param(intra_parameter;
         with_lido_shift=true,
-        #with_inhibition=false,
+        with_inhibition=false,
         #C_lidocaine=0.0,
-
-        g_nav1p8=30.0 *(1-intra_parameter),
         kwargs...)
 
         push!(params, param)
@@ -36,23 +34,24 @@ function main()
 
     # -------- param vectors -------- #
 
-    amps = 0.0:50:300.0                     #"amp (pA)"
+    amps = 0.0:2.5:300.0                     #"amp (pA)"
     C_lido = [1.0, 10.0, 100.0, 1000.0]     #"Lidocaine (µM)"
 
-    shifts = 0:1.5:15.0
-    inhibs = 0:0.2:1.0
+    shifts = 0:1:15.0
+    inhibs = [0.0, 0.3, 0.5, 0.7, 0.9, 0.925, 0.95, 0.975, 1.0]
 
     # -------- Set parameter variation -------- #
 
-    VEC_intra_parameter = inhibs
+    VEC_intra_parameter = amps
     VEC_inter_parameter = shifts
 
     # -------- label parameters -------- #
 
-    intra_axe_label = "inhibition (-)"
+    intra_axe_label = "amp (pA)"
     inter_axe_label = "shift (mV)"
 
     inter_labels = ["$k" for k in VEC_inter_parameter]
+    file_prefix = "$(folder)_1.8_40_60_shifts_"
 
     # -------- Set up results structure -------- #
     
@@ -69,7 +68,7 @@ function main()
     rheobases = Vector{Float32}()
 
     # -------- Parameter looping -------- #
-
+    println(shift_setup())
     println("################ Start Looping ################ ")
     println("Parameter set type : $folder")
     println("")
@@ -85,9 +84,6 @@ function main()
         params = parameter_creation(VEC_intra_parameter;
         #"""###################### PARAMETER ######################"""#   
                     C_lidocaine=inter_parameter,
-                    #g_nav1p3 = 0.0,
-                    #g_nav1p7 = 0.0,
-                    #g_nav1p8 = 0.0,
                     )
         #"""#######################################################"""#  
 
@@ -126,14 +122,14 @@ function main()
     # display(p_rheo)
     # display(p_plan)
 
-    savefig(p_peaks, "plots/parameter_analyses/peaks-curve.pdf")
-    savefig(p_freqs, "plots/parameter_analyses/F-I-curve.pdf")
-    savefig(p_height, "plots/parameter_analyses/first_peak.pdf")
-    savefig(p_width, "plots/parameter_analyses/first_width.pdf")
+    savefig(p_peaks, "plots/parameter_analyses/$(file_prefix)peaks-curve.pdf")
+    savefig(p_freqs, "plots/parameter_analyses/$(file_prefix)F-I-curve.pdf")
+    savefig(p_height, "plots/parameter_analyses/$(file_prefix)first_peak.pdf")
+    savefig(p_width, "plots/parameter_analyses/$(file_prefix)first_width.pdf")
 
-    savefig(p_pattern, "plots/parameter_analyses/pattern.pdf")
-    savefig(p_rheo, "plots/parameter_analyses/rheobases.pdf")
-    savefig(p_plan, "plots/parameter_analyses/heat_plan.pdf")
+    savefig(p_pattern, "plots/parameter_analyses/$(file_prefix)pattern.pdf")
+    savefig(p_rheo, "plots/parameter_analyses/$(file_prefix)rheobases.pdf")
+    savefig(p_plan, "plots/parameter_analyses/$(file_prefix)heat_plan.pdf")
 
     println("---- End Plots ----")
 

@@ -1,8 +1,8 @@
-export get_lidocaine_inhibition, inact_1_3_shift, act_1_3_shift, inact_1_7_shift, act_1_7_shift, inact_1_8_shift, act_1_8_shift
+export get_lidocaine_inhibition, inact_1_3_shift, act_1_3_shift, inact_1_7_shift, act_1_7_shift, inact_1_8_shift, act_1_8_shift, shift_setup
 
 # ----------------- Lidocaine shifting steady states ----------------- #
 
-shift_mode::Bool = true
+linear_mode::Bool = true
 
 shift_inact_1p3::Float64 = 0.0
 
@@ -11,11 +11,23 @@ shift_inact_1p7::Float64 = 0.0
 shift_inact_1p8::Float64 = 0.4
 shift_act_1p8::Float64   = 0.6
 
+function shift_setup()
+    return "___________________________________
+Linear Mode : $linear_mode
+
+1.3 inactivation : $shift_inact_1p3
+1.7 inactivation : $shift_inact_1p7
+
+1.8 inactivation : $shift_inact_1p8
+1.8 activation : $shift_act_1p8
+___________________________________"
+end
+
 # 1.3 inactivation
 # 20 mV shift at 1000 µM (Sheets et al. 2008)
 # 20.7 mV shift at 1000 µM (Lenkowski et al. 2003)
-function inact_1_3_shift(C; shift_mode=shift_mode)
-    if shift_mode
+function inact_1_3_shift(C; linear_mode=linear_mode)
+    if linear_mode
         return -C * shift_inact_1p3
     end
     return - ((-21.4 / (1 + exp(3.17 * (log10(C) - log10(120))))) + 21.4)
@@ -29,8 +41,8 @@ end
 # 1.7 inactivation
 # 23 mV shift at 1000 µM (Sheets et al. 2008)
 # 10.6 mV shift at 100 µM (Chevrier et al. 2004)
-function inact_1_7_shift(C; shift_mode=shift_mode)
-    if shift_mode
+function inact_1_7_shift(C; linear_mode=linear_mode)
+    if linear_mode
         return -C * shift_inact_1p7
     end
     return - ( (-24.2 / (1 + exp(3.17 * (log10(C) - log10(120))))) + 24.2)
@@ -44,16 +56,16 @@ end
 # 1.8 inactivation
 # 4.8 mV shift at 1000 µM (Sheets et al. 2008)
 # 4 mV shift at 100 µM (Chevrier et al. 2004)
-function inact_1_8_shift(C; shift_mode=shift_mode)
-    if shift_mode
+function inact_1_8_shift(C; linear_mode=linear_mode)
+    if linear_mode
         return -C * shift_inact_1p8
     end
     return - ( (4.8 / (1 + exp(-14.16 * (log10(C) - log10(77))))) + 0)
 end
 
 # 1.8 activation
-function act_1_8_shift(C; shift_mode=shift_mode)
-    if shift_mode
+function act_1_8_shift(C; linear_mode=linear_mode)
+    if linear_mode
         return C * shift_act_1p8
     end
     return (-6.8 / (1 + exp(8.73 * (log10(C) - log10(56.5))))) + 6.8 
@@ -93,11 +105,11 @@ function add_lido_shift_inhib_traj(plt)
     remaining_1_7 = [r[2] for r in results]
     remaining_1_8 = [r[3] for r in results]
 
-    lido_shifts = .- inact_1_8_shift.(lido_concentrations; shift_mode=false) .+ act_1_8_shift.(lido_concentrations; shift_mode=false)
+    lido_shifts = .- inact_1_8_shift.(lido_concentrations; linear_mode=false) .+ act_1_8_shift.(lido_concentrations; linear_mode=false)
 
     plot!(plt, 1.0 .- remaining_1_8, lido_shifts, color=:cyan, label="Lidocaine on NaV1.8", linewidth = 3)
-    # plot!(plt, 1.0 .- remaining_1_8, .- inact_1_8_shift.(lido_concentrations; shift_mode=false), color=:cyan, linestyle=:dash, label="Inactivation", linewidth = 3)
-    # plot!(plt, 1.0 .- remaining_1_8, .+ act_1_8_shift.(lido_concentrations; shift_mode=false), color=:cyan, label="Activation", linewidth = 3)
+    # plot!(plt, 1.0 .- remaining_1_8, .- inact_1_8_shift.(lido_concentrations; linear_mode=false), color=:cyan, linestyle=:dash, label="Inactivation", linewidth = 3)
+    # plot!(plt, 1.0 .- remaining_1_8, .+ act_1_8_shift.(lido_concentrations; linear_mode=false), color=:cyan, label="Activation", linewidth = 3)
 
     test_point = [100.0, 1000.0]
     results = get_lidocaine_inhibition.(test_point)
@@ -105,7 +117,7 @@ function add_lido_shift_inhib_traj(plt)
     remaining_1_7 = [r[2] for r in results]
     remaining_1_8 = [r[3] for r in results]
 
-    lido_shifts = .- inact_1_8_shift.(test_point; shift_mode=false) .+ act_1_8_shift.(test_point; shift_mode=false)
+    lido_shifts = .- inact_1_8_shift.(test_point; linear_mode=false) .+ act_1_8_shift.(test_point; linear_mode=false)
     scatter!(plt, 1.0 .- remaining_1_8, lido_shifts, color=:cyan, markersize=4, label="", markerstrokewidth = 0.0)
 
     return plt

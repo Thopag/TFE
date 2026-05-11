@@ -15,17 +15,18 @@ function main()
 
     # -------- Set up -------- #
 
-    shifts = 0.0:2.5:15
-    inhibs = zeros(length(shifts))
+    shifts = 0:1:15.0
+    inhibs = [0.0, 0.3, 0.5, 0.7, 0.9, 0.925, 0.95, 0.975, 1.0]
 
-    changing_params = zip(shifts, inhibs)
+    changing_params = shifts
     L = length(changing_params)
+    file_prefix = "$(folder)_1.8_40_60_shifts_"
 
     # -------- Plot Set up -------- #
 
     alpha = 1
     xticks = [-120, -90, -60, -30, 0, 30, 60]
-    ylimits =  (-0.35, 0.02)
+    ylimits =  (-25, 0.5)
 
     plt = plot(xlabel=L"Voltage ($mV$)", ylabel= L"Steady State Current ($\mu A/cm^2$)", legendfontsize=7, legend=:bottomleft
                                         , xticks = xticks)
@@ -45,17 +46,18 @@ function main()
     # plot!(plt, V, INaV1p8, label=L"NaV1.8", color=:green, alpha=1)
 
     # -------- Looping -------- #
-    for (i,(shift, inhib)) in enumerate(changing_params)
+    for (i,inter_parameter) in enumerate(changing_params)
         #inhib = 0.0
         #shift = 0.0
-        changing_label = "s = $shift | i = $inhib"
+        changing_label = "$(inter_parameter)"
 
         p  = get_param(0.0;
-            with_inhibition = false,
-            with_lido_shift = true,
-            C_lidocaine = shift,
-            #Put inhibition
-            )
+        #"""###################### PARAMETER ######################"""#   
+                with_inhibition = false,
+                with_lido_shift = true,
+                C_lidocaine=inter_parameter,
+                )
+        #"""#######################################################"""#
     
         INaV1p3, INaV1p7, INaV1p8, IKdr, IKm, IAHP, ILeak, Iext, dV_dt = steady_state_currents(p, V)
         
@@ -65,7 +67,7 @@ function main()
         plot!(plt, V, INaV1p8, label="", color=greens[i], alpha=alpha)
     end
 
-    savefig(plt, "plots/ss_current/ss_current_$(folder).pdf")
+    savefig(plt, "plots/ss_current/$(file_prefix)ss_current.pdf")
 end
 
 main()
