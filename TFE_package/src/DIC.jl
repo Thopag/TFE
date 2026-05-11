@@ -42,14 +42,14 @@ function DIC(V, p; with_plot=false)
 
     C_lido = p.C_lidocaine
 
-    h_inf_1p3(V) = h_inf_1_3(V; C_lido=C_lido, with_lido_shift=p.with_lido_shift)
-    m_inf_1p3(V) = m_inf_1_3(V; C_lido=C_lido, with_lido_shift=p.with_lido_shift)
+    h_inf_1p3(V) = h_inf_1_3(V; C_lido=C_lido)
+    m_inf_1p3(V) = m_inf_1_3(V; C_lido=C_lido)
 
-    h_inf_1p7(V) = h_inf_1_7(V; C_lido=C_lido, with_lido_shift=p.with_lido_shift)
-    m_inf_1p7(V) = m_inf_1_7(V; C_lido=C_lido, with_lido_shift=p.with_lido_shift)
+    h_inf_1p7(V) = h_inf_1_7(V; C_lido=C_lido)
+    m_inf_1p7(V) = m_inf_1_7(V; C_lido=C_lido)
 
-    h_inf_1p8(V) = h_inf_1_8(V; C_lido=C_lido, with_lido_shift=p.with_lido_shift)
-    m_inf_1p8(V) = m_inf_1_8(V; C_lido=C_lido, with_lido_shift=p.with_lido_shift)
+    h_inf_1p8(V) = h_inf_1_8(V; C_lido=C_lido)
+    m_inf_1p8(V) = m_inf_1_8(V; C_lido=C_lido)
 
     l_inf_Kdr = l_inf_K_dr
     n_inf_Kdr = n_inf_K_dr

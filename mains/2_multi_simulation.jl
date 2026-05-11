@@ -56,4 +56,6 @@ function main()
     savefig(plt_V, "plots/multi_simulation/voltage.pdf")
 end
 
-main()
+if abspath(PROGRAM_FILE) == @__FILE__
+    main()
+end

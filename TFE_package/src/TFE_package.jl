@@ -1,6 +1,6 @@
 module TFE_package
 
-using Plots, LaTeXStrings, DifferentialEquations, Peaks, Statistics, ForwardDiff, ColorSchemes
+using Plots, LaTeXStrings, DifferentialEquations, Peaks, Statistics, ForwardDiff, ColorSchemes, BifurcationKit, Accessors
 
 include("utils.jl")
 include("lidocaine.jl")
@@ -21,8 +21,7 @@ function warm_up()
         0.0, 0.0, 0.0, 0.0,
         0.0, 0.0,
         0.0, 0.0, 0.0,
-        false, 0.0, true,
-        true, false
+        false, 0.0, true
     )
     simulation(u0, tspan, p)
 end

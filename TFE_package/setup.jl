@@ -15,4 +15,4 @@ println("Start Warm up")
 @time TFE.warm_up()
 println("End Warm up")
 
-using Plots, LaTeXStrings, ColorSchemes
+using Plots, LaTeXStrings, ColorSchemes, Accessors

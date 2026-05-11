@@ -1,4 +1,4 @@
-export Model_Parameters, give_currents, steady_state_currents, pulse, get_peaks, instant_freqs, global_pattern, window_count, parameter_analyse
+export Model_Parameters, give_currents, steady_state_currents, global_pattern, parameter_analyse, make_bifurcation
 
 # --------------------------- Parameters struct --------------------------- #
 
@@ -26,8 +26,6 @@ struct Model_Parameters{T}
     with_noise::Bool
     C_lidocaine::T
     with_original::Bool
-    with_DIV0::Bool
-    with_lido_shift::Bool
 end
 
 function pulse(t, ti, tf)
@@ -81,18 +79,17 @@ function steady_state_currents(p, V)
 
     g_Leak = p.g_Leak
     E_Leak = p.E_Leak
-    with_lido_shift = p.with_lido_shift
 
     C_lido = p.C_lidocaine
 
-    m3 = m_inf_1_3.(V; C_lido=C_lido, with_lido_shift=with_lido_shift)
-    h3 = h_inf_1_3.(V; C_lido=C_lido, with_lido_shift=with_lido_shift)
+    m3 = m_inf_1_3.(V; C_lido=C_lido)
+    h3 = h_inf_1_3.(V; C_lido=C_lido)
 
-    m7 = m_inf_1_7.(V; C_lido=C_lido, with_lido_shift=with_lido_shift)
-    h7 = h_inf_1_7.(V; C_lido=C_lido, with_lido_shift=with_lido_shift)
+    m7 = m_inf_1_7.(V; C_lido=C_lido)
+    h7 = h_inf_1_7.(V; C_lido=C_lido)
 
-    m8 = m_inf_1_8.(V; C_lido=C_lido, with_lido_shift=with_lido_shift)
-    h8 = h_inf_1_8.(V; C_lido=C_lido, with_lido_shift=with_lido_shift)
+    m8 = m_inf_1_8.(V; C_lido=C_lido)
+    h8 = h_inf_1_8.(V; C_lido=C_lido)
 
     nm = n_inf_K_M.(V)
 
@@ -266,4 +263,25 @@ function parameter_analyse(param_sets, u0; duration = 1700.0)
     print("\r")
 
     return VEC_peak_count, VEC_freq, VEC_pattern, VEC_first_peak_h, VEC_first_peak_w
+end
+
+# --------------------------- Bifurcation --------------------------- #
+
+function make_bifurcation(param_init, u0, lens_param, p_min, p_max)
+
+    prob = BifurcationProblem(ODE_system_bifurcation, u0, param_init, lens_param, 
+        record_from_solution = (x, p; k...) -> x[1])
+
+    step_scaling = 100
+    opts = ContinuationPar(
+        p_min = p_min, 
+        p_max = p_max,
+        max_steps = 10000*step_scaling ,
+        dsmin = 0.01/step_scaling , 
+        ds = 0.1/step_scaling ,
+        dsmax = 1/step_scaling ,
+        detect_bifurcation = 3,
+    )
+    br = continuation(prob, PALC(), opts)
+    return br
 end

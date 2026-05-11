@@ -35,20 +35,13 @@ function DIV0_parameter(amp;
     sigma_noise = 0.05,
 
     with_original = true,
-
-    # --- Lidocaine effect --- #
-
-    with_lido_shift = false,
-    with_inhibition = true
     )
 
-    if with_inhibition
-        remaining_1_3, remaining_1_7, remaining_1_8 = get_lidocaine_inhibition(C_lidocaine)
-        g_nav1p3 = g_nav1p3*remaining_1_3
-        g_nav1p7 = g_nav1p7*remaining_1_7
-        g_nav1p8 = g_nav1p8*remaining_1_8
-    end
-    
+    remaining_1_3, remaining_1_7, remaining_1_8 = get_lidocaine_inhibition(C_lidocaine)
+    g_nav1p3 = g_nav1p3*remaining_1_3
+    g_nav1p7 = g_nav1p7*remaining_1_7
+    g_nav1p8 = g_nav1p8*remaining_1_8
+ 
     # --- Stimulus parameters --- #
 
     # Cell Morphology
@@ -67,16 +60,13 @@ function DIV0_parameter(amp;
 
     # --- Parameter struct --- #
 
-    with_DIV0 = true
-
     p = Model_Parameters(
         amp, CellArea, I0, stim_on, stim_off, Excitation, C,
         g_nav1p3, g_nav1p7, g_nav1p8, E_Na,
         g_Kdr, g_Km, g_AHP, E_k,
         g_Leak, E_Leak,
         sigma_noise, mu_noise, tau_noise,
-        with_noise, C_lidocaine, with_original,
-        with_DIV0, with_lido_shift
+        with_noise, C_lidocaine, with_original
     )
     
     return p
@@ -140,16 +130,13 @@ function DIV0_parameter_default(amp, stim_on, stim_length)
 
     # --- Parameter struct --- #
 
-    with_DIV0 = false #true
-
     p = Model_Parameters(
         I0, stim_on, stim_off, Excitation, C,
         g_nav1p3, g_nav1p7, g_nav1p8, E_Na,
         g_Kdr, g_Km, g_AHP, E_k,
         g_Leak, E_Leak,
         sigma_noise, mu_noise, tau_noise,
-        with_noise, 0.0, true,
-        with_DIV0
+        with_noise, 0.0, true
     )
     
     return p

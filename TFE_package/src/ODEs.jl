@@ -49,7 +49,6 @@ function ODE_system(du,u,p,t)
     with_noise = p.with_noise
 
     with_original = p.with_original
-    with_lido_shift = p.with_lido_shift
 
     C_lido = p.C_lidocaine
 
@@ -95,14 +94,14 @@ function ODE_system(du,u,p,t)
 
     du[1] = (I_ext+I_noise-I_NaV1p3-I_NaV1p7-I_NaV1p8-I_Kdr-I_Km-I_Leak-I_AHP)/C
 
-    du[2] = dot_x(V, m3, m_inf_1_3, tau_m_1_3; C_lido=C_lido, with_lido_shift=with_lido_shift)
-    du[3] = dot_x(V, h3, h_inf_1_3, tau_h_1_3; C_lido=C_lido, with_lido_shift=with_lido_shift, with_DIV0=p.with_DIV0)
+    du[2] = dot_x(V, m3, m_inf_1_3, tau_m_1_3; C_lido=C_lido)
+    du[3] = dot_x(V, h3, h_inf_1_3, tau_h_1_3; C_lido=C_lido)
 
-    du[4] = dot_x(V, m7, m_inf_1_7, tau_m_1_7; C_lido=C_lido, with_lido_shift=with_lido_shift)
-    du[5] = dot_x(V, h7, h_inf_1_7, tau_h_1_7; C_lido=C_lido, with_lido_shift=with_lido_shift)
+    du[4] = dot_x(V, m7, m_inf_1_7, tau_m_1_7; C_lido=C_lido)
+    du[5] = dot_x(V, h7, h_inf_1_7, tau_h_1_7; C_lido=C_lido)
 
-    du[6] = dot_x(V, m8, m_inf_1_8, tau_m_1_8; C_lido=C_lido, with_lido_shift=with_lido_shift)
-    du[7] = dot_x(V, h8, h_inf_1_8, tau_h_1_8; C_lido=C_lido, with_lido_shift=with_lido_shift)
+    du[6] = dot_x(V, m8, m_inf_1_8, tau_m_1_8; C_lido=C_lido)
+    du[7] = dot_x(V, h8, h_inf_1_8, tau_h_1_8; C_lido=C_lido)
 
     du[8] = dot_x(V, ndr, n_inf_K_dr, tau_n_K_dr)
     du[9] = dot_x(V, ldr, l_inf_K_dr, tau_l_K_dr)
@@ -200,7 +199,6 @@ function ODE_system_bifurcation(u,p)
     with_noise = p.with_noise
 
     with_original = p.with_original
-    with_lido_shift = p.with_lido_shift
 
     C_lido = p.C_lidocaine
 
@@ -238,14 +236,14 @@ function ODE_system_bifurcation(u,p)
 
     du[1] = (I_ext-I_NaV1p3-I_NaV1p7-I_NaV1p8-I_Kdr-I_Km-I_Leak-I_AHP)/C
 
-    du[2] = dot_x(V, m3, m_inf_1_3, tau_m_1_3; C_lido=C_lido, with_lido_shift=with_lido_shift)
-    du[3] = dot_x(V, h3, h_inf_1_3, tau_h_1_3; C_lido=C_lido, with_lido_shift=with_lido_shift, with_DIV0=p.with_DIV0)
+    du[2] = dot_x(V, m3, m_inf_1_3, tau_m_1_3; C_lido=C_lido)
+    du[3] = dot_x(V, h3, h_inf_1_3, tau_h_1_3; C_lido=C_lido)
 
-    du[4] = dot_x(V, m7, m_inf_1_7, tau_m_1_7; C_lido=C_lido, with_lido_shift=with_lido_shift)
-    du[5] = dot_x(V, h7, h_inf_1_7, tau_h_1_7; C_lido=C_lido, with_lido_shift=with_lido_shift)
+    du[4] = dot_x(V, m7, m_inf_1_7, tau_m_1_7; C_lido=C_lido)
+    du[5] = dot_x(V, h7, h_inf_1_7, tau_h_1_7; C_lido=C_lido)
 
-    du[6] = dot_x(V, m8, m_inf_1_8, tau_m_1_8; C_lido=C_lido, with_lido_shift=with_lido_shift)
-    du[7] = dot_x(V, h8, h_inf_1_8, tau_h_1_8; C_lido=C_lido, with_lido_shift=with_lido_shift)
+    du[6] = dot_x(V, m8, m_inf_1_8, tau_m_1_8; C_lido=C_lido)
+    du[7] = dot_x(V, h8, h_inf_1_8, tau_h_1_8; C_lido=C_lido)
 
     du[8] = dot_x(V, ndr, n_inf_K_dr, tau_n_K_dr)
     du[9] = dot_x(V, ldr, l_inf_K_dr, tau_l_K_dr)

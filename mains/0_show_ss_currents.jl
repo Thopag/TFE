@@ -9,6 +9,35 @@ elseif folder == "DIV7"
     get_param = DIV7_parameter
 end
 
+function init_ss_currents(V, get_param)
+    xticks = [-120, -90, -60, -30, 0, 30, 60]
+    ylimits =  (-25, 0.5)
+
+    plt = plot(xlabel=L"Voltage ($mV$)", ylabel= L"Steady State Current ($\mu A/cm^2$)", legendfontsize=7, legend=:bottomleft
+                                        , xticks = xticks)
+    plot!(ylims=ylimits)
+
+    default_p = get_param(0.0)
+    INaV1p3, INaV1p7, INaV1p8, IKdr, IKm, IAHP, ILeak, Iext, dV_dt = steady_state_currents(default_p, V)
+    plot!(plt, V, .- IKdr, label=L"- K_{dr}", color=:orange, alpha=1, linewidth = 1.5)
+    plot!(plt, V, .- IKm, label=L"- K_{M}", color=:purple, alpha=1, linewidth = 1.5)
+    plot!(plt, V, .- IAHP, label=L"- K_{AHP}", color=:brown, alpha=1, linewidth = 1.5)
+
+    # plot!(plt, V, INaV1p3, label=L"NaV1.3", color=:blue, alpha=1)
+    # plot!(plt, V, INaV1p7, label=L"NaV1.7", color=:red, alpha=1)
+    # plot!(plt, V, INaV1p8, label=L"NaV1.8", color=:green, alpha=1)
+    return plt
+end
+
+function iteration_ss_currents(plt, p, V, i, inter_label, reds, blues, greens, greys)
+    INaV1p3, INaV1p7, INaV1p8, IKdr, IKm, IAHP, ILeak, Iext, dV_dt = steady_state_currents(p, V)
+        
+    plot!(plt, [], [], label=inter_label, color=greys[i])
+    plot!(plt, V, INaV1p3, label="", color=blues[i])
+    plot!(plt, V, INaV1p7, label="", color=reds[i])
+    plot!(plt, V, INaV1p8, label="", color=greens[i])
+end
+
 function main()
 
     V = -120.0:0.5:60.0
@@ -24,26 +53,11 @@ function main()
 
     # -------- Plot Set up -------- #
 
-    alpha = 1
-    xticks = [-120, -90, -60, -30, 0, 30, 60]
-    ylimits =  (-25, 0.5)
-
-    plt = plot(xlabel=L"Voltage ($mV$)", ylabel= L"Steady State Current ($\mu A/cm^2$)", legendfontsize=7, legend=:bottomleft
-                                        , xticks = xticks)
-    plot!(ylims=ylimits)
-
     reds, blues, greens, greys = sodium_palettes(L)
 
     # -------- put default values -------- #
-    default_p = get_param(0.0)
-    INaV1p3, INaV1p7, INaV1p8, IKdr, IKm, IAHP, ILeak, Iext, dV_dt = steady_state_currents(default_p, V)
-    plot!(plt, V, .- IKdr, label=L"- K_{dr}", color=:orange, alpha=1, linewidth = 1.5)
-    plot!(plt, V, .- IKm, label=L"- K_{M}", color=:purple, alpha=1, linewidth = 1.5)
-    plot!(plt, V, .- IAHP, label=L"- K_{AHP}", color=:brown, alpha=1, linewidth = 1.5)
 
-    # plot!(plt, V, INaV1p3, label=L"NaV1.3", color=:blue, alpha=1)
-    # plot!(plt, V, INaV1p7, label=L"NaV1.7", color=:red, alpha=1)
-    # plot!(plt, V, INaV1p8, label=L"NaV1.8", color=:green, alpha=1)
+    plt = init_ss_currents(V, get_param)
 
     # -------- Looping -------- #
     for (i,inter_parameter) in enumerate(changing_params)
@@ -53,21 +67,16 @@ function main()
 
         p  = get_param(0.0;
         #"""###################### PARAMETER ######################"""#   
-                with_inhibition = false,
-                with_lido_shift = true,
                 C_lidocaine=inter_parameter,
                 )
         #"""#######################################################"""#
     
-        INaV1p3, INaV1p7, INaV1p8, IKdr, IKm, IAHP, ILeak, Iext, dV_dt = steady_state_currents(p, V)
-        
-        plot!(plt, [], [], label=changing_label, color=greys[i], alpha=1)
-        plot!(plt, V, INaV1p3, label="", color=blues[i], alpha=alpha)
-        plot!(plt, V, INaV1p7, label="", color=reds[i], alpha=alpha)
-        plot!(plt, V, INaV1p8, label="", color=greens[i], alpha=alpha)
+        iteration_ss_currents(plt, p, V, i, changing_label, reds, blues, greens, greys)
     end
 
     savefig(plt, "plots/ss_current/$(file_prefix)ss_current.pdf")
 end
 
-main()
+if abspath(PROGRAM_FILE) == @__FILE__
+    main()
+end

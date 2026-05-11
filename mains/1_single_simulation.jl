@@ -78,4 +78,6 @@ function main()
     # display(p_freq)
 end
 
-main()
+if abspath(PROGRAM_FILE) == @__FILE__
+    main()
+end
