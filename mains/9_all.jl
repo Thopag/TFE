@@ -24,10 +24,10 @@ function main()
 
     # -------- Vectors -------- #
 
-    amps = 0.0:150:300.0                    # "amp (pA)"
+    amps = 0.0:2.5:300.0                    # "amp (pA)"
     C_lido = [1.0, 10.0, 100.0, 1000.0]     # "Lidocaine (µM)"
 
-    shifts = 0:1:15.0                       # "shift (mV)"
+    shifts = [0.0] #0:1:15.0                       # "shift (mV)"
     inhibs = 0.0:0.1:1.0 #[0.0, 0.3, 0.5, 0.7, 0.9, 0.925, 0.95, 0.975, 1.0]
 
     # -------- Intra Parameter -------- #
@@ -45,14 +45,14 @@ function main()
     # -------- Inter Parameter -------- #
 
     VEC_inter_parameter = shifts
-    inter_axe_label = "shift (mV)"
+    inter_axe_label = ""
 
     inter_labels = ["$k" for k in VEC_inter_parameter]
     L = length(VEC_inter_parameter)
 
     # -------- General Labeling -------- #
 
-    folder_name = "$(parameter_set)_test" ######## FOLDER NAME ########
+    folder_name = "$(parameter_set)_default" ######## FOLDER NAME ########
     file_prefix = "$(folder_name)_"
 
     println("%%%%%%%%%%%%%%%%%%%%%%% INFO %%%%%%%%%%%%%%%%%%%%%%%")

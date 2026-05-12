@@ -11,7 +11,12 @@ end
 
 function init_DIC(L)
     xticks = [-120, -90, -60, -30, 0, 30, 60]
-    rainbow = [get(colorschemes[:rainbow], i) for i in range(0.0, stop=1.0, length=L)]
+
+    if L == 1
+        rainbow = [:black]
+    else
+        rainbow = [get(colorschemes[:rainbow], i) for i in range(0.0, stop=1.0, length=L)]
+    end
 
     plt_f = plot(xlabel="Voltage (mV)", ylabel="g fast", xticks = xticks)
     plt_s = plot(xlabel="Voltage (mV)", ylabel="g slow", xticks = xticks)
