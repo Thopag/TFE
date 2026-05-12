@@ -1,6 +1,6 @@
 
 ############################ PARAMETER SET TYPE ############################
-folder = "DIV7"
+folder = "DIV0"
 ############################ PARAMETER SET TYPE ############################
 
 if folder == "DIV0"
@@ -13,7 +13,7 @@ end
 
 function main()
 
-    amps = 35.0:5:50.0
+    amps = 15:5:25.0
 
     # -------- Set up -------- #
 
@@ -29,33 +29,38 @@ function main()
 
     # -------- Plot Set up -------- #
 
-    xlimits = (400, 1700)
-
-    V_limits = (-80, 40)
-    plt_V = plot(ylabel="Voltage (mV)", xlabel="time (ms)", legend=:topright,
-                xlimits=xlimits, ylimits=V_limits)
+    xlimits = (stim_on-25, stim_on+150)
+    plt_all = init_plot_all(; xlimits=xlimits)
 
     L = length(changing_params)
     println("################ Start Looping ################ ")
     println("Parameter set type : $folder")
     println("")
-    println("Bifurcation parameter is [$changing_param_name]")
-    println("   with values : $changing_params")
+
+    colors = theme_palette(:default).colors
 
     for (i,changing_param) in enumerate(changing_params)
         print("\rProgress: $(round(((i-1)/L*100), digits=2)) %")
+        amp = changing_param
+        param = get_param(amp; stim_on=stim_on, stim_length=stim_length,
+                #C_lidocaine=shift,
+                )
 
-        p = get_param(changing_param; stim_on=stim_on, stim_length=stim_length)
-        t,V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP,I_noise = simulation(u0, (0.0, duration), p)
+        t,V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP,I_noise = simulation(u0, (0.0, duration), param)
 
-        plot!(plt_V, t, V, label="$changing_param")
+        I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, I_Leak, I_ext, dV_dt = give_currents(t,V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP, param)
+        peaks_idx, n_peak, w_peaks = TFE.get_peaks(t, V;  min_h=-5.0, min_proms=10.0)
+        t_spikes = t[peaks_idx]
+
+        several_plot_all(plt_all, colors[i], t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp, t_spikes,
+                                I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, I_Leak, I_ext, I_noise, dV_dt, param; label="$changing_param")
+
     end
     println("\r################ End Looping ################ ")
 
-    #display(plt_V)
-    savefig(plt_V, "plots/multi_simulation/voltage.pdf")
+    #display(plt_all)
+    savefig(plt_all, "plots/multi_simulation/all.png")
+    savefig(plt_all, "plots/multi_simulation/all.pdf")
 end
 
-if abspath(PROGRAM_FILE) == @__FILE__
-    main()
-end
+main()

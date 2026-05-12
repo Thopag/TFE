@@ -1,6 +1,6 @@
 module TFE_package
 
-using Plots, LaTeXStrings, DifferentialEquations, Peaks, Statistics, ForwardDiff, ColorSchemes, BifurcationKit, Accessors
+using Plots, Plots.Measures, LaTeXStrings, DifferentialEquations, Peaks, Statistics, ForwardDiff, ColorSchemes, BifurcationKit, Accessors
 
 include("utils.jl")
 include("lidocaine.jl")
