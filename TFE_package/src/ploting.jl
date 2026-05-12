@@ -8,6 +8,10 @@ const pattern_palette = cgrad(colors_list, categorical = true)
 
 function sodium_palettes(L; dark=0.95, light=0.4)
 
+    if L == 1
+        return [:red], [:blue], [:green], [:grey]
+    end
+
     reds = [get(colorschemes[:Reds], i) for i in range(light, stop=dark, length=L)]
     blues = [get(colorschemes[:Blues], i) for i in range(light, stop=dark, length=L)]
     greens = [get(colorschemes[:Greens], i) for i in range(light, stop=dark, length=L)]

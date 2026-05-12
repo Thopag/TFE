@@ -5,7 +5,7 @@ include("3_bifurcation_diagram.jl")
 include("4_parameter_analyses.jl")
 
 ############################ PARAMETER SET TYPE ############################
-parameter_set = "DIV7"
+parameter_set = "DIV0"
 ############################ PARAMETER SET TYPE ############################
 
 if parameter_set == "DIV0"
@@ -24,10 +24,10 @@ function main()
 
     # -------- Vectors -------- #
 
-    amps = 0.0:2.5:300.0                    # "amp (pA)"
+    amps = 0.0:150:300.0                    # "amp (pA)"
     C_lido = [1.0, 10.0, 100.0, 1000.0]     # "Lidocaine (µM)"
 
-    shifts = 0:2.5:25.0                       # "shift (mV)"
+    shifts = 0:1:15.0                       # "shift (mV)"
     inhibs = 0.0:0.1:1.0 #[0.0, 0.3, 0.5, 0.7, 0.9, 0.925, 0.95, 0.975, 1.0]
 
     # -------- Intra Parameter -------- #
@@ -36,9 +36,9 @@ function main()
 
     # For Bifurcation
     lens_param = PropertyLens(:amp)
-    p_min = VEC_intra_parameter[1]
+    p_min = -VEC_intra_parameter[end]
     p_max = VEC_intra_parameter[end]
-    init_intra_parameter = p_min
+    init_intra_parameter = 0.0
 
     intra_axe_label = "amp (pA)"
     
@@ -52,7 +52,7 @@ function main()
 
     # -------- General Labeling -------- #
 
-    folder_name = "$(parameter_set)_shift_1_3_1_7" ######## FOLDER NAME ########
+    folder_name = "$(parameter_set)_test" ######## FOLDER NAME ########
     file_prefix = "$(folder_name)_"
 
     println("%%%%%%%%%%%%%%%%%%%%%%% INFO %%%%%%%%%%%%%%%%%%%%%%%")
@@ -118,8 +118,8 @@ function main()
         println("------------DIC Done------------")
 
         println("-------Start Bifurcation--------")
-        iteration_bifurcation(plt_bif, i, param, u0_bifurcation, lens_param, p_min, p_max, 
-                                                    color_specialpoint, reds, blues)
+        iteration_bifurcation(plt_bif, i, param, u0_bifurcation, lens_param, p_min, p_max,
+                                                    inter_label, color_specialpoint, reds, blues, greys)
         println("--------Bifurcation Done--------")
 
         println("----Start Parameter Analyses----")

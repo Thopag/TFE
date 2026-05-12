@@ -146,7 +146,7 @@ function simulation(u0, tspan, p)
 
     # -- SDE Simulation -- #
     prob = SDEProblem(ODE_system, stochastic_part, u0, tspan, p) 
-    sol = solve(prob,dtmax=0.01)
+    sol = solve(prob,dtmax=0.01, maxiters=1e7)
 
     # -- ODE Simulation -- #
     # prob = ODEProblem(ODE_system, u0, tspan, p) 

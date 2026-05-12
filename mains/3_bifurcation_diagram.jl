@@ -22,7 +22,9 @@ function init_bifurcation(param_label)
 end
 
 function iteration_bifurcation(plt, i, param_init, u0, lens_param, p_min, p_max, 
-                                                    color_specialpoint, reds, blues)
+                                                    inter_label, color_specialpoint, reds, blues, greys)
+    
+    plot!(plt, [], [], label=inter_label, color=greys[i], alpha=1)
     br = make_bifurcation(param_init, u0, lens_param, p_min, p_max)
 
     # ----  Plot result ---- #
@@ -50,21 +52,21 @@ function main()
 
     u0 = get_u0()[1:end-1]
 
-    p_min = 0.0
+    p_min = -300.0
     p_max = 300.0
 
-    starting_param = p_min
+    starting_param = 0.0
     lens_param = PropertyLens(:amp)
 
     # ---- inter bifurcation parameter ---- #
 
     C_lido = [0.0, 100.0, 1000.0]
-    shifts = 0:1:15.0
-    inhibs = [0.0, 0.3, 0.5, 0.7, 0.9, 0.925, 0.95, 0.975, 1.0]
+    shifts = [0.0] #0:2.5:25.0
+    inhibs = 0.0:0.1:1.0 #[0.0, 0.3, 0.5, 0.7, 0.9, 0.925, 0.95, 0.975, 1.0]
     inter_params = shifts
     L = length(inter_params)
 
-    file_prefix = "$(folder)_1.8_40_60_shifts_"
+    file_prefix = "$(folder)_shift_1_3_1_7_"
 
     # ---- Plot set up ---- #
 
@@ -76,7 +78,6 @@ function main()
     println(lidocaine_effect_setup())
     for (i,inter_parameter) in enumerate(inter_params)
         changing_label = "$(inter_parameter)"
-        plot!(plt, [], [], label=changing_label, color=greys[i], alpha=1)
 
         println("Inter value : $inter_parameter -- $(round(((i-1)/L*100), digits=2)) % is done")
 
@@ -84,11 +85,14 @@ function main()
         param_init = get_param(starting_param;
         #"""###################### PARAMETER ######################"""#   
                     C_lidocaine=inter_parameter,
+                    # g_nav1p3 = 0.35* (1-inter_parameter),
+                    # g_nav1p7 = 35.0,
+                    # g_nav1p8 = 0.2,
                     )
         #"""#######################################################"""#
 
         iteration_bifurcation(plt, i, param_init, u0, lens_param, p_min, p_max, 
-                                                    color_specialpoint, reds, blues)
+                                                    changing_label, color_specialpoint, reds, blues, greys)
         #print(show(br))
     end
 
@@ -100,6 +104,5 @@ function main()
 
 end
 
-if abspath(PROGRAM_FILE) == @__FILE__
-    main()
-end
+
+#main()

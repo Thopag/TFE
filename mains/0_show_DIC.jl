@@ -63,6 +63,5 @@ function main()
     savefig(plt_us, "plots/DIC/$(file_prefix)all_g_us.pdf")
 end
 
-if abspath(PROGRAM_FILE) == @__FILE__
-    main()
-end
+
+#main()
