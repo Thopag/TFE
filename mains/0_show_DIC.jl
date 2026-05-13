@@ -1,6 +1,6 @@
 
 ############################ PARAMETER SET TYPE ############################
-folder = "DIV0"
+folder = "DIV7"
 ############################ PARAMETER SET TYPE ############################
 
 if folder == "DIV0"
@@ -24,7 +24,7 @@ function init_DIC(L)
     return plt_f, plt_s, plt_us, rainbow
 end
 
-function iteration_DIC(V, p, i, inter_label, plt_f, plt_s, plt_us, colors;with_extra_plot=false)
+function iteration_DIC(V, p, i, inter_label, plt_f, plt_s, plt_us, colors;with_extra_plot=true)
     g_f, g_s, g_us = DIC(V, p; with_plot=with_extra_plot)
     plot!(plt_f, V, g_f, label=inter_label, color=colors[i])
     plot!(plt_s, V, g_s, label=inter_label, color=colors[i])
@@ -40,33 +40,32 @@ function main()
     shifts = 0:1:15.0
     inhibs = [0.0, 0.3, 0.5, 0.7, 0.9, 0.925, 0.95, 0.975, 1.0]
 
-    changing_params = shifts
+    changing_params = [0.0]
     L = length(changing_params)
-    file_prefix = "$(folder)_1.8_40_60_shifts_"
+    file_prefix = "$(folder)"
 
     # -------- Plot Set up -------- #
 
-    with_extra_plot = false
+    with_extra_plot = true
 
     plt_f, plt_s, plt_us, rainbow = init_DIC(L)
 
     for (i,inter_parameter) in enumerate(changing_params)
         #inhib = 0.0
         #shift = 0.0
-        changing_label = "$(inter_parameter)"
+        changing_label = ""
 
         p  = get_param(0.0;
         #"""###################### PARAMETER ######################"""#   
-                C_lidocaine=inter_parameter,
+                #C_lidocaine=inter_parameter,
                 )
         #"""#######################################################"""#
     
         iteration_DIC(V, p, i, changing_label, plt_f, plt_s, plt_us, rainbow;with_extra_plot=with_extra_plot)
     end
-    savefig(plt_f, "plots/DIC/$(file_prefix)all_g_f.pdf")
-    savefig(plt_s, "plots/DIC/$(file_prefix)all_g_s.pdf")
-    savefig(plt_us, "plots/DIC/$(file_prefix)all_g_us.pdf")
+    savefig(plt_f, "plots/default/$(file_prefix)all_g_f.pdf")
+    savefig(plt_s, "plots/default/$(file_prefix)all_g_s.pdf")
+    savefig(plt_us, "plots/default/$(file_prefix)all_g_us.pdf")
 end
-
 
 #main()

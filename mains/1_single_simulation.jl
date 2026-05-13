@@ -1,6 +1,6 @@
 
 ############################ PARAMETER SET TYPE ############################
-folder = "DIV0"
+folder = "DIV7"
 ############################ PARAMETER SET TYPE ############################
 
 if folder == "DIV0"
@@ -15,7 +15,7 @@ function main()
 
     with_plot = true
 
-    amp = 16.0                   # pA
+    amp = 2.0                   # pA
     duration = 1700.0             # ms
     stim_on = 500.0               # ms
     stim_length = duration - stim_on - 200.0         # ms
@@ -24,9 +24,14 @@ function main()
     shift = 1000.0
     param = get_param(amp; stim_on=stim_on, stim_length=stim_length,
         #C_lidocaine=shift,
+        g_nav1p3 = 0.35,
+        g_nav1p7 = 35.0,
+        g_nav1p8 = 0.2,
         )
 
     u0 = get_u0()
+
+    file_prefix = "$(folder)_$(amp)amp"
 
     print("--------------- Start Simulation ---------------\n")
     println("Parameter set type : $folder")
@@ -59,15 +64,12 @@ function main()
         # plot!(plt_traj, ylim=(-90,170))
         # plot!(plt_traj, xlim=(-90,40))
         # # display(plt_traj)
-        # savefig(plt_traj, "plots/single_simulation/plot_traj.pdf")
+        # savefig(plt_traj, "plots/single_simulation/$(file_prefix)_traj.pdf")
 
-        display(plt_all)
-        savefig(plt_all, "plots/single_simulation/plot_all.png")
-        #savefig(plt_all, "plots/single_simulation/plot_all.pdf")
+        #display(plt_all)
+        savefig(plt_all, "plots/simulation/$(file_prefix)_all.png")
+        #savefig(plt_all, "plots/simulation/$(file_prefix)_all.pdf")
     end
-
-    # p_freq = scatter(t_spikes[1:end-1], freqs)
-    # display(p_freq)
 end
 
 main()

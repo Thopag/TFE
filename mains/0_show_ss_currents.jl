@@ -76,7 +76,7 @@ function main()
         iteration_ss_currents(plt, p, V, i, changing_label, reds, blues, greens, greys)
     end
 
-    savefig(plt, "plots/ss_current/$(file_prefix)ss_current.pdf")
+    savefig(plt, "plots/default/$(file_prefix)ss_current.pdf")
 end
 
 

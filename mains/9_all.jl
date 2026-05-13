@@ -5,7 +5,7 @@ include("3_bifurcation_diagram.jl")
 include("4_parameter_analyses.jl")
 
 ############################ PARAMETER SET TYPE ############################
-parameter_set = "DIV0"
+parameter_set = "DIV7"
 ############################ PARAMETER SET TYPE ############################
 
 if parameter_set == "DIV0"
@@ -24,11 +24,11 @@ function main()
 
     # -------- Vectors -------- #
 
-    amps = 0.0:2.5:300.0                    # "amp (pA)"
-    C_lido = [1.0, 10.0, 100.0, 1000.0]     # "Lidocaine (µM)"
+    amps = 0.0:1:300.0                    # "amp (pA)"
+    xC_lido = [0.0, 10.0, 100.0, 1000.0]     # "Lidocaine (µM)"
 
-    shifts = [0.0] #0:1:15.0                       # "shift (mV)"
-    inhibs = 0.0:0.1:1.0 #[0.0, 0.3, 0.5, 0.7, 0.9, 0.925, 0.95, 0.975, 1.0]
+    shifts = 0:1:15.0                       # "shift (mV)"
+    inhibs = 0:0.1:1.0 #[0.0, 0.3, 0.5, 0.7, 0.9, 0.925, 0.95, 0.975, 1.0]
 
     # -------- Intra Parameter -------- #
 
@@ -41,19 +41,19 @@ function main()
     init_intra_parameter = 0.0
 
     intra_axe_label = "amp (pA)"
-    
+
     # -------- Inter Parameter -------- #
 
     VEC_inter_parameter = shifts
-    inter_axe_label = ""
+    inter_axe_label = "Shift (mV)"
 
     inter_labels = ["$k" for k in VEC_inter_parameter]
     L = length(VEC_inter_parameter)
 
     # -------- General Labeling -------- #
 
-    folder_name = "$(parameter_set)_default" ######## FOLDER NAME ########
-    file_prefix = "$(folder_name)_"
+    folder_name = "$(parameter_set)_$(TFE.shift_inact_1p7)-inact-1.7_$(TFE.shift_inact_1p3)-inact-1.3_$(TFE.shift_inact_1p8)-inact-1.8_$(TFE.shift_act_1p8)-act-1.8" ######## FOLDER NAME ########
+    file_prefix = "$(folder_name)"
 
     println("%%%%%%%%%%%%%%%%%%%%%%% INFO %%%%%%%%%%%%%%%%%%%%%%%")
     println("Will be stored in $folder_name")
@@ -76,7 +76,7 @@ function main()
 
     plt_f, plt_s, plt_us, rainbow = init_DIC(L)
 
-    plt_bif, color_specialpoint = init_bifurcation(intra_axe_label)
+    plt_bif, color_specialpoint = init_bifurcation(intra_axe_label, p_min, p_max)
 
     M_peak_count, M_freq, M_pattern, M_first_peak_h, M_first_peak_w, inter_with_rheobase, rheobases = init_parameter_analyses(VEC_intra_parameter, VEC_inter_parameter)
 
@@ -95,7 +95,7 @@ function main()
                     C_lidocaine=inter_parameter,
                     # g_nav1p3 = 0.35 ,
                     # g_nav1p7 = 35.0 ,
-                    # g_nav1p8 = 0.2* (1-inter_parameter),
+                    # g_nav1p8 = 0.2 * (1-inter_parameter),
                     )
         #"""#######################################################"""#
                     , VEC_intra_parameter)
@@ -143,26 +143,26 @@ function main()
     println("-- Start Saving --")
 
     # -- Steady State Currents -- #
-    savefig(plt_ss_current, "plots/$(folder_name)/$(file_prefix)ss_current.pdf")
+    savefig(plt_ss_current, "plots/$(folder_name)/$(file_prefix)_ss_current.pdf")
 
     # -- DIC -- #
-    savefig(plt_f, "plots/$(folder_name)/$(file_prefix)all_g_f.pdf")
-    savefig(plt_s, "plots/$(folder_name)/$(file_prefix)all_g_s.pdf")
-    savefig(plt_us, "plots/$(folder_name)/$(file_prefix)all_g_us.pdf")
+    savefig(plt_f, "plots/$(folder_name)/$(file_prefix)_all_g_f.pdf")
+    savefig(plt_s, "plots/$(folder_name)/$(file_prefix)_all_g_s.pdf")
+    savefig(plt_us, "plots/$(folder_name)/$(file_prefix)_all_g_us.pdf")
 
     # -- Parameter analyses -- #
-    savefig(p_peaks, "plots/$(folder_name)/$(file_prefix)peaks-curve.pdf")
-    savefig(p_freqs, "plots/$(folder_name)/$(file_prefix)F-I-curve.pdf")
-    savefig(p_height, "plots/$(folder_name)/$(file_prefix)first_peak.pdf")
-    savefig(p_width, "plots/$(folder_name)/$(file_prefix)first_width.pdf")
+    savefig(p_peaks, "plots/$(folder_name)/$(file_prefix)_peaks-curve.pdf")
+    savefig(p_freqs, "plots/$(folder_name)/$(file_prefix)_F-I-curve.pdf")
+    savefig(p_height, "plots/$(folder_name)/$(file_prefix)_first_height.pdf")
+    savefig(p_width, "plots/$(folder_name)/$(file_prefix)_first_width.pdf")
 
-    savefig(p_pattern, "plots/$(folder_name)/$(file_prefix)pattern.pdf")
-    savefig(p_rheo, "plots/$(folder_name)/$(file_prefix)rheobases.pdf")
-    savefig(p_plan, "plots/$(folder_name)/$(file_prefix)heat_plan.pdf")
+    savefig(p_pattern, "plots/$(folder_name)/$(file_prefix)_pattern.pdf")
+    savefig(p_rheo, "plots/$(folder_name)/$(file_prefix)_rheobases.pdf")
+    savefig(p_plan, "plots/$(folder_name)/$(file_prefix)_heat_plan.pdf")
 
     # -- Bifurcation -- #
-    savefig(plt_bif, "plots/$(folder_name)/$(file_prefix)bifurcation.png")
-    savefig(plt_bif, "plots/$(folder_name)/$(file_prefix)bifurcation.pdf")
+    savefig(plt_bif, "plots/$(folder_name)/$(file_prefix)_bifurcation.png")
+    #savefig(plt_bif, "plots/$(folder_name)/$(file_prefix)_bifurcation.pdf")
 
     println("-- End Saving --")
 end

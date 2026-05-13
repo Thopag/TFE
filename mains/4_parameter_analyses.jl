@@ -130,14 +130,14 @@ function main(;constant_amp=0.0)
                                                                         M_peak_count, M_freq, M_pattern, M_first_peak_h, M_first_peak_w, inter_with_rheobase, rheobases
                                                                                                     , intra_axe_label, inter_axe_label, inter_labels)
 
-    # savefig(p_peaks, "plots/parameter_analyses/$(file_prefix)peaks-curve.pdf")
-    # savefig(p_freqs, "plots/parameter_analyses/$(file_prefix)F-I-curve.pdf")
-    # savefig(p_height, "plots/parameter_analyses/$(file_prefix)first_peak.pdf")
-    # savefig(p_width, "plots/parameter_analyses/$(file_prefix)first_width.pdf")
-    # savefig(p_rheo, "plots/parameter_analyses/$(file_prefix)rheobases.pdf")
+    # savefig(p_peaks, "plots/default/$(file_prefix)peaks-curve.pdf")
+    # savefig(p_freqs, "plots/default/$(file_prefix)F-I-curve.pdf")
+    # savefig(p_height, "plots/default/$(file_prefix)first_peak.pdf")
+    # savefig(p_width, "plots/default/$(file_prefix)first_width.pdf")
+    # savefig(p_rheo, "plots/default/$(file_prefix)rheobases.pdf")
 
-    savefig(p_pattern, "plots/parameter_analyses/$(file_prefix)pattern.pdf")
-    savefig(p_plan, "plots/parameter_analyses/$(file_prefix)heat_plan.pdf")
+    savefig(p_pattern, "plots/default/$(file_prefix)pattern.pdf")
+    savefig(p_plan, "plots/default/$(file_prefix)heat_plan.pdf")
 
     println("---- End Plots ----")
 

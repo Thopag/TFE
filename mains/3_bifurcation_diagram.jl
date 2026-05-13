@@ -10,10 +10,12 @@ elseif folder == "DIV7"
     get_u0 = DIV7_u0
 end
 
-function init_bifurcation(param_label)
+function init_bifurcation(param_label, p_min, p_max)
     color_specialpoint = Dict{Symbol, Symbol}(:hopf => :red, :bp => :green, :endpoint => :black)
 
-    plt = plot(xlabel=param_label, ylabel=" Voltage (mV)", legendfontsize=7)
+    xticks = p_min:30:p_max
+
+    plt = plot(xlabel=param_label, ylabel=" Voltage (mV)", legendfontsize=7, xticks=xticks)
 
     for (symbol_type, color) in color_specialpoint
         scatter!(plt, [], [], label="$(symbol_type)", c=color)
@@ -34,14 +36,14 @@ function iteration_bifurcation(plt, i, param_init, u0, lens_param, p_min, p_max,
 
     #color_stability = [:red, :blue]
     color_stability = [reds[i], blues[i]]
-    plot!(plt, bif_param , V, c=color_stability[stability .+ 1], label="", linewidth = 1.5)
+    plot!(plt, bif_param , V, c=color_stability[stability .+ 1], label="", linewidth = 1.0)
 
     # Add special point
     for specialpoint in br.specialpoint
         idx = specialpoint.idx
         symbol_type = specialpoint.type
         color = get(color_specialpoint, symbol_type, :blue)
-        scatter!(plt, [bif_param[idx]], [V[idx]], label="", c=color)
+        scatter!(plt, [bif_param[idx]], [V[idx]], label="", c=color, markersize = 4, alpha=1)
     end
     return
 end
@@ -71,7 +73,7 @@ function main()
     # ---- Plot set up ---- #
 
     intra_axe_label = "amp (pA)"
-    plt, color_specialpoint = init_bifurcation(intra_axe_label)
+    plt, color_specialpoint = init_bifurcation(intra_axe_label, p_min, p_max)
 
     reds, blues, greens, greys = sodium_palettes(L; dark=0.8, light=0.5)
 
@@ -99,8 +101,8 @@ function main()
     # ----  End Plots ---- #
 
     #display(plt)
-    savefig(plt, "plots/bifurcation/$(file_prefix)bifurcation.png")
-    savefig(plt, "plots/bifurcation/$(file_prefix)bifurcation.pdf")
+    savefig(plt, "plots/default/$(file_prefix)bifurcation.png")
+    savefig(plt, "plots/default/$(file_prefix)bifurcation.pdf")
 
 end
 
