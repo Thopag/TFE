@@ -45,7 +45,7 @@ function iteration_bifurcation(plt, i, param_init, u0, lens_param, p_min, p_max,
         color = get(color_specialpoint, symbol_type, :blue)
         scatter!(plt, [bif_param[idx]], [V[idx]], label="", c=color, markersize = 4, alpha=1)
     end
-    return
+    return br
 end
 
 function main()
@@ -68,7 +68,7 @@ function main()
     inter_params = shifts
     L = length(inter_params)
 
-    file_prefix = "$(folder)_shift_1_3_1_7_"
+    file_prefix = "$(folder)"
 
     # ---- Plot set up ---- #
 
@@ -86,25 +86,25 @@ function main()
         # ---- Make bifurcations ---- #
         param_init = get_param(starting_param;
         #"""###################### PARAMETER ######################"""#   
-                    C_lidocaine=inter_parameter,
+                    #C_lidocaine=inter_parameter,
                     # g_nav1p3 = 0.35* (1-inter_parameter),
                     # g_nav1p7 = 35.0,
                     # g_nav1p8 = 0.2,
                     )
         #"""#######################################################"""#
 
-        iteration_bifurcation(plt, i, param_init, u0, lens_param, p_min, p_max, 
+        br = iteration_bifurcation(plt, i, param_init, u0, lens_param, p_min, p_max, 
                                                     changing_label, color_specialpoint, reds, blues, greys)
-        #print(show(br))
+        print(show(br))
     end
 
     # ----  End Plots ---- #
 
     #display(plt)
-    savefig(plt, "plots/default/$(file_prefix)bifurcation.png")
-    savefig(plt, "plots/default/$(file_prefix)bifurcation.pdf")
+    savefig(plt, "plots/default/$(file_prefix)_bifurcation.png")
+    savefig(plt, "plots/default/$(file_prefix)_bifurcation.pdf")
 
 end
 
 
-#main()
+main()

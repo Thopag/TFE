@@ -59,19 +59,19 @@ end
 function shifted_steady_state_gate_functions()
 
     V = -120:0.5:60
-    shifts = 0.0:2.5:15.0
+    shifts = 0.0:5:25.0
     reds, blues, greens, greys = sodium_palettes(length(shifts))
 
     xticks = [-120, -90, -60, -30, 0, 30, 60]
     plt = plot(xlabel="Voltage (mV)", ylabel= "- (-)", legend=:bottomright, legendfontsize=11
                     , xticks = xticks)
 
-    plot!(plt, [], [], label=L"m_{8, ∞}", linestyle = :solid, color=:green)
-    plot!(plt, [], [], label=L"h_{8, ∞}", linestyle = :dash, color=:green)
+    plot!(plt, [], [], label=L"m_{3, ∞}", linestyle = :solid, color=:blue)
+    plot!(plt, [], [], label=L"h_{3, ∞}", linestyle = :dash, color=:blue)
 
-    for (s, c) in zip(shifts,greens)
-        plot!(plt, V, ODE.m_inf_1_8.(V; C_lido=s), label="", linestyle = :solid, color=c)
-        plot!(plt, V, ODE.h_inf_1_8.(V; C_lido=s), label="", linestyle = :dash, color=c)
+    for (s, c) in zip(shifts,blues)
+        plot!(plt, V, ODE.m_inf_1_3.(V; C_lido=s), label="", linestyle = :solid, color=c)
+        plot!(plt, V, ODE.h_inf_1_3.(V; C_lido=s), label="", linestyle = :dash, color=c)
     end
 
     #display(plt)

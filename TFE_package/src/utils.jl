@@ -1,4 +1,4 @@
-export Model_Parameters, give_currents, steady_state_currents, global_pattern, parameter_analyse, make_bifurcation
+export Model_Parameters, give_currents, steady_state_currents, global_pattern, find_rheobase, parameter_analyse, make_bifurcation
 
 # --------------------------- Parameters struct --------------------------- #
 
@@ -203,6 +203,40 @@ function global_pattern(t_spikes, n_peak, begin_stim, end_stim; window_width=100
     end
     
     return f_global, pattern
+end
+
+function find_rheobase(get_param, amps, u0; duration = 1700.0)
+
+    L = length(amps)
+    for (i,amp) in enumerate(amps)
+        print("\rProgress: $(round(((i-1)/L*100), digits=2)) %")
+        # -- Make Simulation -- #
+        param = get_param(amp)
+        t,V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP,Inoise = simulation(u0, (0.0, duration), param)
+
+        # ---- Peak Detection ---- #
+
+        # Peak detection
+        peaks_idx, peak_count, _ = get_peaks(t, V;  min_h=-5.0, min_proms=10)
+        t_spikes = t[peaks_idx]
+
+        peaks_idx = peaks_idx[t_spikes .> param.stim_on]
+        t_spikes = t_spikes[t_spikes .> param.stim_on]
+
+        if peak_count > 0
+            peak_count = length(peaks_idx)
+        end
+
+        _, pattern = global_pattern(t_spikes, peak_count, param.stim_on, param.stim_off)
+
+        if pattern >= 1
+            print("\r")
+            return amp
+        end
+    end
+
+    print("\r")
+    return nothing
 end
 
 function parameter_analyse(param_sets, u0; duration = 1700.0)

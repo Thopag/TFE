@@ -21,12 +21,13 @@ function sodium_palettes(L; dark=0.95, light=0.4)
 end
 
 function init_plot_all(; xlimits=(400, 1700))
-    n_fig = 2
+    n_fig = 1
     plt = plot(layout = (n_fig, 1), link = :x, xlims=xlimits, size = (750, 230*n_fig), xaxis = nothing,
                                                                     left_margin = 5mm,
                                                                     bottom_margin = 5mm, 
                                                                     margin = 5mm)
-    xticks = xlimits[1]:25:xlimits[end] #range(xlimits[1], xlimits[end], length=10)
+    xticks = xlimits[1]:100:xlimits[end] #range(xlimits[1], xlimits[end], length=10)
+    #xticks = :native
     plot!(plt[n_fig], xaxis = "Time (ms)", xticks=xticks)
     return plt
 end
@@ -42,25 +43,25 @@ function plot_all(plt, t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp, t
     ylims = Plots.ylims(plt[voltage])
         
     plot!(plt[voltage], t, V, color= :black, label="")
-    #vline!(plt[voltage], t_spikes, color=:red, label="peaks")
+    #vline!(plt[voltage], t_spikes, color=:red, label="")
     annotate!(plt[voltage],
         xlims[2] - 0.1*(xlims[2]-xlims[1]),
         ylims[2] - 0.05*(ylims[2]-ylims[1]),
         text( L"amp = %$amp pA", 11, :black))
 
-    current = 2
-    ylabel!(plt[current], "Current (uA/cm2)", legendfontsize=7, legend = :bottomright)
-    #plot!(plt[current], ylims=(-(param.I0 + param.Excitation)*2.0, (param.I0 + param.Excitation)*2.0))
-    #plot!(plt[current], ylims=(-20, 20))
-    plot!(plt[current], t, I_NaV1p3, color=:blue, label=L"I_{NaV1.3}")
-    plot!(plt[current], t, I_NaV1p7, color=:red, label=L"I_{NaV1.7}")
-    plot!(plt[current], t, I_NaV1p8, color=:green, label=L"I_{NaV1.8}")
-    plot!(plt[current], t, I_Kdr, color=:orange, label=L"I_{Kdr}", alpha=alpha)
-    plot!(plt[current], t, I_Km, color=:purple, label=L"I_{KM}", alpha=alpha)
-    plot!(plt[current], t, I_AHP, color=:brown, label=L"I_{AHP}", alpha=alpha)
-    plot!(plt[current], t, I_Leak, color=:black, label=L"I_{Leak}")
-    plot!(plt[current], t, .- I_ext, color=:black, linestyle = :dash, label=L"-I_{ext}")
-    #plot!(p[current], t, I_noise, color=:pink, label=L"I_{noise}")
+    # current = 2
+    # ylabel!(plt[current], "Current (uA/cm2)", legendfontsize=7, legend = :bottomright)
+    # plot!(plt[current], ylims=(-(param.I0 + param.Excitation)*1.2, (param.I0 + param.Excitation)*1.2))
+    # #plot!(plt[current], ylims=(-20, 20))
+    # plot!(plt[current], t, I_NaV1p3, color=:blue, label=L"I_{NaV1.3}", alpha=alpha)
+    # plot!(plt[current], t, I_NaV1p7, color=:red, label=L"I_{NaV1.7}", alpha=alpha)
+    # plot!(plt[current], t, I_NaV1p8, color=:green, label=L"I_{NaV1.8}", alpha=alpha)
+    # plot!(plt[current], t, I_Kdr, color=:orange, label=L"I_{Kdr}", alpha=alpha)
+    # plot!(plt[current], t, I_Km, color=:purple, label=L"I_{KM}")
+    # plot!(plt[current], t, I_AHP, color=:brown, label=L"I_{AHP}")
+    # plot!(plt[current], t, I_Leak, color=:black, label=L"I_{Leak}", alpha=alpha)
+    # plot!(plt[current], t, .- I_ext, color=:black, linestyle = :dash, label=L"-I_{ext}")
+    # #plot!(p[current], t, I_noise, color=:pink, label=L"I_{noise}")
 
     current_no_zoom = 3
     # ylabel!(plt[current_no_zoom], "Current (uA/cm2)", legendfontsize=7, legend = :bottomright)
@@ -73,6 +74,16 @@ function plot_all(plt, t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp, t
     # plot!(plt[current_no_zoom], t, I_Leak, color=:black, label=L"I_{Leak}", alpha=alpha)
     # plot!(plt[current_no_zoom], t, .- I_ext, color=:black, linestyle = :dash, label=L"-I_{ext}")
     # #plot!(p[current], t, I_noise, color=:pink, label=L"I_{noise}")
+
+    channel = 3
+    # ylabel!(plt[channel], "Channel Availability (%)")
+    # plot!(plt[channel], ylims=(-0.05,1))
+    # plot!(plt[channel], t, m3.^3 .* h3 .* 100, color=:blue, label=L"NaV_{1.3}")
+    # plot!(plt[channel], t, m7.^3 .* h7 .* 100, color=:red, label=L"NaV_{1.7}")
+    # plot!(plt[channel], t, m8.^3 .* h8 .* 100, color=:green, label=L"NaV_{1.8}")
+    # plot!(plt[channel], t, ndr.^3 .* ldr .* 100, color=:orange, label=L"K_{dr}")
+    # plot!(plt[channel], t, nm .* 100, color=:purple, label=L"K_{m}")
+    # plot!(plt[channel], t, z_AHP .* 100, color=:brown, label=L"K_{AHP}")
 
     # i_dV_dt = 3
     # ylabel!(plt[i_dV_dt], "dV_dt (mV/s)")
@@ -93,16 +104,6 @@ function plot_all(plt, t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp, t
     # plot!(plt[variable], t, ldr, label=L"l_{dr}", linestyle = :dash, color=:orange)
     # plot!(plt[variable], t, nm, label=L"n_{m}", linestyle = :solid, color=:purple)
     # plot!(plt[variable], t, z_AHP, label=L"z_{AHP}", linestyle = :solid, color=:brown)
-
-    # channel = 3
-    # ylabel!(plt[channel], "Channel Availability (%)")
-    # # plot!(plt[channel], ylims=(-0.05,1))
-    # plot!(plt[channel], t, m3.^3 .* h3 .* 100, color=:blue, label=L"NaV_{1.3}")
-    # plot!(plt[channel], t, m7.^3 .* h7 .* 100, color=:red, label=L"NaV_{1.7}")
-    # plot!(plt[channel], t, m8.^3 .* h8 .* 100, color=:green, label=L"NaV_{1.8}")
-    # plot!(plt[channel], t, ndr.^3 .* ldr .* 100, color=:orange, label=L"K_{dr}")
-    # plot!(plt[channel], t, nm .* 100, color=:purple, label=L"K_{m}")
-    # plot!(plt[channel], t, z_AHP .* 100, color=:brown, label=L"K_{AHP}")
 
     # global_current = 5
     # ylabel!(plt[global_current], "Current (uA/cm2)")

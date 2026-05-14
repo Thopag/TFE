@@ -35,8 +35,8 @@ function main()
 
     params = map( (amp, inter_param) -> get_param(amp;
                     #C_lidocaine = inter_param,
-                    g_nav1p3 = 0.35 * (1-inter_param),
-                    g_nav1p7 = 35.0 * (1-inter_param),
+                    g_nav1p3 = 0.35,
+                    g_nav1p7 = 35.0,
                     g_nav1p8 = 0.2 ,
                     )
                 , amps, VEC_inter_param)
