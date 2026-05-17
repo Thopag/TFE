@@ -1,5 +1,5 @@
 ############################ PARAMETER SET TYPE ############################
-folder = "DIV0"
+folder = "DIV7"
 ############################ PARAMETER SET TYPE ############################
 
 if folder == "DIV0"
@@ -107,4 +107,4 @@ function main()
 end
 
 
-main()
+#main()

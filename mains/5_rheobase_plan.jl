@@ -1,5 +1,5 @@
 ############################ PARAMETER SET TYPE ############################
-parameter_set = "DIV0"
+parameter_set = "DIV7"
 ############################ PARAMETER SET TYPE ############################
 
 if parameter_set == "DIV0"
@@ -13,12 +13,12 @@ end
 function main()
 
     u0 = get_u0()
-    amps = 0.0:0.5:300.0
+    amps = 0.0:1:300.0
 
     # -------- Vectors -------- #
 
-    shifts = 0:0.5:15.0
-    inhibs = 0:0.05:1.0
+    shifts = 0:1:25.0
+    inhibs = vcat(0:0.05:0.9, 0.92:0.02:1.0)
 
     # -------- First Parameter -------- #
 
@@ -28,7 +28,7 @@ function main()
     # -------- Second Parameter -------- #
 
     VEC_second_param = inhibs
-    second_param_label = "Inhibition (-)"
+    second_param_label = "Inhibition NaV1.7 (-)"
 
 
     # -------- General Labeling -------- #
@@ -71,7 +71,8 @@ function main()
             param_function(amp) = get_param(amp;
             #"""###################### PARAMETER ######################"""#  
                         C_lidocaine=first_param,
-                        g_nav1p8 = 30.0 * (1-second_param),
+                        #g_nav1p8 = 30.0 * (1-second_param),
+                        g_nav1p7 = 35.0 * (1-second_param),
                         )
             #"""#######################################################"""#
         
@@ -85,7 +86,7 @@ function main()
 
     plt = plot(xlabel=second_param_label, ylabel=first_param_label)
 
-    heatmap!(plt, VEC_second_param, VEC_first_param, permutedims(M_rheobase), c = cgrad(:RdYlGn_4))
+    heatmap!(plt, VEC_second_param, VEC_first_param, M_rheobase, c = cgrad(:roma, 12, rev = true, categorical = true, scale = :exp))
 
     diff_x = VEC_second_param[2]-VEC_second_param[1]
     diff_y = VEC_first_param[2]-VEC_first_param[1]

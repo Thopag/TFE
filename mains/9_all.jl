@@ -5,7 +5,7 @@ include("3_bifurcation_diagram.jl")
 include("4_parameter_analyses.jl")
 
 ############################ PARAMETER SET TYPE ############################
-parameter_set = "DIV0"
+parameter_set = "DIV7"
 ############################ PARAMETER SET TYPE ############################
 
 if parameter_set == "DIV0"
@@ -24,8 +24,8 @@ function main()
 
     # -------- Vectors -------- #
 
-    amps = 0.0:1:40.0                    # "amp (pA)"
-    C_lido = [0.0, 10.0, 100.0, 1000.0]     # "Lidocaine (µM)"
+    amps = 0.0:1:300.0                    # "amp (pA)"
+    C_lido = [0.0, 10.0, 50.0, 100.0, 500.0, 1000.0]     # "Lidocaine (µM)"
 
     shifts = 0:1:15.0                       # "shift (mV)"
     inhibs = 0:0.1:1.0 #[0.0, 0.3, 0.5, 0.7, 0.9, 0.925, 0.95, 0.975, 1.0]
@@ -44,15 +44,15 @@ function main()
 
     # -------- Inter Parameter -------- #
 
-    VEC_inter_parameter = shifts
-    inter_axe_label = "Shift (mV)"
+    VEC_inter_parameter = C_lido
+    inter_axe_label = "Lidocaine (µM)"
 
     inter_labels = ["$k" for k in VEC_inter_parameter]
     L = length(VEC_inter_parameter)
 
     # -------- General Labeling -------- #
 
-    folder_name = "default"
+    folder_name = "$(parameter_set)_lidocaine"
     #folder_name = "$(parameter_set)_$(TFE.shift_inact_1p8)-inact-1.8_$(TFE.shift_act_1p8)-act-1.8" ######## FOLDER NAME ########
     #folder_name = "$(parameter_set)_$(TFE.shift_inact_1p7)-inact-1.7_$(TFE.shift_inact_1p3)-inact-1.3_$(TFE.shift_inact_1p8)-inact-1.8_$(TFE.shift_act_1p8)-act-1.8" ######## FOLDER NAME ########
     file_prefix = "$(folder_name)"
