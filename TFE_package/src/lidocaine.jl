@@ -4,16 +4,16 @@ export get_lidocaine_inhibition, inact_1_3_shift, act_1_3_shift, inact_1_7_shift
 
 
 with_shift::Bool = true
-with_inhibition::Bool = true
+with_inhibition::Bool = false
 
-linear_mode::Bool = false
+linear_mode::Bool = true
 
 shift_inact_1p3::Float64 = 0.0
 
 shift_inact_1p7::Float64 = 0.0
 
 shift_inact_1p8::Float64 = 0.0
-shift_act_1p8::Float64   = 0.0
+shift_act_1p8::Float64   = 1.0
 
 function lidocaine_effect_setup()
     return "___________________________________

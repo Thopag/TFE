@@ -1,6 +1,6 @@
 
 ############################ PARAMETER SET TYPE ############################
-folder = "DIV7"
+folder = "DIV0"
 ############################ PARAMETER SET TYPE ############################
 
 if folder == "DIV0"
@@ -19,29 +19,29 @@ function main()
     amps_i_1_3 = [12.0, 13.0, 15.0, 17.0, 20.0, 23.0,]
     amps_i_1_7 = [12.0, 13.0, 14.0, 17.0, 27.0, 180.0]
 
-    amps_cst = zeros(6) .+ 25.0
+    amps_cst = zeros(6) .+ 210.0
 
     amps = amps_cst
 
     VEC_g_nav1p7 = [3.0, 0.0, 0.0]
-    VEC_inhib = [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]
-    VEC_shift = [0.0, 5.0, 10.0, 15.0]
+    VEC_inhib = [0.0, 0.9]
+    VEC_shift = [0.0, 3.0]
 
-    VEC_inter_param = VEC_inhib
+    VEC_inter_param = VEC_shift
 
     # -------- Set up -------- #
 
     file_prefix = "$(folder)"
 
     params = map( (amp, inter_param) -> get_param(amp;
-                    #C_lidocaine = inter_param,
-                    g_nav1p3 = 0.35,
-                    g_nav1p7 = 35.0,
-                    g_nav1p8 = 0.2 ,
+                    C_lidocaine = inter_param,
+                    # g_nav1p3 = 0.35,
+                    # g_nav1p7 = 35.0,
+                    # g_nav1p8 = 30.0 * (1-inter_param) ,
                     )
                 , amps, VEC_inter_param)
 
-    labels = [L"inhib_{NaV1.7&NaV1.3} = %$inter_param - %$amp pA" for (amp, inter_param) in zip(amps, VEC_inter_param)]
+    labels = [L"shift_{act1.8} = %$inter_param - %$amp pA" for (amp, inter_param) in zip(amps, VEC_inter_param)]
     L = length(params)
 
     # -------- Timing set up -------- #
@@ -52,7 +52,8 @@ function main()
 
     # -------- Plot Set up -------- #
 
-    xlimits = (stim_on-25, stim_on+150)
+    #xlimits = (stim_on-25, stim_on+150)
+    xlimits = (stim_on-50, stim_on+stim_length+50)
     plt_all = init_several_plot_all(; xlimits=xlimits)
 
     

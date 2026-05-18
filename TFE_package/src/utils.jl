@@ -207,6 +207,9 @@ end
 
 function find_rheobase(get_param, amps, u0; duration = 1700.0)
 
+    is_finded = false
+    rheobase = NaN
+    spiking = NaN
     L = length(amps)
     for (i,amp) in enumerate(amps)
         print("\rProgress: $(round(((i-1)/L*100), digits=2)) %")
@@ -229,14 +232,21 @@ function find_rheobase(get_param, amps, u0; duration = 1700.0)
 
         _, pattern = global_pattern(t_spikes, peak_count, param.stim_on, param.stim_off)
 
-        if pattern >= 1
+        if (pattern >= 1) && (!is_finded)
             print("\r")
-            return amp
+            rheobase = amp
+            is_finded = true
+        end
+
+        if (pattern == 4)
+            print("\r")
+            spiking = amp
+            return rheobase, spiking
         end
     end
 
     print("\r")
-    return nothing
+    return rheobase, spiking
 end
 
 function parameter_analyse(param_sets, u0; duration = 1700.0)

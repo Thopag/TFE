@@ -1,5 +1,5 @@
 ############################ PARAMETER SET TYPE ############################
-folder = "DIV7"
+folder = "DIV0"
 ############################ PARAMETER SET TYPE ############################
 
 if folder == "DIV0"
@@ -63,7 +63,7 @@ function main()
     # ---- inter bifurcation parameter ---- #
 
     C_lido = [0.0, 100.0, 1000.0]
-    shifts = [0.0] #0:2.5:25.0
+    shifts = 0:7.5:15.0
     inhibs = 0.0:0.1:1.0 #[0.0, 0.3, 0.5, 0.7, 0.9, 0.925, 0.95, 0.975, 1.0]
     inter_params = shifts
     L = length(inter_params)
@@ -86,7 +86,7 @@ function main()
         # ---- Make bifurcations ---- #
         param_init = get_param(starting_param;
         #"""###################### PARAMETER ######################"""#   
-                    #C_lidocaine=inter_parameter,
+                    C_lidocaine=inter_parameter,
                     # g_nav1p3 = 0.35* (1-inter_parameter),
                     # g_nav1p7 = 35.0,
                     # g_nav1p8 = 0.2,
@@ -94,8 +94,8 @@ function main()
         #"""#######################################################"""#
 
         br = iteration_bifurcation(plt, i, param_init, u0, lens_param, p_min, p_max, 
-                                                    changing_label, color_specialpoint, reds, blues, greys)
-        print(show(br))
+                                                    changing_label, color_specialpoint, reds, greens, greys)
+        #print(show(br))
     end
 
     # ----  End Plots ---- #
@@ -107,4 +107,4 @@ function main()
 end
 
 
-#main()
+main()

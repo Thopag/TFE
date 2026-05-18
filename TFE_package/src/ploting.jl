@@ -119,7 +119,7 @@ function init_several_plot_all(; xlimits=(400, 1700))
                                                                     left_margin = 5mm,
                                                                     bottom_margin = 5mm, 
                                                                     margin = 5mm)
-    xticks = xlimits[1]:25:xlimits[end] #range(xlimits[1], xlimits[end], length=10)
+    xticks = xlimits[1]:100:xlimits[end] #range(xlimits[1], xlimits[end], length=10)
     plot!(plt[n_fig], xaxis = "Time (ms)", xticks=xticks)
     return plt
 end
@@ -130,13 +130,13 @@ function several_plot_all(plt, color, t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm
     alpha = 0.4
 
     voltage = 1
-    ylabel!(plt[voltage], "Voltage (mV)", legend = :topright, ylims=(-90,50))
+    ylabel!(plt[voltage], "Voltage (mV)", legend = :topright, ylims=(-90,50), legendfontsize=7)
     plot!(plt[voltage], t, V, color=color, label=label)
     #vline!(plt[voltage], t_spikes, color=:red, label="peaks")
 
     # current = 2
-    # ylabel!(plt[current], "NaV1.8 Current (uA/cm2)", legendfontsize=7, legend = :topright)
-    # plot!(plt[current], t, I_NaV1p8, color=color, label="")
+    # ylabel!(plt[current], "NaV1.7 Current (uA/cm2)", legendfontsize=7, legend = :topright)
+    # plot!(plt[current], t, I_NaV1p7, color=color, label="")
     # # plot!(plt[current], ylims=(-(param.I0 + param.Excitation)*1.7, (param.I0 + param.Excitation)*1.7))
     # # plot!(plt[current], t, .- I_ext, color=color, linestyle = :dash, label=L"-I_{ext} - %$label")
 
@@ -144,7 +144,13 @@ function several_plot_all(plt, color, t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm
     # ylabel!(plt[channel], "NaV1.8 Channel Availability (%)")
     # plot!(plt[channel], t, m8.^3 .* h8 .* 100, color=color, label="")
 
+    # variable = 2
+    # ylabel!(plt[variable], "NaV1.8 inactivation (-)")
+    # plot!(plt[variable], t, h8, color=color, linestyle=:dash, label="")
+    # plot!(plt[variable], t, m8, color=color, label="")
+
     # current = 3
+    # # plot!(plt[current], ylims=(-0.5, 25))
     # ylabel!(plt[current], "K Current (uA/cm2)", legendfontsize=7, legend = :topright)
     # plot!(plt[current], t, I_Kdr .+ I_Km .+ I_AHP, color=color, label="")
 
