@@ -78,7 +78,7 @@ function main()
 
     plt_f, plt_s, plt_us, rainbow = init_DIC(L)
 
-    plt_bif, color_specialpoint = init_bifurcation(intra_axe_label, p_min, p_max)
+    plt_bif, color_specialpoint = init_bifurcation(intra_axe_label, p_min, p_max, reds, greens, greys)
 
     M_peak_count, M_freq, M_pattern, M_first_peak_h, M_first_peak_w, inter_with_rheobase, rheobases = init_parameter_analyses(VEC_intra_parameter, VEC_inter_parameter)
 

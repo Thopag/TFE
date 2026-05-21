@@ -1,6 +1,6 @@
 
 ############################ PARAMETER SET TYPE ############################
-folder = "DIV0"
+folder = "DIV7"
 ############################ PARAMETER SET TYPE ############################
 
 if folder == "DIV0"
@@ -16,7 +16,7 @@ function main(;extra=0.0)
     with_plot = true
 
     amp = 200.0                   # pA
-    duration = 60000.0             # ms
+    duration = 1700.0             # ms
     stim_on = 500.0               # ms
     stim_length = duration - stim_on - 200.0         # ms
 
@@ -27,9 +27,10 @@ function main(;extra=0.0)
         #g_nav1p8 = 30.0 * (1-inhib),
         )
 
-    file_prefix = "$(folder)_$(amp)amp"
+    file_prefix = "$(folder)"#_$(amp)amp"
 
     u0 = get_u0()
+    #u0 = [-7.0407356746133765, 0.9870854072159283, 2.9653217237358692e-5, 0.9627214745221165, 7.519051987830313e-6, 0.8677369807299044, 0.009428204942099143, 0.992282714087809, 0.014777919108885743, 0.996285733438894, 0.04696791243885193, 0.0]
 
     print("------------------------------\n")
     println("Parameter set type : $folder")
@@ -68,7 +69,7 @@ function main(;extra=0.0)
 
         #display(plt_all)
         savefig(plt_all, "plots/simulation/$(file_prefix)_all.png")
-        #savefig(plt_all, "plots/simulation/$(file_prefix)_all.pdf")
+        savefig(plt_all, "plots/simulation/$(file_prefix)_all.pdf")
 
     end
 

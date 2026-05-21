@@ -314,7 +314,7 @@ end
 function make_bifurcation(param_init, u0, lens_param, p_min, p_max)
 
     prob = BifurcationProblem(ODE_system_bifurcation, u0, param_init, lens_param, 
-        record_from_solution = (x, p; k...) -> x[1])
+        record_from_solution = (x, p; k...) -> x[:])
 
     step_scaling = 100
     opts = ContinuationPar(
@@ -325,6 +325,7 @@ function make_bifurcation(param_init, u0, lens_param, p_min, p_max)
         ds = 0.1/step_scaling ,
         dsmax = 1/step_scaling ,
         detect_bifurcation = 3,
+        detect_event = 0
     )
     br = continuation(prob, PALC(), opts)
     return br
