@@ -78,4 +78,54 @@ function shifted_steady_state_gate_functions()
     savefig(plt, "plots/report/shifted_steady_state_gate_functions.pdf")
 end
 
-shifted_steady_state_gate_functions()
+#shifted_steady_state_gate_functions()
+
+function steady_state_channel_availability()
+
+    V = -120:0.5:60
+    E_Na = 50.0
+    E_k = -90.0
+
+    xticks = [-120, -90, -60, -30, 0, 30, 60]
+
+    m3 = ODE.m_inf_1_3.(V)
+    h3 = ODE.h_inf_1_3.(V)
+
+    m7 = ODE.m_inf_1_7.(V)
+    h7 = ODE.h_inf_1_7.(V)
+
+    m8 = ODE.m_inf_1_8.(V)
+    h8 = ODE.h_inf_1_8.(V)
+
+    nm = ODE.n_inf_K_M.(V)
+
+    ndr = ODE.n_inf_K_dr.(V)
+    ldr = ODE.l_inf_K_dr.(V)
+
+    z_AHP = ODE.z_AHP_inf.(V)
+
+    Na_1p3 = (m3.^3) .* h3 .* (V .- E_Na)
+    Na_1p7 = (m7.^3) .* h7 .* (V .- E_Na)
+    Na_1p8 = (m8.^3) .* h8 .* (V .- E_Na)
+    Kdr = (ndr.^3) .* ldr .* (V .- E_k)
+    Km = nm .* (V .- E_k)
+    KAHP = (z_AHP.^1) .* (V .- E_k)
+
+    plt = plot(xlabel="Voltage (mV)", ylabel= "Normed Channel Availability (-)", legend=:topleft, legendfontsize=7
+                    , xticks = xticks, size = (600, 300), left_margin = 5mm, bottom_margin = 5mm, margin = 5mm)
+
+    plot!(plt, V, Na_1p3 ./ maximum(abs.(Na_1p3)), label=L"NaV1.3", linestyle = :solid, color=:blue, linewidth = 3)
+
+    plot!(plt, V, Na_1p7 ./ maximum(abs.(Na_1p7)), label=L"NaV1.7", linestyle = :solid, color=:red, linewidth = 3)
+
+    plot!(plt, V, Na_1p8 ./ maximum(abs.(Na_1p8)), label=L"NaV1.8", linestyle = :solid, color=:green, linewidth = 3)
+
+    plot!(plt, V, Kdr ./ maximum(abs.(Kdr)), label=L"K_{dr}", linestyle = :solid, color=:orange, linewidth = 3)
+    plot!(plt, V, Km ./ maximum(abs.(Km)), label=L"K_{M}", linestyle = :solid, color=:purple, linewidth = 3)
+    plot!(plt, V, KAHP ./ maximum(abs.(KAHP)), label=L"K_{AHP}", linestyle = :solid, color=:brown, linewidth = 3)
+
+    #display(plt)
+    savefig(plt, "plots/report/steady_state_channels.pdf")
+end
+
+steady_state_channel_availability()

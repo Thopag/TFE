@@ -24,7 +24,7 @@ function init_bifurcation(param_label, p_min, p_max)
 end
 
 function iteration_bifurcation(plt, i, param_init, u0, lens_param, p_min, p_max, 
-                                                    inter_label, color_specialpoint, reds, blues, greys)
+                                                    inter_label, color_specialpoint, reds, greens, greys)
     
     plot!(plt, [], [], label=inter_label, color=greys[i], alpha=1)
     br = make_bifurcation(param_init, u0, lens_param, p_min, p_max)
@@ -35,7 +35,7 @@ function iteration_bifurcation(plt, i, param_init, u0, lens_param, p_min, p_max,
     stability = br.branch.stable
 
     #color_stability = [:red, :blue]
-    color_stability = [reds[i], blues[i]]
+    color_stability = [reds[i], greens[i]]
     plot!(plt, bif_param , V, c=color_stability[stability .+ 1], label="", linewidth = 1.0)
 
     # Add special point

@@ -208,8 +208,8 @@ end
 function find_rheobase(get_param, amps, u0; duration = 1700.0)
 
     is_finded = false
-    rheobase = NaN
-    spiking = NaN
+    rheobase = NaN32
+    spiking = NaN32
     L = length(amps)
     for (i,amp) in enumerate(amps)
         print("\rProgress: $(round(((i-1)/L*100), digits=2)) %")
@@ -236,6 +236,7 @@ function find_rheobase(get_param, amps, u0; duration = 1700.0)
             print("\r")
             rheobase = amp
             is_finded = true
+            return rheobase, spiking #To remove
         end
 
         if (pattern == 4)

@@ -1,5 +1,5 @@
 ############################ PARAMETER SET TYPE ############################
-parameter_set = "DIV0"
+parameter_set = "DIV7"
 ############################ PARAMETER SET TYPE ############################
 
 if parameter_set == "DIV0"
@@ -12,32 +12,37 @@ end
 
 function main()
 
-    cs = get(colorschemes[:nipy_spectral], range(0.15, 1.0, length=256))
+    cs = get(colorschemes[:nipy_spectral], range(0.15, 0.97, length=256))
     cmap = cgrad(cs, 25, categorical = true, rev = true, scale = :exp)
 
     u0 = get_u0()
-    amps = 0.0:50.0:300.0
+    amps = 0.0:2:300.0
+
+    with_lido_traj = true
 
     # -------- Vectors -------- #
 
-    shifts = 0:7.5:15.0
-    inhibs = 0.0:0.5:1.0 #vcat(0:0.45:0.9, 0.92:0.04:1.0)
+    shifts = 0:2.5:25.0
+    inhibs = vcat(0:0.05:0.9, 0.92:0.02:1.0)
+    g_1p7 = 0.0:5.0:100.0
+    g_1p3 = 0.0:0.05:1.0
 
     # -------- First Parameter -------- #
 
-    VEC_first_param = shifts
-    first_param_label = "Shift (mV)"
+    VEC_first_param = inhibs
+    first_param_label = "Inhibition NaV1.7 (-)"
 
     # -------- Second Parameter -------- #
 
     VEC_second_param = inhibs
-    second_param_label = "Inhibition (-)"
+    second_param_label = "Inhibition NaV1.3 (-)"
 
 
     # -------- General Labeling -------- #
 
     folder_name = "default"
-    file_prefix = "$(parameter_set)"
+    #file_prefix = "$(parameter_set)_$(TFE.shift_inact_1p7)-inact-1.7_$(TFE.shift_inact_1p3)-inact-1.3_$(TFE.shift_inact_1p8)-inact-1.8_$(TFE.shift_act_1p8)-act-1.8"
+    file_prefix = "DIV7_inhibs"
 
     println("%%%%%%%%%%%%%%%%%%%%%%% INFO %%%%%%%%%%%%%%%%%%%%%%%")
     println("Will be stored in $folder_name")
@@ -57,8 +62,8 @@ function main()
     n_row = length(VEC_first_param)
     n_col = length(VEC_second_param)
 
-    M_rheobase = Matrix{Union{NaN, Float32}}(undef, n_row, n_col)
-    M_spiking = Matrix{Union{NaN, Float32}}(undef, n_row, n_col)
+    M_rheobase = Matrix{Float32}(undef, n_row, n_col)
+    M_spiking = Matrix{Float32}(undef, n_row, n_col)
 
     # -------- Parameter looping -------- #
 
@@ -74,8 +79,12 @@ function main()
             # -------- iterations -------- #
             param_function(amp) = get_param(amp;
             #"""###################### PARAMETER ######################"""#  
-                        C_lidocaine=first_param,
-                        g_nav1p8 = 30.0 * (1-second_param),
+                        #C_lidocaine=first_param,
+                        #g_nav1p7 = first_param,
+                        #g_nav1p3 = second_param,
+                        g_nav1p3 = 0.35 * (1-second_param),
+                        g_nav1p7 = 35.0 * (1-first_param),
+                        g_nav1p8 = 0.2,
                         )
             #"""#######################################################"""#
             
@@ -98,15 +107,18 @@ function main()
     plt_rheobase = plot(xlabel=second_param_label, ylabel=first_param_label)
     plt_spiking = plot(xlabel=second_param_label, ylabel=first_param_label)
 
-    heatmap!(plt_rheobase, VEC_second_param, VEC_first_param, M_rheobase, nan_color=:black, c = cmap, climb=(amps[1],amps[end]))
-    heatmap!(plt_spiking, VEC_second_param, VEC_first_param, M_spiking, nan_color=:black, c = cmap, climb=(amps[1],amps[end]))
+
+    heatmap!(plt_rheobase, VEC_second_param, VEC_first_param, M_rheobase, background_color_inside = :black, c = cmap, clims=(amps[1],amps[end]))
+    heatmap!(plt_spiking, VEC_second_param, VEC_first_param, M_spiking, background_color_inside = :black, c = cmap, clims=(amps[1],amps[end]))
 
     plot!(plt_rheobase, xlims=x_limits, ylims=y_limits)
     plot!(plt_spiking, xlims=x_limits, ylims=y_limits)
 
     ################### Lido Traj ###################
-    # TFE.add_lido_shift_inhib_traj(plt_rheobase)
-    # TFE.add_lido_shift_inhib_traj(plt_spiking)
+    if with_lido_traj
+        TFE.add_lido_shift_inhib_traj(plt_rheobase)
+        TFE.add_lido_shift_inhib_traj(plt_spiking)
+    end
 
     # ---------- save figures ---------- #
 
