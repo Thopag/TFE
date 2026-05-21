@@ -8,7 +8,7 @@ with_inhibition::Bool = false
 
 linear_mode::Bool = true
 
-shift_inact_1p3::Float64 = 0.0
+shift_inact_1p3::Float64 = 1.0
 
 shift_inact_1p7::Float64 = 0.0
 

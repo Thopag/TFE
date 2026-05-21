@@ -1,6 +1,6 @@
 
 ############################ PARAMETER SET TYPE ############################
-folder = "DIV0"
+folder = "DIV7"
 ############################ PARAMETER SET TYPE ############################
 
 if folder == "DIV0"
@@ -14,34 +14,37 @@ end
 function main()
 
     u0 = get_u0()
+    println(lidocaine_effect_setup())
 
     amps_i_1_8 = [12.0, 12.0, 12.0, 12.0, 12.0, 12.0]
     amps_i_1_3 = [12.0, 13.0, 15.0, 17.0, 20.0, 23.0,]
     amps_i_1_7 = [12.0, 13.0, 14.0, 17.0, 27.0, 180.0]
 
-    amps_cst = zeros(6) .+ 210.0
+    amps_cst = zeros(6) .+ 20.0
 
     amps = amps_cst
 
     VEC_g_nav1p7 = [3.0, 0.0, 0.0]
-    VEC_inhib = [0.0, 0.9]
-    VEC_shift = [0.0, 3.0]
+    VEC_g_nav1p8 = [0.35, 0.0]
+    VEC_inhib = [0.0, 0.83]
+    VEC_shift = [10.0, 0.0]
 
     VEC_inter_param = VEC_shift
+    VEC_inter_param_2 = VEC_inhib
 
     # -------- Set up -------- #
 
     file_prefix = "$(folder)"
 
-    params = map( (amp, inter_param) -> get_param(amp;
+    params = map( (amp, inter_param, inter_param_2) -> get_param(amp;
                     C_lidocaine = inter_param,
-                    # g_nav1p3 = 0.35,
-                    # g_nav1p7 = 35.0,
-                    # g_nav1p8 = 30.0 * (1-inter_param) ,
+                    g_nav1p3 = 0.35 * (1.0 - inter_param_2),
+                    # g_nav1p7 = 35.0 * (1.0 - inter_param_2),
+                    # g_nav1p8 = inter_param,
                     )
-                , amps, VEC_inter_param)
+                , amps, VEC_inter_param, VEC_inter_param_2)
 
-    labels = [L"shift_{act1.8} = %$inter_param - %$amp pA" for (amp, inter_param) in zip(amps, VEC_inter_param)]
+    labels = [L"shift_{NaV1.3} = %$inter_param - inhib_{NaV1.3} = %$inter_param_2 - %$amp pA" for (amp, inter_param, inter_param_2) in zip(amps, VEC_inter_param, VEC_inter_param_2)]
     L = length(params)
 
     # -------- Timing set up -------- #
@@ -53,7 +56,8 @@ function main()
     # -------- Plot Set up -------- #
 
     #xlimits = (stim_on-25, stim_on+150)
-    xlimits = (stim_on-50, stim_on+stim_length+50)
+    #xlimits = (stim_on-50, stim_on+stim_length+50)
+    xlimits = (450, 700)
     plt_all = init_several_plot_all(; xlimits=xlimits)
 
     
@@ -62,9 +66,8 @@ function main()
     println("")
 
     colors = theme_palette(:default).colors
-
     for (i,(param,label)) in enumerate(zip(params, labels))
-        print("\rProgress: $(round(((i-1)/L*100), digits=2)) %")
+        #print("\rProgress: $(round(((i-1)/L*100), digits=2)) %")
 
         amp = param.amp
         t,V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP,I_noise = simulation(u0, (0.0, duration), param)

@@ -128,4 +128,45 @@ function steady_state_channel_availability()
     savefig(plt, "plots/report/steady_state_channels.pdf")
 end
 
-steady_state_channel_availability()
+#steady_state_channel_availability()
+
+function shifted_channel_availability()
+
+    TFE.with_shift = true
+    TFE.with_inhibition = false
+    TFE.linear_mode = true
+
+    V = -120:0.5:60
+    shifts = 0.0:5:25.0
+    E_Na = 50.0
+    E_k = -90.0
+
+    xticks = [-120, -90, -60, -30, 0, 30, 60]
+
+    m(shift) = ODE.m_inf_1_3.(V; C_lido=shift)
+    h(shift) = ODE.h_inf_1_3.(V; C_lido=shift)
+    TFE.shift_inact_1p3 = 1.0
+
+    Na_channel(shift) = (m(shift).^3) .* h(shift)
+    max = maximum(abs.(Na_channel(0.0)))
+
+    plt = plot(xlabel="Voltage (mV)", ylabel= "Normed Channel Availability (-)", legend=:topleft, legendfontsize=7
+                    , xticks = xticks, size = (400, 300), left_margin = 5mm, bottom_margin = 5mm, margin = 5mm)
+
+    reds, blues, greens, greys = sodium_palettes(length(shifts))
+
+    yticks = []
+    for (s,c) in zip(shifts,blues)
+        plot!(plt, V, Na_channel(s) ./ max, label="$s mV", linestyle = :solid, color=c)
+        tick = maximum(abs.(Na_channel(s))) / max
+        if tick >= 0.15
+            push!(yticks, round(tick,digits=2))
+        end
+    end
+
+    plot!(plt, yticks = yticks)
+    #display(plt)
+    savefig(plt, "plots/report/shifted_channels.pdf")
+end
+
+shifted_channel_availability()
