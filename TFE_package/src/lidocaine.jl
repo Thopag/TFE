@@ -8,12 +8,12 @@ with_inhibition::Bool = false
 
 linear_mode::Bool = true
 
-shift_inact_1p3::Float64 = 0.0
+shift_inact_1p3::Float64 = 1.0
 
 shift_inact_1p7::Float64 = 0.0
 
-shift_inact_1p8::Float64 = 0.4
-shift_act_1p8::Float64   = 0.6
+shift_inact_1p8::Float64 = 0.0
+shift_act_1p8::Float64   = 0.0
 
 function lidocaine_effect_setup()
     return "___________________________________
@@ -124,7 +124,7 @@ function add_lido_shift_inhib_traj(plt)
     lido_shifts_1_7 = .- inact_1_7_shift.(lido_concentrations; linear_mode=false, with_shift=true)
     lido_shifts_1_3 = .- inact_1_3_shift.(lido_concentrations; linear_mode=false, with_shift=true)
 
-    plot!(plt, 1.0 .- remaining_1_3, 1.0 .- remaining_1_7, color=:cyan, label="", linewidth = 3)
+    plot!(plt, 1.0 .- remaining_1_3, lido_shifts_1_3, color=:cyan, label="", linewidth = 3)
 
     test_point = [100.0, 1000.0]
     results = get_lidocaine_inhibition.(test_point; with_inhibition=true)
@@ -137,7 +137,7 @@ function add_lido_shift_inhib_traj(plt)
     lido_shifts_1_7 = .- inact_1_7_shift.(test_point; linear_mode=false, with_shift=true)
     lido_shifts_1_3 = .- inact_1_3_shift.(test_point; linear_mode=false, with_shift=true)
 
-    scatter!(plt, 1.0 .- remaining_1_3, 1.0 .- remaining_1_7, color=:cyan, markersize=4, label="", markerstrokewidth = 0.0)
+    scatter!(plt, 1.0 .- remaining_1_3, lido_shifts_1_3, color=:cyan, markersize=4, label="", markerstrokewidth = 0.0)
 
     return plt
 end

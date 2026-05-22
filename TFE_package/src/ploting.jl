@@ -115,7 +115,7 @@ end
 
 function init_several_plot_all(; xlimits=(400, 1700))
     n_fig = 2
-    plt = plot(layout = (n_fig, 1), link = :x, xlims=xlimits, size = (300, 230*n_fig), xaxis = nothing,
+    plt = plot(layout = (n_fig, 1), link = :x, xlims=xlimits, size = (750, 230*n_fig), xaxis = nothing,
                                                                     left_margin = 5mm,
                                                                     bottom_margin = 5mm, 
                                                                     margin = 5mm)
@@ -134,20 +134,20 @@ function several_plot_all(plt, color, t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm
     plot!(plt[voltage], t, V, color=color, label=label)
     #vline!(plt[voltage], t_spikes, color=:red, label="peaks")
 
-    # current = 3
-    # ylabel!(plt[current], "NaV1.3 Current (uA/cm2)")
-    # plot!(plt[current], t, I_NaV1p3, color=color, label="")
-    # # plot!(plt[current], ylims=(-(param.I0 + param.Excitation)*1.7, (param.I0 + param.Excitation)*1.7))
-    # # plot!(plt[current], t, .- I_ext, color=color, linestyle = :dash, label=L"-I_{ext} - %$label")
+    current = 2
+    ylabel!(plt[current], "NaV1.8 Current (uA/cm2)")
+    plot!(plt[current], t, I_NaV1p8, color=color, label="")
+    # plot!(plt[current], ylims=(-(param.I0 + param.Excitation)*1.7, (param.I0 + param.Excitation)*1.7))
+    # plot!(plt[current], t, .- I_ext, color=color, linestyle = :dash, label=L"-I_{ext} - %$label")
 
     # channel = 2
-    # ylabel!(plt[channel], "NaV1.3 Channel Availability (%)")
-    # plot!(plt[channel], t, m3.^3 .* h3 .* 100, color=color, label="")
+    # ylabel!(plt[channel], "NaV1.8 Channel Availability (%)")
+    # plot!(plt[channel], t, m8.^3 .* h8 .* 100, color=color, label="")
 
-    variable = 2
-    ylabel!(plt[variable], "NaV1.3 inactivation (-)")
-    plot!(plt[variable], t, h3, color=color, linestyle=:dash, label="")
-    plot!(plt[variable], t, m3, color=color, label="")
+    # variable = 2
+    # ylabel!(plt[variable], "NaV1.3 inactivation (-)")
+    # plot!(plt[variable], t, h3, color=color, linestyle=:dash, label="")
+    # plot!(plt[variable], t, m3, color=color, label="")
 
     # current = 3
     # # plot!(plt[current], ylims=(-0.5, 25))

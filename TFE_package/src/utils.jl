@@ -236,6 +236,7 @@ function find_rheobase(get_param, amps, u0; duration = 1700.0)
             print("\r")
             rheobase = amp
             is_finded = true
+            return rheobase, spiking #To REMOVE (put for DIV7)
         end
 
         if (pattern == 4)

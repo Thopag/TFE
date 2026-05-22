@@ -15,7 +15,7 @@ function main(;extra=0.0)
 
     with_plot = true
 
-    amp = 200.0                   # pA
+    amp = 20.0                   # pA
     duration = 1700.0             # ms
     stim_on = 500.0               # ms
     stim_length = duration - stim_on - 200.0         # ms
@@ -25,6 +25,9 @@ function main(;extra=0.0)
     param = get_param(amp; stim_on=stim_on, stim_length=stim_length,
         #C_lidocaine=shift,
         #g_nav1p8 = 30.0 * (1-inhib),
+        g_nav1p3 = 0.70,
+        g_nav1p7 = 75.0,
+        g_nav1p8 = 0.2,
         )
 
     file_prefix = "$(folder)"#_$(amp)amp"

@@ -1,6 +1,6 @@
 
 ############################ PARAMETER SET TYPE ############################
-folder = "DIV7"
+folder = "DIV0"
 ############################ PARAMETER SET TYPE ############################
 
 if folder == "DIV0"
@@ -26,10 +26,10 @@ function main()
 
     VEC_g_nav1p7 = [3.0, 0.0, 0.0]
     VEC_g_nav1p8 = [0.35, 0.0]
-    VEC_inhib = [0.0, 0.83]
+    VEC_inhib = [0.0, 0.5]
     VEC_shift = [10.0, 0.0]
 
-    VEC_inter_param = VEC_shift
+    VEC_inter_param = VEC_inhib
     VEC_inter_param_2 = VEC_inhib
 
     # -------- Set up -------- #
@@ -37,14 +37,14 @@ function main()
     file_prefix = "$(folder)"
 
     params = map( (amp, inter_param, inter_param_2) -> get_param(amp;
-                    C_lidocaine = inter_param,
-                    g_nav1p3 = 0.35 * (1.0 - inter_param_2),
+                    # C_lidocaine = inter_param,
+                    # g_nav1p3 = 0.35 * (1.0 - inter_param_2),
                     # g_nav1p7 = 35.0 * (1.0 - inter_param_2),
-                    # g_nav1p8 = inter_param,
+                    g_nav1p8 = 30.0 * (1.0 - inter_param_2),
                     )
                 , amps, VEC_inter_param, VEC_inter_param_2)
 
-    labels = [L"shift_{NaV1.3} = %$inter_param - inhib_{NaV1.3} = %$inter_param_2 - %$amp pA" for (amp, inter_param, inter_param_2) in zip(amps, VEC_inter_param, VEC_inter_param_2)]
+    labels = [L"inhib_{NaV1.8} = %$inter_param - %$amp pA" for (amp, inter_param, inter_param_2) in zip(amps, VEC_inter_param, VEC_inter_param_2)]
     L = length(params)
 
     # -------- Timing set up -------- #
