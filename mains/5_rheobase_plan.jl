@@ -1,5 +1,5 @@
 ############################ PARAMETER SET TYPE ############################
-parameter_set = "DIV7"
+parameter_set = "DIV0"
 ############################ PARAMETER SET TYPE ############################
 
 if parameter_set == "DIV0"
@@ -22,7 +22,7 @@ function main()
 
     # -------- Vectors -------- #
 
-    shifts = 0:1:25.0
+    shifts = 0:1:15.0
     inhibs = vcat(0:0.05:0.9, 0.92:0.02:1.0)
     g_1p7 = 0.0:5.0:100.0
     g_1p3 = 0.0:0.05:1.0
@@ -30,12 +30,12 @@ function main()
     # -------- First Parameter -------- #
 
     VEC_first_param = shifts
-    first_param_label = "Shift inactivation NaV1.3 (mV)"
+    first_param_label = "Shift NaV1.8 (mV)"
 
     # -------- Second Parameter -------- #
 
     VEC_second_param = inhibs
-    second_param_label = "Inhibition NaV1.3 (-)"
+    second_param_label = "Inhibition NaV1.8 (-)"
 
 
     # -------- General Labeling -------- #
@@ -80,11 +80,7 @@ function main()
             param_function(amp) = get_param(amp;
             #"""###################### PARAMETER ######################"""#  
                         C_lidocaine=first_param,
-                        #g_nav1p7 = first_param,
-                        #g_nav1p3 = second_param,
-                        g_nav1p3 = 0.35 * (1-second_param),
-                        # g_nav1p7 = 35.0 * (1-second_param),
-                        # g_nav1p8 = 0.2,
+                        g_nav1p8 = 30.0 * (1-second_param),
                         )
             #"""#######################################################"""#
             

@@ -29,6 +29,7 @@ function main()
 
     shifts = 0:1:15.0                       # "shift (mV)"
     inhibs = 0:0.1:1.0 #[0.0, 0.3, 0.5, 0.7, 0.9, 0.925, 0.95, 0.975, 1.0]
+    g_1p3 = [0.0, 0.035, 0.1, 0.35, 1.0]
 
     # -------- Intra Parameter -------- #
 
@@ -44,18 +45,18 @@ function main()
 
     # -------- Inter Parameter -------- #
 
-    VEC_inter_parameter = C_lido
-    inter_axe_label = "Lidocaine (µM)"
+    VEC_inter_parameter = g_1p3
+    inter_axe_label = "NaV1.3 Conductance (mS/cm2)"
 
     inter_labels = ["$k" for k in VEC_inter_parameter]
     L = length(VEC_inter_parameter)
 
     # -------- General Labeling -------- #
 
-    folder_name = "$(parameter_set)_lidocaine"
+    folder_name = "default"
     #folder_name = "$(parameter_set)_$(TFE.shift_inact_1p8)-inact-1.8_$(TFE.shift_act_1p8)-act-1.8" ######## FOLDER NAME ########
     #folder_name = "$(parameter_set)_$(TFE.shift_inact_1p7)-inact-1.7_$(TFE.shift_inact_1p3)-inact-1.3_$(TFE.shift_inact_1p8)-inact-1.8_$(TFE.shift_act_1p8)-act-1.8" ######## FOLDER NAME ########
-    file_prefix = "$(folder_name)"
+    file_prefix = "$(folder_name)_60_g1_7"
 
     println("%%%%%%%%%%%%%%%%%%%%%%% INFO %%%%%%%%%%%%%%%%%%%%%%%")
     println("Will be stored in $folder_name")
@@ -94,9 +95,9 @@ function main()
 
         params = map(intra_parameter -> get_param(intra_parameter;
         #"""###################### PARAMETER ######################"""#  
-                    C_lidocaine=inter_parameter,
-                    # g_nav1p3 = 0.35 ,
-                    # g_nav1p7 = 35.0 ,
+                    #C_lidocaine=inter_parameter,
+                    g_nav1p3 = inter_parameter,
+                    g_nav1p7 = 60.0,
                     # g_nav1p8 = 0.2 * (1-inter_parameter),
                     )
         #"""#######################################################"""#
@@ -104,9 +105,9 @@ function main()
 
         param = get_param(init_intra_parameter;
         #"""###################### PARAMETER ######################"""#  
-                    C_lidocaine=inter_parameter,
-                    # g_nav1p3 = 0.35,
-                    # g_nav1p7 = 35.0,
+                    #C_lidocaine=inter_parameter,
+                    g_nav1p3 = inter_parameter,
+                    g_nav1p7 = 60.0,
                     # g_nav1p8 = 0.2* (1-inter_parameter),
                     )
         #"""#######################################################"""# 
@@ -121,7 +122,7 @@ function main()
 
         println("-------Start Bifurcation--------")
         iteration_bifurcation(plt_bif, i, param, u0_bifurcation, lens_param, p_min, p_max,
-                                                    inter_label, color_specialpoint, reds, blues, greys)
+                                                    inter_label, color_specialpoint, reds, greens, greys)
         println("--------Bifurcation Done--------")
 
         println("----Start Parameter Analyses----")

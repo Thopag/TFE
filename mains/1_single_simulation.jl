@@ -15,8 +15,8 @@ function main(;extra=0.0)
 
     with_plot = true
 
-    amp = 20.0                   # pA
-    duration = 1700.0             # ms
+    amp = 50.0                   # pA
+    duration = 50000.0             # ms
     stim_on = 500.0               # ms
     stim_length = duration - stim_on - 200.0         # ms
 
@@ -25,16 +25,16 @@ function main(;extra=0.0)
     param = get_param(amp; stim_on=stim_on, stim_length=stim_length,
         #C_lidocaine=shift,
         #g_nav1p8 = 30.0 * (1-inhib),
-        g_nav1p3 = 0.70,
-        g_nav1p7 = 75.0,
+        g_nav1p3 = 0.0,
+        g_nav1p7 = 60.0,
         g_nav1p8 = 0.2,
         )
 
     file_prefix = "$(folder)"#_$(amp)amp"
 
     u0 = get_u0()
-    #u0 = [-7.0407356746133765, 0.9870854072159283, 2.9653217237358692e-5, 0.9627214745221165, 7.519051987830313e-6, 0.8677369807299044, 0.009428204942099143, 0.992282714087809, 0.014777919108885743, 0.996285733438894, 0.04696791243885193, 0.0]
-
+    #u0[1: end-1] = [-50.2126247161288, 0.45933775981465164, 0.0485126079545434, 0.1694457999024514, 0.00826080421626194, 0.007958185816536244, 0.9283153023896267, 0.02809157585619739, 0.30161943643279443, 0.045541292337403824, 1.0124299845052346e-6]
+    
     print("------------------------------\n")
     println("Parameter set type : $folder")
     println("I_ext : $amp pA")
@@ -72,7 +72,7 @@ function main(;extra=0.0)
 
         #display(plt_all)
         savefig(plt_all, "plots/simulation/$(file_prefix)_all.png")
-        savefig(plt_all, "plots/simulation/$(file_prefix)_all.pdf")
+        #savefig(plt_all, "plots/simulation/$(file_prefix)_all.pdf")
 
     end
 

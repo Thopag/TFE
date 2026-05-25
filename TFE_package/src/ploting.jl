@@ -27,7 +27,7 @@ function init_plot_all(; xlimits=(400, 1700))
                                                                     bottom_margin = 5mm, 
                                                                     margin = 5mm)
     xticks = xlimits[1]:100:xlimits[end] #range(xlimits[1], xlimits[end], length=10)
-    #xticks = :native
+    xticks = :native
     plot!(plt[n_fig], xaxis = "Time (ms)", xticks=xticks)
     return plt
 end
@@ -114,12 +114,13 @@ function plot_all(plt, t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp, t
 end
 
 function init_several_plot_all(; xlimits=(400, 1700))
-    n_fig = 2
+    n_fig = 1
     plt = plot(layout = (n_fig, 1), link = :x, xlims=xlimits, size = (750, 230*n_fig), xaxis = nothing,
                                                                     left_margin = 5mm,
                                                                     bottom_margin = 5mm, 
                                                                     margin = 5mm)
-    xticks = xlimits[1]:50:xlimits[end] #range(xlimits[1], xlimits[end], length=10)
+    xticks = xlimits[1]:100:xlimits[end] #range(xlimits[1], xlimits[end], length=10)
+    xticks = :native
     plot!(plt[n_fig], xaxis = "Time (ms)", xticks=xticks)
     return plt
 end
@@ -134,9 +135,9 @@ function several_plot_all(plt, color, t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm
     plot!(plt[voltage], t, V, color=color, label=label)
     #vline!(plt[voltage], t_spikes, color=:red, label="peaks")
 
-    current = 2
-    ylabel!(plt[current], "NaV1.8 Current (uA/cm2)")
-    plot!(plt[current], t, I_NaV1p8, color=color, label="")
+    # current = 2
+    # ylabel!(plt[current], "NaV1.8 Current (uA/cm2)")
+    # plot!(plt[current], t, I_NaV1p8, color=color, label="")
     # plot!(plt[current], ylims=(-(param.I0 + param.Excitation)*1.7, (param.I0 + param.Excitation)*1.7))
     # plot!(plt[current], t, .- I_ext, color=color, linestyle = :dash, label=L"-I_{ext} - %$label")
 

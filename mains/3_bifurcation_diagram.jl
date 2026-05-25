@@ -70,7 +70,7 @@ function main()
     #u0 = [-7.0407356746133765, 0.9870854072159283, 2.9653217237358692e-5, 0.9627214745221165, 7.519051987830313e-6, 0.8677369807299044, 0.009428204942099143, 0.992282714087809, 0.014777919108885743, 0.996285733438894, 0.04696791243885193]
 
     p_min = -300.0
-    p_max = 300.0
+    p_max = 600.0
 
     starting_param = 0.0
     lens_param = PropertyLens(:amp)
@@ -81,7 +81,9 @@ function main()
     shifts = 0:1.5:15.0
     inhibs = [0.0, 0.3, 0.5, 0.7, 0.9, 0.95, 1.0]
     g_1p7 = [35.0, 50.0, 65.0, 80.0, 95.0]
-    g_1p3 = [0.35, 0.5, 0.65, 0.8, 0.95]
+    g_1p3 = [0.0] #, 0.035, 0.1, 0.35, 1.0]
+    g_1p8 = 5.0:15.0:50.0
+    g_Km = [0.05, 0.5]
     inter_params = g_1p3
     L = length(inter_params)
 
@@ -106,8 +108,9 @@ function main()
         #"""###################### PARAMETER ######################"""#   
                     # C_lidocaine=inter_parameter,
                     g_nav1p3 = inter_parameter,
-                    g_nav1p7 = 65.0,
-                    g_nav1p8 = 0.2,
+                    g_nav1p7 = 60.0,
+                    # g_nav1p8 = inter_parameter,
+                    # g_Km = 0.5,
                     )
         #"""#######################################################"""#
 
@@ -115,8 +118,8 @@ function main()
                                                     inter_label, color_specialpoint, reds, greens, greys)
 
         # println(show(br))
-        # println(br.branch.x[42500])
-        # println(br.branch.param[42500])
+        # println(br.branch.x[4000])
+        # println(br.branch.param[4000])
     end
 
     # ----  End Plots ---- #
@@ -126,6 +129,5 @@ function main()
     savefig(plt, "plots/default/$(file_prefix)_bifurcation.pdf")
 
 end
-
 
 main()
