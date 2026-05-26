@@ -1,6 +1,6 @@
 
 ############################ PARAMETER SET TYPE ############################
-folder = "DIV7"
+folder = "DIV0"
 ############################ PARAMETER SET TYPE ############################
 
 if folder == "DIV0"
@@ -14,28 +14,26 @@ end
 function main()
 
     u0 = get_u0()
-
-    #u0[1: end-1] = [-50.2126247161288, 0.45933775981465164, 0.0485126079545434, 0.1694457999024514, 0.00826080421626194, 0.007958185816536244, 0.9283153023896267, 0.02809157585619739, 0.30161943643279443, 0.045541292337403824, 1.0124299845052346e-6]
     println(lidocaine_effect_setup())
 
     amps_i_1_8 = [12.0, 12.0, 12.0, 12.0, 12.0, 12.0]
     amps_i_1_3 = [12.0, 13.0, 15.0, 17.0, 20.0, 23.0,]
     amps_i_1_7 = [12.0, 13.0, 14.0, 17.0, 27.0, 180.0]
-    amps = [35.0, 40.0, 45.0]
+    amps = [16.0, 16.0, 20.0]
 
     amps_cst = zeros(6) .+ 120
 
-    amps = amps_cst
+    amps = amps
 
     VEC_g_nav1p7 = [3.0, 0.0, 0.0]
     VEC_g_nav1p8 = [0.35, 0.0]
     VEC_inhib = [0.0, 0.5]
     VEC_shift = [10.0, 0.0]
 
-    VEC_g_1p3 = [0.0, 0.035, 0.1, 0.35, 1.0]
+    VEC_g_1p7 = [3.0, 0.0, 0.0]
 
-    VEC_inter_param = VEC_g_1p3
-    VEC_inter_param_2 = VEC_g_1p3
+    VEC_inter_param = VEC_g_1p7
+    VEC_inter_param_2 = VEC_g_1p7
 
     # -------- Timing set up -------- #
 
@@ -49,19 +47,19 @@ function main()
 
     params = map( (amp, inter_param, inter_param_2) -> get_param(amp; stim_on=stim_on, stim_length=stim_length,
                     # C_lidocaine = inter_param,
-                    g_nav1p3 = inter_param,
-                    g_nav1p7 = 60.0,
+                    #g_nav1p3 = inter_param,
+                    g_nav1p7 = inter_param,
                     # g_nav1p8 = 30.0 * (1.0 - inter_param_2),
                     )
                 , amps, VEC_inter_param, VEC_inter_param_2)
 
-    labels = [L"g_{NaV1.3} = %$inter_param - %$ amp pA" for (amp, inter_param, inter_param_2) in zip(amps, VEC_inter_param, VEC_inter_param_2)]
+    labels = [L"g_{NaV1.7} = %$inter_param - %$ amp \: pA" for (amp, inter_param, inter_param_2) in zip(amps, VEC_inter_param, VEC_inter_param_2)]
     L = length(params)
 
     # -------- Plot Set up -------- #
 
-    #xlimits = (stim_on-25, stim_on+150)
-    xlimits = (stim_on-50, stim_on+stim_length+50)
+    xlimits = (stim_on-25, stim_on+150)
+    #xlimits = (stim_on-50, stim_on+stim_length+50)
     plt_all = init_several_plot_all(; xlimits=xlimits)
 
     
