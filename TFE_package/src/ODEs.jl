@@ -26,7 +26,7 @@ function ODE_system(du,u,p,t)
 
     # --- parameters --- #
 
-    I_ext = p.I0 + pulse(t, p.stim_on, p.stim_off) * p.Excitation
+    I_ext = p.I0 + pulse(t, p.stim_on, p.stim_off) * p.Excitation 
     C = p.C
 
     g_nav1p3 = p.g_nav1p3

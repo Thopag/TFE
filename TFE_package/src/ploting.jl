@@ -26,7 +26,7 @@ function init_plot_all(; xlimits=(400, 1700))
                                                                     left_margin = 5mm,
                                                                     bottom_margin = 5mm, 
                                                                     margin = 5mm)
-    xticks = xlimits[1]:25:xlimits[end] #range(xlimits[1], xlimits[end], length=10)
+    xticks = xlimits[1]:100:xlimits[end] #range(xlimits[1], xlimits[end], length=10)
     #xticks = :native
     plot!(plt[n_fig], xaxis = "Time (ms)", xticks=xticks)
     return plt
