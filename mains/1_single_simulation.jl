@@ -23,8 +23,8 @@ function main(;extra=0.0)
     shift = 0.0
     inhib = 0.925
     param = get_param(amp; stim_on=stim_on, stim_length=stim_length,
-        #C_lidocaine=shift,
-        #g_nav1p8 = 30.0 * (1-inhib),
+        # C_lidocaine=shift,
+        # g_nav1p8 = 30.0 * (1-inhib),
         # g_nav1p3 = 0.0,
         # g_nav1p7 = 60.0,
         # g_nav1p8 = 0.2,
@@ -56,22 +56,12 @@ function main(;extra=0.0)
     if with_plot
         #xlimits = (stim_on-25, stim_on+150)
         xlimits = (stim_on-50, stim_on+stim_length+50)
-        plt_all = init_plot_all(; xlimits=xlimits)
-        plot_all(plt_all, t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp, t_spikes,
-                                I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, I_Leak, I_ext, I_noise, dV_dt, param)
+        plt = plot_single_simulation(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp, t_spikes,
+                                I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, I_Leak, I_ext, I_noise, dV_dt, param; xlimits=xlimits)
 
-        # plt_traj = plot(V, dV_dt, color=:black, label="")
-        # xlabel!(plt_traj, "Voltage (mV)")
-        # ylabel!(plt_traj, "dV/dt (mV/s)")
-
-        # plot!(plt_traj, ylim=(-90,170))
-        # plot!(plt_traj, xlim=(-90,40))
-        # # display(plt_traj)
-        # savefig(plt_traj, "plots/single_simulation/$(file_prefix)_traj.pdf")
-
-        #display(plt_all)
-        savefig(plt_all, "plots/simulation/$(file_prefix)_all.png")
-        savefig(plt_all, "plots/simulation/$(file_prefix)_all.pdf")
+        #display(plt)
+        savefig(plt, "plots/simulation/$(file_prefix)_all.png")
+        savefig(plt, "plots/simulation/$(file_prefix)_all.pdf")
 
     end
 

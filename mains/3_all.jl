@@ -1,9 +1,3 @@
-
-include("0_show_DIC.jl")
-include("0_show_ss_currents.jl")
-include("3_bifurcation_diagram.jl")
-include("4_parameter_analyses.jl")
-
 ############################ PARAMETER SET TYPE ############################
 parameter_set = "DIV7"
 ############################ PARAMETER SET TYPE ############################
@@ -24,24 +18,10 @@ function main()
 
     # -------- Vectors -------- #
 
-    amps = 0.0:2:300.0                    # "amp (pA)"
-    C_lido = [0.0, 50.0, 100.0, 250.0, 500.0, 750.0, 1000.0]     # "Lidocaine (µM)"
-
-    shifts = 0:2.5:25.0                       # "shift (mV)"
+    C_lido = [0.0, 50.0, 100.0, 250.0, 500.0, 750.0, 1000.0]
+    shifts = 0:2.5:25.0
     inhibs = 0:0.1:1.0 
     g_1p3 = [0.0, 0.035, 0.1, 0.35, 1.0]
-
-    # -------- Intra Parameter -------- #
-
-    VEC_intra_parameter = amps
-
-    # For Bifurcation
-    lens_param = PropertyLens(:amp)
-    p_min = -VEC_intra_parameter[end]
-    p_max = VEC_intra_parameter[end]
-    init_intra_parameter = 0.0
-
-    intra_axe_label = "amp (pA)"
 
     # -------- Inter Parameter -------- #
 
@@ -51,9 +31,20 @@ function main()
     inter_labels = ["$k" for k in VEC_inter_parameter]
     L = length(VEC_inter_parameter)
 
+    # -------- Amps -------- #
+
+    amps = 0.0:50:300.0
+    amp_axe_label = "amp (pA)"
+
+    # For Bifurcation
+    lens_param = PropertyLens(:amp)
+    p_min = -amps[end]
+    p_max = amps[end]
+    default_amp = 0.0
+
     # -------- General Labeling -------- #
 
-    folder_name = "Inhib_1.7_g1.7_60-g1.3_0.35"
+    folder_name = "default"
     #folder_name = "$(parameter_set)_$(TFE.shift_inact_1p8)-inact-1.8_$(TFE.shift_act_1p8)-act-1.8" ######## FOLDER NAME ########
     #folder_name = "$(parameter_set)_$(TFE.shift_inact_1p7)-inact-1.7_$(TFE.shift_inact_1p3)-inact-1.3_$(TFE.shift_inact_1p8)-inact-1.8_$(TFE.shift_act_1p8)-act-1.8" ######## FOLDER NAME ########
     file_prefix = "$(folder_name)"
@@ -62,10 +53,9 @@ function main()
     println("Will be stored in $folder_name")
     println("Parameter set type : $parameter_set")
     println("lidocaine effect :")
-    println(lidocaine_effect_setup())
+    lidocaine_effect_setup()
     println("")
-    println("INTRA simulations parameter is [$intra_axe_label]")
-    println("   with values : $VEC_intra_parameter")
+    println("Amps values : $amps")
     println("")
     println("INTER simulations parameter is [$inter_axe_label]")
     println("   with values : $VEC_inter_parameter")
@@ -76,12 +66,9 @@ function main()
     reds, blues, greens, greys = sodium_palettes(L)
 
     plt_ss_current = init_ss_currents(V, get_param)
-
     plt_f, plt_s, plt_us, rainbow = init_DIC(L)
-
-    plt_bif, color_specialpoint = init_bifurcation(intra_axe_label, p_min, p_max, reds, greens, greys)
-
-    M_peak_count, M_freq, M_pattern, M_first_peak_h, M_first_peak_w, inter_with_rheobase, rheobases = init_parameter_analyses(VEC_intra_parameter, VEC_inter_parameter)
+    plt_bif, color_specialpoint = init_bifurcation(amp_axe_label, p_min, p_max, reds, greens, greys)
+    M_peak_count, M_freq, M_pattern, M_first_peak_h, M_first_peak_w, inter_with_rheobase, rheobases = init_parameter_analyses(amps, VEC_inter_parameter)
 
     # -------- Parameter looping -------- #
 
@@ -93,7 +80,7 @@ function main()
         println("_____________________________________________________________________________")
         println("Inter value : $inter_parameter -- $(round(((i-1)/L*100), digits=2)) % is done")
 
-        params = map(intra_parameter -> get_param(intra_parameter;
+        param_function(amp) = get_param(amp;
         #"""###################### PARAMETER ######################"""#  
                     #C_lidocaine=inter_parameter,
                     g_nav1p3 = 0.35,
@@ -101,16 +88,9 @@ function main()
                     # g_nav1p8 = 0.2 * (1-inter_parameter),
                     )
         #"""#######################################################"""#
-                    , VEC_intra_parameter)
 
-        param = get_param(init_intra_parameter;
-        #"""###################### PARAMETER ######################"""#  
-                    #C_lidocaine=inter_parameter,
-                    g_nav1p3 = 0.35,
-                    g_nav1p7 = 60.0 * (1-inter_parameter),
-                    # g_nav1p8 = 0.2* (1-inter_parameter),
-                    )
-        #"""#######################################################"""# 
+        params  = param_function.(amps)
+        param   = param_function(default_amp)
     
         # -------- iterations -------- #
 
@@ -126,7 +106,7 @@ function main()
         println("--------Bifurcation Done--------")
 
         println("----Start Parameter Analyses----")
-        iteration_parameter_analyses(i, params, u0, inter_label, VEC_intra_parameter, 
+        iteration_parameter_analyses(i, params, u0, inter_label, amps, 
                                             M_peak_count, M_freq, M_pattern, M_first_peak_h, M_first_peak_w, inter_with_rheobase, rheobases)
         println("----Parameter Analyses Done----")
 
@@ -136,14 +116,17 @@ function main()
 
     # -------- ending -------- #
 
-    p_peaks, p_freqs, p_height, p_width, p_rheo, p_plan, p_pattern = end_parameter_analyses(VEC_intra_parameter, VEC_inter_parameter, 
+    p_peaks, p_freqs, p_height, p_width, p_rheo, p_plan, p_pattern = end_parameter_analyses(amps, VEC_inter_parameter, 
                                                                         M_peak_count, M_freq, M_pattern, M_first_peak_h, M_first_peak_w, inter_with_rheobase, rheobases
-                                                                                                    , intra_axe_label, inter_axe_label, inter_labels)
+                                                                                                    , amp_axe_label, inter_axe_label, inter_labels)
 
 
     # ---------- save figures ---------- #
 
     println("-- Start Saving --")
+
+    jldsave("plots/$(folder_name)/$(file_prefix)_all.jld2"; amps, VEC_inter_parameter, 
+                                        M_peak_count, M_freq, M_pattern, M_first_peak_h, M_first_peak_w, inter_with_rheobase, rheobases)
 
     # -- Steady State Currents -- #
     savefig(plt_ss_current, "plots/$(folder_name)/$(file_prefix)_ss_current.pdf")

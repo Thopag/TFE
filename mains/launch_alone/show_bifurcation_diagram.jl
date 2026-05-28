@@ -10,58 +10,6 @@ elseif folder == "DIV7"
     get_u0 = DIV7_u0
 end
 
-function init_bifurcation(param_label, p_min, p_max, reds, greens, greys; xlimits=:native)
-
-    if length(reds) > 1
-        color_specialpoint = Dict{Symbol, Vector{RGB{Float64}}}(:hopf => reds, :bp => greens, :endpoint => greys)
-    else
-        color_specialpoint = Dict{Symbol, Vector{Symbol}}(:hopf => [:red], :bp => [:green], :endpoint => [:grey])
-    end
-    label_specialpoint = Dict{Symbol, String}(:hopf => "Hopf", :bp => "Branch Point", :endpoint => "End Point")
-
-    xticks = p_min:30:p_max
-
-    plt = plot(xlabel=param_label, ylabel=" Voltage (mV)", legendfontsize=7, xticks=xticks, xlims=xlimits, legend = :bottomright)
-
-    for ((symbol_type, colors), (_, label)) in zip(color_specialpoint, label_specialpoint)
-        scatter!(plt, [], [], label=label, c=colors[(end ÷ 2) + 1])
-    end
-    return plt, color_specialpoint
-end
-
-function iteration_bifurcation(plt, i, param_init, u0, lens_param, p_min, p_max, 
-                                                    inter_label, color_specialpoint, reds, greens, greys)
-    
-    plot!(plt, [], [], label=inter_label, color=greys[i], alpha=1)
-    br = make_bifurcation(param_init, u0, lens_param, p_min, p_max)
-
-    # ----  Plot result ---- #
-    V =  [x[1] for x in br.branch.x]
-    bif_param = br.branch.param
-    stability = br.branch.stable
-
-    #color_stability = [:red, :blue]
-    color_stability = [reds[i], greens[i]]
-    linestyle_stability = [:dash, :solid]
-
-    # plot!(plt, bif_param , V, c=color_stability[stability .+ 1], linestyle=linestyle_stability[stability .+ 1], label="", linewidth = 1.0)
-
-    start_idx = 1
-    # Add special point and trajectories
-    for specialpoint in br.specialpoint
-        sp_idx = specialpoint.idx
-
-        plot!(plt, bif_param[start_idx:sp_idx] , V[start_idx:sp_idx], c=color_stability[stability[start_idx] + 1], linestyle=linestyle_stability[stability[start_idx] + 1] 
-                                                        ,alpha=0.7, label="", linewidth = 1.0)
-        start_idx = sp_idx + 1
-
-        symbol_type = specialpoint.type
-        colors = get(color_specialpoint, symbol_type, :blue)
-        scatter!(plt, [bif_param[sp_idx]], [V[sp_idx]], label="", c=colors[i], markersize = 4, alpha=1)
-    end
-    return br
-end
-
 function main()
 
     # ---- bifurcation set up ---- #
@@ -130,4 +78,4 @@ function main()
 
 end
 
-#main()
+main()

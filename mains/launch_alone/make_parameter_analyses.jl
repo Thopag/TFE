@@ -11,51 +11,6 @@ elseif folder == "DIV7"
     get_u0 = DIV7_u0
 end
 
-function init_parameter_analyses(VEC_intra_parameter, VEC_inter_parameter)
-    n_row = length(VEC_intra_parameter)
-    n_col = length(VEC_inter_parameter)
-
-    M_peak_count = Matrix{Int}(undef, n_row, n_col)
-    M_freq = Matrix{Float32}(undef, n_row, n_col)
-    M_pattern = Matrix{Int}(undef, n_row, n_col)
-    M_first_peak_h = Matrix{Float32}(undef, n_row, n_col)
-    M_first_peak_w = Matrix{Float32}(undef, n_row, n_col)
-
-    inter_with_rheobase = Vector{String}()
-    rheobases = Vector{Float32}()
-
-    return M_peak_count, M_freq, M_pattern, M_first_peak_h, M_first_peak_w, inter_with_rheobase, rheobases
-end
-
-function iteration_parameter_analyses(i, params, u0, label, VEC_intra_parameter,
-                                M_peak_count, M_freq, M_pattern, M_first_peak_h, M_first_peak_w, inter_with_rheobase, rheobases)
-
-    VEC_peak_count, VEC_freq, VEC_pattern, VEC_first_peak_h, VEC_first_peak_w = parameter_analyse(params, u0;)
-
-    # Get the first parameter that has a spike
-    # This is mainly used when the intra_parameter is "Amp"
-    rheobase_idx = findfirst(x -> x >= 1, VEC_pattern)
-    if !isnothing(rheobase_idx)
-        push!(inter_with_rheobase, label)
-        push!(rheobases, VEC_intra_parameter[rheobase_idx])
-    end
-
-    M_peak_count[:, i] = VEC_peak_count
-    M_freq[:, i] = VEC_freq
-    M_pattern[:, i] = VEC_pattern
-    M_first_peak_h[:, i] = VEC_first_peak_h
-    M_first_peak_w[:, i] = VEC_first_peak_w 
-end
-
-function end_parameter_analyses(VEC_intra_parameter, VEC_inter_parameter, 
-                                    M_peak_count, M_freq, M_pattern, M_first_peak_h, M_first_peak_w, inter_with_rheobase, rheobases
-                                                                                    , intra_axe_label, inter_axe_label, inter_labels)
-    
-    return plot_parameter_analyses(VEC_intra_parameter, VEC_inter_parameter, 
-                                    M_peak_count, M_freq, M_pattern, M_first_peak_h, M_first_peak_w, inter_with_rheobase, rheobases
-                                                                                    , intra_axe_label, inter_axe_label, inter_labels)
-end
-
 function main(;constant_amp=0.0)
 
     # -------- param vectors -------- #
@@ -143,7 +98,4 @@ function main(;constant_amp=0.0)
 
 end
 
-
-# for i in 50:25:300.0
-#     main(;constant_amp=i)
-# end
+main()

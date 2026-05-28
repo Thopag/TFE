@@ -1,14 +1,19 @@
 module TFE_package
 
-using Plots, Plots.Measures, LaTeXStrings, DifferentialEquations, Peaks, Statistics, ForwardDiff, ColorSchemes, BifurcationKit, Accessors
+using DifferentialEquations, Peaks, Statistics, ForwardDiff, BifurcationKit, Accessors
+using Plots, Plots.Measures, LaTeXStrings, ColorSchemes, JLD2
 
+include("ploting.jl")
 include("utils.jl")
+include("excitability.jl")
+include("bifurcation.jl")
 include("lidocaine.jl")
 include("ODEs.jl")
-include("ploting.jl")
 include("params/DIV0.jl")
 include("params/DIV7.jl")
 include("DIC.jl")
+include("ss_currents.jl")
+
 
 precompile(simulation, (Vector{Float64}, Tuple{Float64, Float64}, Model_Parameters{Float64}))
 
@@ -21,7 +26,7 @@ function warm_up()
         0.0, 0.0, 0.0, 0.0,
         0.0, 0.0,
         0.0, 0.0, 0.0,
-        false, 0.0, true
+        false, 0.0
     )
     simulation(u0, tspan, p)
 end

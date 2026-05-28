@@ -60,7 +60,7 @@ function main()
 
     xlimits = (stim_on-25, stim_on+150)
     #xlimits = (stim_on-50, stim_on+stim_length+50)
-    plt_all = init_several_plot_all(; xlimits=xlimits)
+    plt_all = init_plot_multi_simulation(; xlimits=xlimits)
 
     
     println("################ Start Looping ################ ")
@@ -78,7 +78,7 @@ function main()
         peaks_idx, n_peak, w_peaks = TFE.get_peaks(t, V;  min_h=-5.0, min_proms=10.0)
         t_spikes = t[peaks_idx]
 
-        several_plot_all(plt_all, colors[i], t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp, t_spikes,
+        plot_multi_simulation(plt_all, colors[i], t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp, t_spikes,
                                 I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, I_Leak, I_ext, I_noise, dV_dt, param; label=label)
 
     end

@@ -1,4 +1,4 @@
-export init_plot_all, init_several_plot_all, plot_all, several_plot_all, plot_parameter_analyses, sodium_palettes
+export init_plot_multi_simulation, plot_single_simulation, plot_multi_simulation, plot_parameter_analyses, sodium_palettes
 
 const pattern_list   = ["No spike"    , "Single spike", "Two spikes", "Transient" , "Spiking" ]
 const markers_list   = [:circle       , :utriangle    , :dtriangle  , :diamond    , :square   ]
@@ -20,20 +20,17 @@ function sodium_palettes(L; dark=0.95, light=0.4)
     return reds, blues, greens, greys
 end
 
-function init_plot_all(; xlimits=(400, 1700))
+function plot_single_simulation(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp, t_spikes,
+                            I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, I_Leak, I_ext, I_noise, dV_dt, param; xlimits=(400, 1700))
+
     n_fig = 2
     plt = plot(layout = (n_fig, 1), link = :x, xlims=xlimits, size = (750, 230*n_fig), xaxis = nothing,
                                                                     left_margin = 5mm,
                                                                     bottom_margin = 5mm, 
                                                                     margin = 5mm)
-    xticks = xlimits[1]:100:xlimits[end] #range(xlimits[1], xlimits[end], length=10)
-    #xticks = :native
-    plot!(plt[n_fig], xaxis = "Time (ms)", xticks=xticks)
-    return plt
-end
 
-function plot_all(plt, t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp, t_spikes,
-                            I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, I_Leak, I_ext, I_noise, dV_dt, param)
+    xticks = xlimits[1]:100:xlimits[end]
+    plot!(plt[n_fig], xaxis = "Time (ms)", xticks=xticks)
 
     alpha = 0.4
 
@@ -113,7 +110,7 @@ function plot_all(plt, t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp, t
     return plt
 end
 
-function init_several_plot_all(; xlimits=(400, 1700))
+function init_plot_multi_simulation(; xlimits=(400, 1700))
     n_fig = 1
     plt = plot(layout = (n_fig, 1), link = :x, xlims=xlimits, size = (750, 230*n_fig), xaxis = nothing,
                                                                     left_margin = 5mm,
@@ -125,7 +122,7 @@ function init_several_plot_all(; xlimits=(400, 1700))
     return plt
 end
 
-function several_plot_all(plt, color, t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp, t_spikes,
+function plot_multi_simulation(plt, color, t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp, t_spikes,
                             I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, I_Leak, I_ext, I_noise, dV_dt, param; label="")
 
     alpha = 0.4

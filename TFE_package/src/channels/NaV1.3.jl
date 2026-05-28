@@ -23,25 +23,25 @@ end
 
 # ---- #
 
-function h_inf_1_3(V; with_original = true, C_lido=0)
+function h_inf_1_3(V; C_lido=0)
     # Lidocaine effect
     lido_shift = inact_1_3_shift(C_lido)
     return alpha_h_1_3(V;lido_shift=lido_shift) / (alpha_h_1_3(V;lido_shift=lido_shift) + beta_h_1_3(V;lido_shift=lido_shift))
 end
 
-function tau_h_1_3(V; with_original = true, C_lido=0)
+function tau_h_1_3(V; C_lido=0)
     # Lidocaine effect
     lido_shift = 0.0
     return 1 / (alpha_h_1_3(V; lido_shift=lido_shift) + beta_h_1_3(V; lido_shift=lido_shift))
 end
 
-function m_inf_1_3(V; with_original = true, C_lido=0)
+function m_inf_1_3(V; C_lido=0)
     # Lidocaine effect
     lido_shift = act_1_3_shift(C_lido)
     return alpha_m_1_3(V; lido_shift=lido_shift) / (alpha_m_1_3(V; lido_shift=lido_shift) + beta_m_1_3(V; lido_shift=lido_shift))
 end
 
-function tau_m_1_3(V; with_original = true, C_lido=0)
+function tau_m_1_3(V; C_lido=0)
     # Lidocaine effect
     lido_shift = 0.0
     return 1 / (alpha_m_1_3(V; lido_shift=lido_shift) + beta_m_1_3(V; lido_shift=lido_shift))

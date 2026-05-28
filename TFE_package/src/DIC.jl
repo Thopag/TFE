@@ -1,4 +1,4 @@
-export DIC
+export DIC, init_DIC, iteration_DIC
 
 function tau_f(V)
     return tau_m_1_7(V)
@@ -162,4 +162,28 @@ function DIC(V, p; with_plot=false)
     end
 
     return g_f, g_s, g_us
+end
+
+# ----------------------------------------------- #
+
+function init_DIC(L)
+    xticks = [-120, -90, -60, -30, 0, 30, 60]
+
+    if L == 1
+        rainbow = [:black]
+    else
+        rainbow = [get(colorschemes[:rainbow], i) for i in range(0.0, stop=1.0, length=L)]
+    end
+
+    plt_f = plot(xlabel="Voltage (mV)", ylabel="g fast", xticks = xticks)
+    plt_s = plot(xlabel="Voltage (mV)", ylabel="g slow", xticks = xticks)
+    plt_us = plot(xlabel="Voltage (mV)", ylabel="g ultra slow", xticks = xticks)
+    return plt_f, plt_s, plt_us, rainbow
+end
+
+function iteration_DIC(V, p, i, inter_label, plt_f, plt_s, plt_us, colors;with_extra_plot=true)
+    g_f, g_s, g_us = DIC(V, p; with_plot=with_extra_plot)
+    plot!(plt_f, V, g_f, label=inter_label, color=colors[i])
+    plot!(plt_s, V, g_s, label=inter_label, color=colors[i])
+    plot!(plt_us, V, g_us, label=inter_label, color=colors[i])
 end

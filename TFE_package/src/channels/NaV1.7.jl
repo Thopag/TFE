@@ -23,31 +23,25 @@ end
 
 # ---- #
 
-function h_inf_1_7(V; with_original = true, C_lido=0)
-    if !with_original
-        return control_1_7_inactivation(V; C_lido=C_lido)
-    end
+function h_inf_1_7(V; C_lido=0)
     # Lidocaine effect
     lido_shift = inact_1_7_shift(C_lido)
     return alpha_h_1_7(V; lido_shift=lido_shift) / (alpha_h_1_7(V; lido_shift=lido_shift) + beta_h_1_7(V; lido_shift=lido_shift))
 end
 
-function tau_h_1_7(V; with_original = true, C_lido=0)
+function tau_h_1_7(V; C_lido=0)
     # Lidocaine effect
     lido_shift = 0.0
     return 1 / (alpha_h_1_7(V; lido_shift=lido_shift) + beta_h_1_7(V; lido_shift=lido_shift))
 end
 
-function m_inf_1_7(V; with_original = true, C_lido=0)
-    if !with_original
-        return control_1_7_activation(V; C_lido=C_lido)
-    end
+function m_inf_1_7(V; C_lido=0)
     # Lidocaine effect
     lido_shift = act_1_7_shift(C_lido)
     return alpha_m_1_7(V; lido_shift=lido_shift) / (alpha_m_1_7(V; lido_shift=lido_shift) + beta_m_1_7(V; lido_shift=lido_shift))
 end
 
-function tau_m_1_7(V; with_original = true, C_lido=0)
+function tau_m_1_7(V; C_lido=0)
     # Lidocaine effect
     lido_shift = 0.0
     return 1 / (alpha_m_1_7(V; lido_shift=lido_shift) + beta_m_1_7(V; lido_shift=lido_shift))
@@ -55,6 +49,7 @@ end
 
 # ---- #
 # Differential modulation of Nav1.7 and Nav1.8 peripheral nerve sodium channels by the local anesthetic lidocaine
+# Other gate function that was tested should be removed in the final code
 
 function control_1_7_activation(V; C_lido=0) 
     # With 100 µM lidocaine 
