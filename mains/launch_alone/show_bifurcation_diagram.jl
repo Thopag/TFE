@@ -1,12 +1,12 @@
 ############################ PARAMETER SET TYPE ############################
-folder = "DIV7"
+folder = "DIV0"
 ############################ PARAMETER SET TYPE ############################
 
 if folder == "DIV0"
-    get_param = DIV0_parameter
+    nociceptor_parameter = DIV0_parameter
     get_u0 = DIV0_u0
 elseif folder == "DIV7"
-    get_param = DIV7_parameter
+    nociceptor_parameter = DIV7_parameter
     get_u0 = DIV7_u0
 end
 
@@ -21,22 +21,16 @@ function main()
     p_max = 600.0
 
     starting_param = 0.0
-    lens_param = PropertyLens(:amp)
+    lens_param = PropertyLens(:amp) ∘ PropertyLens(:stimulation)
+    default_stim = stimulation_parameter(starting_param)
 
     # ---- inter bifurcation parameter ---- #
 
-    C_lido = [0.0, 10.0, 100.0, 1000.0]
-    shifts = 0:1.5:15.0
     inhibs = [0.0, 0.3, 0.5, 0.7, 0.9, 0.95, 1.0]
-    g_1p7 = [35.0, 50.0, 65.0, 80.0, 95.0]
-    g_1p3 = [0.0] #, 0.035, 0.1, 0.35, 1.0]
-    g_1p8 = 5.0:15.0:50.0
-    g_Km = [0.05, 0.5]
-    inter_params = g_1p3
+    inter_params = inhibs
     L = length(inter_params)
 
     file_prefix = "$(folder)"
-    #file_prefix = "$(folder)_$(TFE.shift_inact_1p8)-inact-1.8_$(TFE.shift_act_1p8)-act-1.8"
 
     # ---- Plot set up ---- #
 
@@ -45,24 +39,18 @@ function main()
     intra_axe_label = "amp (pA)"
     plt, color_specialpoint = init_bifurcation(intra_axe_label, p_min, p_max, reds, greens, greys)
 
-    println(lidocaine_effect_setup())
     for (i,inter_parameter) in enumerate(inter_params)
         inter_label = L"g_{NaV1.3} = %$(inter_parameter) "
 
         println("Inter value : $inter_parameter -- $(round(((i-1)/L*100), digits=2)) % is done")
 
         # ---- Make bifurcations ---- #
-        param_init = get_param(starting_param;
-        #"""###################### PARAMETER ######################"""#   
-                    # C_lidocaine=inter_parameter,
-                    g_nav1p3 = inter_parameter,
-                    g_nav1p7 = 60.0,
-                    # g_nav1p8 = inter_parameter,
-                    # g_Km = 0.5,
-                    )
-        #"""#######################################################"""#
 
-        br = iteration_bifurcation(plt, i, param_init, u0, lens_param, p_min, p_max,
+        p_lido = lidocaine_parameter(;)
+        p_noci = nociceptor_parameter(; g_NaV1p8 = 30.0 * (1.0-inter_parameter))
+        p_model = model_parameter(default_stim, p_noci; lidocaine=p_lido)
+
+        br = iteration_bifurcation(plt, i, p_model, u0, lens_param, p_min, p_max,
                                                     inter_label, color_specialpoint, reds, greens, greys)
 
         # println(show(br))

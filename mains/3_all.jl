@@ -1,12 +1,12 @@
 ############################ PARAMETER SET TYPE ############################
-parameter_set = "DIV7"
+parameter_set = "DIV0"
 ############################ PARAMETER SET TYPE ############################
 
 if parameter_set == "DIV0"
-    get_param = DIV0_parameter
+    nociceptor_parameter = DIV0_parameter
     get_u0 = DIV0_u0
 elseif parameter_set == "DIV7"
-    get_param = DIV7_parameter
+    nociceptor_parameter = DIV7_parameter
     get_u0 = DIV7_u0
 end
 
@@ -18,15 +18,12 @@ function main()
 
     # -------- Vectors -------- #
 
-    C_lido = [0.0, 50.0, 100.0, 250.0, 500.0, 750.0, 1000.0]
-    shifts = 0:2.5:25.0
-    inhibs = 0:0.1:1.0 
-    g_1p3 = [0.0, 0.035, 0.1, 0.35, 1.0]
+    inhibs = 0:0.5:1.0
 
     # -------- Inter Parameter -------- #
 
     VEC_inter_parameter = inhibs
-    inter_axe_label = "Inhibition NaV1.7 (-)"
+    inter_axe_label = "Inhibition NaV1.8 (-)"
 
     inter_labels = ["$k" for k in VEC_inter_parameter]
     L = length(VEC_inter_parameter)
@@ -37,10 +34,13 @@ function main()
     amp_axe_label = "amp (pA)"
 
     # For Bifurcation
-    lens_param = PropertyLens(:amp)
+    lens_amp = PropertyLens(:amp) ∘ PropertyLens(:stimulation)
     p_min = -amps[end]
     p_max = amps[end]
     default_amp = 0.0
+    default_stim = stimulation_parameter(default_amp)
+
+    VEC_stim = stimulation_parameter.(amps)
 
     # -------- General Labeling -------- #
 
@@ -52,8 +52,6 @@ function main()
     println("%%%%%%%%%%%%%%%%%%%%%%% INFO %%%%%%%%%%%%%%%%%%%%%%%")
     println("Will be stored in $folder_name")
     println("Parameter set type : $parameter_set")
-    println("lidocaine effect :")
-    lidocaine_effect_setup()
     println("")
     println("Amps values : $amps")
     println("")
@@ -64,8 +62,9 @@ function main()
     # -------- initiations -------- #
 
     reds, blues, greens, greys = sodium_palettes(L)
+    p_default_model = model_parameter(default_stim, nociceptor_parameter())
 
-    plt_ss_current = init_ss_currents(V, get_param)
+    plt_ss_current = init_ss_currents(V, p_default_model)
     plt_f, plt_s, plt_us, rainbow = init_DIC(L)
     plt_bif, color_specialpoint = init_bifurcation(amp_axe_label, p_min, p_max, reds, greens, greys)
     M_peak_count, M_freq, M_pattern, M_first_peak_h, M_first_peak_w, inter_with_rheobase, rheobases = init_parameter_analyses(amps, VEC_inter_parameter)
@@ -80,33 +79,27 @@ function main()
         println("_____________________________________________________________________________")
         println("Inter value : $inter_parameter -- $(round(((i-1)/L*100), digits=2)) % is done")
 
-        param_function(amp) = get_param(amp;
-        #"""###################### PARAMETER ######################"""#  
-                    #C_lidocaine=inter_parameter,
-                    g_nav1p3 = 0.35,
-                    g_nav1p7 = 60.0 * (1-inter_parameter),
-                    # g_nav1p8 = 0.2 * (1-inter_parameter),
-                    )
-        #"""#######################################################"""#
+        p_lido = lidocaine_parameter(;)
+        p_noci = nociceptor_parameter(; g_NaV1p8 = 30.0 * (1.0-inter_parameter))
 
-        params  = param_function.(amps)
-        param   = param_function(default_amp)
-    
+        VEC_p_model = map( (stimulation) -> model_parameter(stimulation, p_noci; lidocaine=p_lido), VEC_stim)
+        p_model = model_parameter(default_stim, p_noci; lidocaine=p_lido)
+
         # -------- iterations -------- #
 
-        iteration_ss_currents(plt_ss_current, param, V, i, inter_label, reds, blues, greens, greys)
+        iteration_ss_currents(plt_ss_current, p_model, V, i, inter_label, reds, blues, greens, greys)
         println("---Steady State Currents Done---")
 
-        iteration_DIC(V, param, i, inter_label, plt_f, plt_s, plt_us, rainbow)
+        iteration_DIC(V, p_model, i, inter_label, plt_f, plt_s, plt_us, rainbow)
         println("------------DIC Done------------")
 
         println("-------Start Bifurcation--------")
-        iteration_bifurcation(plt_bif, i, param, u0_bifurcation, lens_param, p_min, p_max,
+        iteration_bifurcation(plt_bif, i, p_model, u0_bifurcation, lens_amp, p_min, p_max,
                                                     inter_label, color_specialpoint, reds, greens, greys)
         println("--------Bifurcation Done--------")
 
         println("----Start Parameter Analyses----")
-        iteration_parameter_analyses(i, params, u0, inter_label, amps, 
+        iteration_parameter_analyses(i, VEC_p_model, u0, inter_label, amps, 
                                             M_peak_count, M_freq, M_pattern, M_first_peak_h, M_first_peak_w, inter_with_rheobase, rheobases)
         println("----Parameter Analyses Done----")
 

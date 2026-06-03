@@ -1,15 +1,15 @@
 export DIC, init_DIC, iteration_DIC
 
 function tau_f(V)
-    return tau_m_1_7(V)
+    return tau_m7(V)
 end
 
 function tau_s(V)
-    return tau_n_K_dr(V)
+    return tau_ndr(V)
 end
 
 function tau_us(V)
-    return tau_l_K_dr(V)
+    return tau_ldr(V)
 end
 
 function get_weights(V, tau_xi)
@@ -40,67 +40,72 @@ function DIC(V, p; with_plot=false)
     g_s = zeros(eltype(V), size(V))
     g_us = zeros(eltype(V), size(V))
 
-    C_lido = p.C_lidocaine
+    n = p.nociceptor
+    lido = p.lidocaine
 
-    h_inf_1p3(V) = h_inf_1_3(V; C_lido=C_lido)
-    m_inf_1p3(V) = m_inf_1_3(V; C_lido=C_lido)
+    linear_shift_mode = lido.linear_shift_mode
+    with_shift = lido.with_shift
+    C_lido = lido.concentration
 
-    h_inf_1p7(V) = h_inf_1_7(V; C_lido=C_lido)
-    m_inf_1p7(V) = m_inf_1_7(V; C_lido=C_lido)
+    h_inf_1p3(V) = h3_inf(V; C_lido=C_lido, shift=lido.shift_h3, with_shift=with_shift, linear_shift_mode=linear_shift_mode)
+    m_inf_1p3(V) = m3_inf(V)
 
-    h_inf_1p8(V) = h_inf_1_8(V; C_lido=C_lido)
-    m_inf_1p8(V) = m_inf_1_8(V; C_lido=C_lido)
+    h_inf_1p7(V) = h7_inf(V; C_lido=C_lido, shift=lido.shift_h7, with_shift=with_shift, linear_shift_mode=linear_shift_mode)
+    m_inf_1p7(V) = m7_inf(V)
 
-    l_inf_Kdr = l_inf_K_dr
-    n_inf_Kdr = n_inf_K_dr
+    h_inf_1p8(V) = h8_inf(V; C_lido=C_lido, shift=lido.shift_h8, with_shift=with_shift, linear_shift_mode=linear_shift_mode)
+    m_inf_1p8(V) = m8_inf(V; C_lido=C_lido, shift=lido.shift_m8, with_shift=with_shift, linear_shift_mode=linear_shift_mode)
 
-    n_inf_KM = n_inf_K_M
+    l_inf_K_dr = ldr_inf
+    n_inf_K_dr = ndr_inf
 
-    z_K_AHP_inf = z_AHP_inf
+    n_inf_K_M = nM_inf
+
+    z_K_AHP_inf = zAHP_inf
 
     vec_xi_inf = [h_inf_1p3, m_inf_1p3,
                 h_inf_1p7, m_inf_1p7,
                 h_inf_1p8, m_inf_1p8,
-                l_inf_Kdr, n_inf_Kdr,
-                n_inf_KM,
+                l_inf_K_dr, n_inf_K_dr,
+                n_inf_K_M,
                 z_K_AHP_inf]
 
-    dV_dot_h_1_3(V) = - (p.g_nav1p3 * (m_inf_1p3(V)^3) * (V - p.E_Na)) / p.C
-    dV_dot_m_1_3(V) = - (p.g_nav1p3 * 3 * (m_inf_1p3(V)^2) * h_inf_1p3(V) * (V - p.E_Na)) / p.C
+    dV_dot_h_1_3(V) = - (n.g_NaV1p3 * (m_inf_1p3(V)^3) * (V - n.E_Na)) / n.C
+    dV_dot_m_1_3(V) = - (n.g_NaV1p3 * 3 * (m_inf_1p3(V)^2) * h_inf_1p3(V) * (V - n.E_Na)) / n.C
 
-    dV_dot_h_1_7(V) = - (p.g_nav1p7 * (m_inf_1p7(V)^3) * (V - p.E_Na)) / p.C
-    dV_dot_m_1_7(V) = - (p.g_nav1p7 * 3 * (m_inf_1p7(V)^2) * h_inf_1p7(V) * (V - p.E_Na)) / p.C
+    dV_dot_h_1_7(V) = - (n.g_NaV1p7 * (m_inf_1p7(V)^3) * (V - n.E_Na)) / n.C
+    dV_dot_m_1_7(V) = - (n.g_NaV1p7 * 3 * (m_inf_1p7(V)^2) * h_inf_1p7(V) * (V - n.E_Na)) / n.C
 
-    dV_dot_h_1_8(V) = - (p.g_nav1p8 * (m_inf_1p8(V)^3) * (V - p.E_Na)) / p.C
-    dV_dot_m_1_8(V) = - (p.g_nav1p8 * 3 * (m_inf_1p8(V)^2) * h_inf_1p8(V) * (V - p.E_Na)) / p.C
+    dV_dot_h_1_8(V) = - (n.g_NaV1p8 * (m_inf_1p8(V)^3) * (V - n.E_Na)) / n.C
+    dV_dot_m_1_8(V) = - (n.g_NaV1p8 * 3 * (m_inf_1p8(V)^2) * h_inf_1p8(V) * (V - n.E_Na)) / n.C
 
-    dV_dot_l_K_dr(V) = - (p.g_Kdr * (n_inf_Kdr(V)^3) * (V - p.E_k)) / p.C
-    dV_dot_n_K_dr(V) = - (p.g_Kdr * 3 * (n_inf_Kdr(V)^2) * l_inf_Kdr(V) * (V - p.E_k)) / p.C
+    dV_dot_l_K_dr(V) = - (n.g_K_dr * (n_inf_K_dr(V)^3) * (V - n.E_K)) / n.C
+    dV_dot_n_K_dr(V) = - (n.g_K_dr * 3 * (n_inf_K_dr(V)^2) * l_inf_K_dr(V) * (V - n.E_K)) / n.C
 
-    dV_dot_n_K_M(V) = - (p.g_Km * (V - p.E_k)) / p.C
+    dV_dot_n_K_M(V) = - (n.g_K_M * (V - n.E_K)) / n.C
 
-    dV_dot_z_AHP(V) = - (p.g_AHP * (V - p.E_k)) / p.C
+    dV_dot_zAHP(V) = - (n.g_K_AHP * (V - n.E_K)) / n.C
 
     vec_dV_dot_dxi = [dV_dot_h_1_3, dV_dot_m_1_3,
                 dV_dot_h_1_7, dV_dot_m_1_7,
                 dV_dot_h_1_8, dV_dot_m_1_8,
                 dV_dot_l_K_dr, dV_dot_n_K_dr,
                 dV_dot_n_K_M,
-                dV_dot_z_AHP]
+                dV_dot_zAHP]
 
-    vec_tau = [tau_h_1_3, tau_m_1_3,
-                tau_h_1_7, tau_m_1_7,
-                tau_h_1_8, tau_m_1_8,
-                tau_l_K_dr, tau_n_K_dr,
-                tau_n_K_M,
-                tau_z_AHP]
+    vec_tau = [tau_h3, tau_m3,
+                tau_h7, tau_m7,
+                tau_h8, tau_m8,
+                tau_ldr, tau_ndr,
+                tau_nM,
+                tau_zAHP]
 
-    labels = ["h 1.3", "m 1.3",
-                "h 1.7", "m 1.7",
-                "h 1.8", "m 1.8",
-                "l Kdr", "n Kdr",
-                "n KM",
-                "z AHP"]
+    labels = ["h3", "m3",
+                "h7", "m7",
+                "h8", "m8",
+                "ldr", "ndr",
+                "nM",
+                "zAHP"]
     colors = [:blue, :blue,
                 :red, :red,
                 :green, :green,
@@ -181,8 +186,8 @@ function init_DIC(L)
     return plt_f, plt_s, plt_us, rainbow
 end
 
-function iteration_DIC(V, p, i, inter_label, plt_f, plt_s, plt_us, colors;with_extra_plot=true)
-    g_f, g_s, g_us = DIC(V, p; with_plot=with_extra_plot)
+function iteration_DIC(V, p_model, i, inter_label, plt_f, plt_s, plt_us, colors; with_extra_plot=true)
+    g_f, g_s, g_us = DIC(V, p_model; with_plot=with_extra_plot)
     plot!(plt_f, V, g_f, label=inter_label, color=colors[i])
     plot!(plt_s, V, g_s, label=inter_label, color=colors[i])
     plot!(plt_us, V, g_us, label=inter_label, color=colors[i])

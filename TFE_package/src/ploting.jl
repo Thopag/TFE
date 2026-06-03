@@ -20,10 +20,9 @@ function sodium_palettes(L; dark=0.95, light=0.4)
     return reds, blues, greens, greys
 end
 
-function plot_single_simulation(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp, t_spikes,
-                            I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, I_Leak, I_ext, I_noise, dV_dt, param; xlimits=(400, 1700))
+function plot_single_simulation(sol, current, p_model, t_spikes; xlimits=(400, 1700))
 
-    n_fig = 2
+    n_fig = 1
     plt = plot(layout = (n_fig, 1), link = :x, xlims=xlimits, size = (750, 230*n_fig), xaxis = nothing,
                                                                     left_margin = 5mm,
                                                                     bottom_margin = 5mm, 
@@ -33,6 +32,10 @@ function plot_single_simulation(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AH
     plot!(plt[n_fig], xaxis = "Time (ms)", xticks=xticks)
 
     alpha = 0.4
+
+    t = sol.t
+    V = sol.V
+    amp = p_model.stimulation.amp
 
     voltage = 1
     ylabel!(plt[voltage], "Voltage (mV)", legendfontsize=9, legend = :topright, ylims=(-90,50))
@@ -46,27 +49,27 @@ function plot_single_simulation(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AH
         ylims[2] - 0.05*(ylims[2]-ylims[1]),
         text( L"amp = %$amp pA", 11, :black))
 
-    current = 2
-    ylabel!(plt[current], "Current (uA/cm2)", legendfontsize=7, legend = :bottomright)
-    plot!(plt[current], ylims=(-(param.I0 + param.Excitation)*1.2, (param.I0 + param.Excitation)*1.2))
-    #plot!(plt[current], ylims=(-20, 20))
-    plot!(plt[current], t, I_NaV1p3, color=:blue, label=L"I_{NaV1.3}", alpha=alpha)
-    plot!(plt[current], t, I_NaV1p7, color=:red, label=L"I_{NaV1.7}")
-    plot!(plt[current], t, I_NaV1p8, color=:green, label=L"I_{NaV1.8}")
-    plot!(plt[current], t, I_Kdr, color=:orange, label=L"I_{Kdr}", alpha=alpha)
-    plot!(plt[current], t, I_Km, color=:purple, label=L"I_{KM}", alpha=alpha)
-    plot!(plt[current], t, I_AHP, color=:brown, label=L"I_{AHP}", alpha=alpha)
-    plot!(plt[current], t, I_Leak, color=:black, label=L"I_{Leak}")
-    plot!(plt[current], t, .- I_ext, color=:black, linestyle = :dash, label=L"-I_{ext}")
-    #plot!(p[current], t, I_noise, color=:pink, label=L"I_{noise}")
+    # current = 2
+    # ylabel!(plt[current], "Current (uA/cm2)", legendfontsize=7, legend = :bottomright)
+    # #plot!(plt[current], ylims=(-(p_model.stimulation.I0 + p_model.Excitation)*1.2, (p_model.I0 + p_model.Excitation)*1.2))
+    # #plot!(plt[current], ylims=(-20, 20))
+    # plot!(plt[current], t, INaV1p3, color=:blue, label=L"I_{NaV1.3}", alpha=alpha)
+    # plot!(plt[current], t, INaV1p7, color=:red, label=L"I_{NaV1.7}")
+    # plot!(plt[current], t, INaV1p8, color=:green, label=L"I_{NaV1.8}")
+    # plot!(plt[current], t, IK_dr, color=:orange, label=L"I_{K_dr}", alpha=alpha)
+    # plot!(plt[current], t, IK_M, color=:purple, label=L"I_{KM}", alpha=alpha)
+    # plot!(plt[current], t, IK_AHP, color=:brown, label=L"I_{AHP}", alpha=alpha)
+    # plot!(plt[current], t, ILeak, color=:black, label=L"I_{Leak}")
+    # plot!(plt[current], t, .- Iext, color=:black, linestyle = :dash, label=L"-I_{ext}")
+    # #plot!(p[current], t, I_noise, color=:pink, label=L"I_{noise}")
 
     current_no_zoom = 3
     # ylabel!(plt[current_no_zoom], "Current (uA/cm2)", legendfontsize=7, legend = :bottomright)
     # plot!(plt[current_no_zoom], t, I_NaV1p3, color=:blue, label=L"I_{NaV1.3}", alpha=alpha)
     # plot!(plt[current_no_zoom], t, I_NaV1p7, color=:red, label=L"I_{NaV1.7}", alpha=alpha)
     # plot!(plt[current_no_zoom], t, I_NaV1p8, color=:green, label=L"I_{NaV1.8}")
-    # plot!(plt[current_no_zoom], t, I_Kdr, color=:orange, label=L"I_{Kdr}", alpha=alpha)
-    # plot!(plt[current_no_zoom], t, I_Km, color=:purple, label=L"I_{KM}", alpha=alpha)
+    # plot!(plt[current_no_zoom], t, I_K_dr, color=:orange, label=L"I_{K_dr}", alpha=alpha)
+    # plot!(plt[current_no_zoom], t, I_K_M, color=:purple, label=L"I_{KM}", alpha=alpha)
     # plot!(plt[current_no_zoom], t, I_AHP, color=:brown, label=L"I_{AHP}", alpha=alpha)
     # plot!(plt[current_no_zoom], t, I_Leak, color=:black, label=L"I_{Leak}", alpha=alpha)
     # plot!(plt[current_no_zoom], t, .- I_ext, color=:black, linestyle = :dash, label=L"-I_{ext}")
@@ -79,8 +82,8 @@ function plot_single_simulation(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AH
     # plot!(plt[channel], t, m7.^3 .* h7 .* 100, color=:red, label=L"NaV_{1.7}")
     # plot!(plt[channel], t, m8.^3 .* h8 .* 100, color=:green, label=L"NaV_{1.8}")
     # plot!(plt[channel], t, ndr.^3 .* ldr .* 100, color=:orange, label=L"K_{dr}")
-    # plot!(plt[channel], t, nm .* 100, color=:purple, label=L"K_{m}")
-    # plot!(plt[channel], t, z_AHP .* 100, color=:brown, label=L"K_{AHP}")
+    # plot!(plt[channel], t, nM .* 100, color=:purple, label=L"K_{m}")
+    # plot!(plt[channel], t, zAHP .* 100, color=:brown, label=L"K_{AHP}")
 
     # i_dV_dt = 3
     # ylabel!(plt[i_dV_dt], "dV_dt (mV/s)")
@@ -99,13 +102,13 @@ function plot_single_simulation(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AH
     # plot!(plt[variable], t, h8, label=L"h_{8}", linestyle = :dash, color=:green)
     # plot!(plt[variable], t, ndr, label=L"n_{dr}", linestyle = :solid, color=:orange)
     # plot!(plt[variable], t, ldr, label=L"l_{dr}", linestyle = :dash, color=:orange)
-    # plot!(plt[variable], t, nm, label=L"n_{m}", linestyle = :solid, color=:purple)
-    # plot!(plt[variable], t, z_AHP, label=L"z_{AHP}", linestyle = :solid, color=:brown)
+    # plot!(plt[variable], t, nM, label=L"n_{m}", linestyle = :solid, color=:purple)
+    # plot!(plt[variable], t, zAHP, label=L"z_{AHP}", linestyle = :solid, color=:brown)
 
     # global_current = 5
     # ylabel!(plt[global_current], "Current (uA/cm2)")
     # plot!(plt[global_current], t, I_NaV1p3 .+ I_NaV1p7 .+ I_NaV1p8, color=:red, label="Sodium")
-    # plot!(plt[global_current], t, I_Kdr .+ I_Km .+ I_AHP, color=:blue , label="Potassium")
+    # plot!(plt[global_current], t, I_K_dr .+ I_K_M .+ I_AHP, color=:blue , label="Potassium")
 
     return plt
 end
@@ -122,8 +125,11 @@ function init_plot_multi_simulation(; xlimits=(400, 1700))
     return plt
 end
 
-function plot_multi_simulation(plt, color, t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp, t_spikes,
-                            I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, I_Leak, I_ext, I_noise, dV_dt, param; label="")
+function plot_multi_simulation(plt, sol, current, p_model, t_spikes, color; label="")
+
+    t = sol.t
+    V = sol.V
+    amp = p_model.stimulation.amp
 
     alpha = 0.4
 
@@ -150,7 +156,7 @@ function plot_multi_simulation(plt, color, t, V, m3, h3, m7, h7, m8, h8, ndr, ld
     # current = 3
     # # plot!(plt[current], ylims=(-0.5, 25))
     # ylabel!(plt[current], "K Current (uA/cm2)", legendfontsize=7, legend = :topright)
-    # plot!(plt[current], t, I_Kdr .+ I_Km .+ I_AHP, color=color, label="")
+    # plot!(plt[current], t, I_K_dr .+ I_K_M .+ I_AHP, color=color, label="")
 
     return plt
 end

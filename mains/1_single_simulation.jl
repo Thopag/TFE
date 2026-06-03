@@ -4,10 +4,10 @@ folder = "DIV0"
 ############################ PARAMETER SET TYPE ############################
 
 if folder == "DIV0"
-    get_param = DIV0_parameter
+    nociceptor_parameter = DIV0_parameter
     get_u0 = DIV0_u0
 elseif folder == "DIV7"
-    get_param = DIV7_parameter
+    nociceptor_parameter = DIV7_parameter
     get_u0 = DIV7_u0
 end
 
@@ -15,20 +15,15 @@ function main(;extra=0.0)
 
     with_plot = true
 
-    amp = 20.0                   # pA
-    duration = 1700.0             # ms
-    stim_on = 500.0               # ms
-    stim_length = duration - stim_on - 200.0         # ms
+    amp = 20.0                                      # pA
+    duration = 1700.0                               # ms
+    stim_on = 500.0                                 # ms
+    stim_length = duration - stim_on - 200.0        # ms
 
-    shift = 0.0
-    inhib = 0.925
-    param = get_param(amp; stim_on=stim_on, stim_length=stim_length,
-        # C_lidocaine=shift,
-        # g_nav1p8 = 30.0 * (1-inhib),
-        # g_nav1p3 = 0.0,
-        # g_nav1p7 = 60.0,
-        # g_nav1p8 = 0.2,
-        )
+    p_lido = lidocaine_parameter()
+    p_noci = nociceptor_parameter()
+    p_stim = stimulation_parameter(amp; on=stim_on, length=stim_length)
+    p_model = model_parameter(p_stim, p_noci; lidocaine=p_lido)
 
     file_prefix = "$(folder)"
 
@@ -38,26 +33,27 @@ function main(;extra=0.0)
     println("Parameter set type : $folder")
     println("I_ext : $amp pA")
 
-    t,V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP,I_noise = simulation(u0, (0.0, duration), param)
+    sol = simulation(u0, (0.0, duration), p_model)
+    t = sol.t
+    V = sol.V
 
-    I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, I_Leak, I_ext, dV_dt = give_currents(t,V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP, param)
+    current = give_currents(sol, p_model)
     peaks_idx, n_peak, w_peaks = TFE.get_peaks(t, V;  min_h=-5.0, min_proms=10.0)
 
     t_spikes = t[peaks_idx]
 
     freqs = TFE.instant_freqs(t_spikes, n_peak)
 
-    freq, pattern = global_pattern(t_spikes, n_peak, param.stim_on, param.stim_off; window_width=100)
+    freq, pattern = global_pattern(t_spikes, n_peak, p_stim.on, p_stim.off; window_width=100)
     pred_pattern = Ploting.pattern_list[pattern+1]
     println("Predicted pattern : $pred_pattern")
-    
+
     # --- Plots --- #
 
     if with_plot
         #xlimits = (stim_on-25, stim_on+150)
         xlimits = (stim_on-50, stim_on+stim_length+50)
-        plt = plot_single_simulation(t, V, m3, h3, m7, h7, m8, h8, ndr, ldr, nm, z_AHP, amp, t_spikes,
-                                I_NaV1p3, I_NaV1p7, I_NaV1p8, I_Kdr, I_Km, I_AHP, I_Leak, I_ext, I_noise, dV_dt, param; xlimits=xlimits)
+        plt = plot_single_simulation(sol, current, p_model, t_spikes; xlimits=xlimits)
 
         #display(plt)
         savefig(plt, "plots/simulation/$(file_prefix)_all.png")

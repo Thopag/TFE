@@ -1,12 +1,12 @@
 ############################ PARAMETER SET TYPE ############################
-parameter_set = "DIV7"
+parameter_set = "DIV0"
 ############################ PARAMETER SET TYPE ############################
 
 if parameter_set == "DIV0"
-    get_param = DIV0_parameter
+    nociceptor_parameter = DIV0_parameter
     get_u0 = DIV0_u0
 elseif parameter_set == "DIV7"
-    get_param = DIV7_parameter
+    nociceptor_parameter = DIV7_parameter
     get_u0 = DIV7_u0
 end
 
@@ -16,8 +16,8 @@ function main()
     cmap = cgrad(cs, 25, categorical = true, rev = true, scale = :exp)
 
     u0 = get_u0()
-    amps = 0.0:2:300.0
-    amps = vcat(0.0:2:32.0, vcat(35.0:5:45.0, 50.0:50.0:300.0))
+    amps = 0.0:50:300.0
+    #amps = vcat(0.0:2:32.0, vcat(35.0:5:45.0, 50.0:50.0:300.0))
 
     with_lido_traj = true
 
@@ -25,31 +25,29 @@ function main()
 
     shifts = vcat(0:0.5:4, 5.0:5:25.0) #0:1:25.0
     inhibs = vcat(0:0.03:0.18, 0.2:0.2:1.0)
-    g_1p7 = 0.0:5.0:100.0
-    g_1p3 = 0.0:0.05:1.0
+
+    shifts = 0.0:5:15.0
+    inhibs = 0.0:0.5:1.0
 
     # -------- First Parameter -------- #
 
     VEC_first_param = shifts
-    first_param_label = "Shift NaV1.7 (mV)"
+    first_param_label = "Shift NaV1.8 (mV)"
 
     # -------- Second Parameter -------- #
 
     VEC_second_param = inhibs
-    second_param_label = "Inhibition NaV1.7 (-)"
+    second_param_label = "Inhibition NaV1.8 (-)"
 
 
     # -------- General Labeling -------- #
 
     folder_name = "default"
-    #file_prefix = "$(parameter_set)_$(TFE.shift_inact_1p7)-inact-1.7_$(TFE.shift_inact_1p3)-inact-1.3_$(TFE.shift_inact_1p8)-inact-1.8_$(TFE.shift_act_1p8)-act-1.8"
-    file_prefix = "DIV7_g1.7_60-g1.3_0.35"
+    file_prefix = "$folder_name"
 
     println("%%%%%%%%%%%%%%%%%%%%%%% INFO %%%%%%%%%%%%%%%%%%%%%%%")
     println("Will be stored in $folder_name")
     println("Parameter set type : $parameter_set")
-    println("lidocaine effect :")
-    println(lidocaine_effect_setup())
     println("")
     println("INTRA simulations parameter is [$first_param_label]")
     println("   with values : $VEC_first_param")
@@ -76,17 +74,17 @@ function main()
         for (j,second_param) in enumerate(VEC_second_param)
 
             println("Second Loop value : $second_param -- $(round(((j-1)/n_col*100), digits=2)) %")
-
             # -------- iterations -------- #
-            param_function(amp) = get_param(amp;
-            #"""###################### PARAMETER ######################"""#  
-                        C_lidocaine=first_param,
-                        g_nav1p7 = 60.0 * (1-second_param),
-                        g_nav1p3 = 0.35,
+            p_lido = lidocaine_parameter(;
+                        with_shift = true,
+                        linear_shift_mode = true,
+                        shift_h7 = first_param,
                         )
-            #"""#######################################################"""#
+            p_noci = nociceptor_parameter(;
+                        g_NaV1p8 = 30.0 * (1.0-second_param),
+                        )
             
-            rheobase, spiking = find_rheobase(param_function, amps, u0)
+            rheobase, spiking = find_rheobase(p_noci, p_lido, amps, u0)
             M_rheobase[i, j] = rheobase
             M_spiking[i, j] = spiking
         end

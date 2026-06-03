@@ -13,42 +13,52 @@ end
 
 # --------------------------- Include channel's equations --------------------------- #
 
-include("channels/NaV1.3.jl")
-include("channels/NaV1.7.jl")
-include("channels/NaV1.8.jl")
-include("channels/K_M.jl")
-include("channels/K_dr.jl")
-include("channels/K_AHP.jl")
+include("channels/nociceptor/NaV1.3.jl")
+include("channels/nociceptor/NaV1.7.jl")
+include("channels/nociceptor/NaV1.8.jl")
+include("channels/nociceptor/K_M.jl")
+include("channels/nociceptor/K_dr.jl")
+include("channels/nociceptor/K_AHP.jl")
 
 # --------------------------- Simulation function --------------------------- #
 
 function ODE_system(du,u,p,t)
 
+    stim = p.stimulation
+    noise = p.noise
+    n = p.nociceptor
+    lido = p.lidocaine
+
     # --- parameters --- #
 
-    I_ext = p.I0 + pulse(t, p.stim_on, p.stim_off) * p.Excitation 
-    C = p.C
+    Excitation = ((stim.amp * (10^-6)) / (n.CellArea * (10^-8))) 
+    I0         = ((stim.Ihold * (10^-6)) / (n.CellArea * (10^-8))) 
 
-    g_nav1p3 = p.g_nav1p3
-    g_nav1p7 = p.g_nav1p7
-    g_nav1p8 = p.g_nav1p8
-    E_Na = p.E_Na
+    Iext = I0 + pulse(t, stim.on, stim.off) * Excitation
 
-    g_Kdr = p.g_Kdr
-    g_Km = p.g_Km
-    g_AHP = p.g_AHP
-    E_k = p.E_k
+    C = n.C
 
-    g_Leak = p.g_Leak
-    E_Leak = p.E_Leak
+    g_NaV1p3 = n.g_NaV1p3
+    g_NaV1p7 = n.g_NaV1p7
+    g_NaV1p8 = n.g_NaV1p8
+    E_Na = n.E_Na
 
-    sigma_noise = p.sigma_noise
-    mu_noise = p.mu_noise
-    tau_noise = p.tau_noise
+    g_K_dr = n.g_K_dr
+    g_K_M = n.g_K_M
+    g_K_AHP = n.g_K_AHP
+    E_K = n.E_K
 
-    with_noise = p.with_noise
+    g_Leak = n.g_Leak
+    E_Leak = n.E_Leak
 
-    C_lido = p.C_lidocaine
+    with_noise = noise.with_noise
+    sigma_noise = noise.sigma
+    mu_noise = noise.mu
+    tau_noise = noise.tau
+
+    linear_shift_mode = lido.linear_shift_mode
+    with_shift = lido.with_shift
+    C_lido = lido.concentration
 
     # --- variables --- #
 
@@ -66,57 +76,59 @@ function ODE_system(du,u,p,t)
     ndr = u[8]
     ldr = u[9]
 
-    nm = u[10]
+    nM = u[10]
 
-    z_AHP = u[11]
+    zAHP = u[11]
 
-    I_noise = u[12]
+    Inoise = u[12]
 
     # --- currents --- #
 
-    I_NaV1p3 = g_nav1p3 * (m3^3) * h3 * (V-E_Na)
-    I_NaV1p7 = g_nav1p7 * (m7^3) * h7 * (V-E_Na)
-    I_NaV1p8 = g_nav1p8 * (m8^3) * h8 * (V-E_Na)
-    I_Kdr = g_Kdr * (ndr^3) * ldr * (V-E_k)
-    I_Km = g_Km*nm * (V-E_k)
-    I_AHP = g_AHP * (z_AHP^1) * (V-E_k)
-    I_Leak = g_Leak * (V-E_Leak)
+    INaV1p3 = g_NaV1p3 * (m3^3) * h3 * (V-E_Na)
+    INaV1p7 = g_NaV1p7 * (m7^3) * h7 * (V-E_Na)
+    INaV1p8 = g_NaV1p8 * (m8^3) * h8 * (V-E_Na)
+    IK_dr = g_K_dr * (ndr^3) * ldr * (V-E_K)
+    IK_M = g_K_M*nM * (V-E_K)
+    IK_AHP = g_K_AHP * (zAHP^1) * (V-E_K)
+    ILeak = g_Leak * (V-E_Leak)
     
     if with_noise
-        du[12] = - ( I_noise - mu_noise) / tau_noise
+        du[12] = - ( Inoise - mu_noise) / tau_noise
     else
         du[12] = 0.0
     end
 
     # --- ODE --- #
 
-    du[1] = (I_ext+I_noise-I_NaV1p3-I_NaV1p7-I_NaV1p8-I_Kdr-I_Km-I_Leak-I_AHP)/C
+    du[1] = (Iext+Inoise-INaV1p3-INaV1p7-INaV1p8-IK_dr-IK_M-ILeak-IK_AHP)/C
 
-    du[2] = dot_x(V, m3, m_inf_1_3, tau_m_1_3; C_lido=C_lido)
-    du[3] = dot_x(V, h3, h_inf_1_3, tau_h_1_3; C_lido=C_lido)
+    du[2] = dot_m3(V, m3)
+    du[3] = dot_h3(V, h3; C_lido=C_lido, shift=lido.shift_h3, with_shift=with_shift, linear_shift_mode=linear_shift_mode)
 
-    du[4] = dot_x(V, m7, m_inf_1_7, tau_m_1_7; C_lido=C_lido)
-    du[5] = dot_x(V, h7, h_inf_1_7, tau_h_1_7; C_lido=C_lido)
+    du[4] = dot_m7(V, m7)
+    du[5] = dot_h7(V, h7; C_lido=C_lido, shift=lido.shift_h7, with_shift=with_shift, linear_shift_mode=linear_shift_mode)
 
-    du[6] = dot_x(V, m8, m_inf_1_8, tau_m_1_8; C_lido=C_lido)
-    du[7] = dot_x(V, h8, h_inf_1_8, tau_h_1_8; C_lido=C_lido)
+    du[6] = dot_m8(V, m8; C_lido=C_lido, shift=lido.shift_m8, with_shift=with_shift, linear_shift_mode=linear_shift_mode)
+    du[7] = dot_h8(V, h8; C_lido=C_lido, shift=lido.shift_h8, with_shift=with_shift, linear_shift_mode=linear_shift_mode)
 
-    du[8] = dot_x(V, ndr, n_inf_K_dr, tau_n_K_dr)
-    du[9] = dot_x(V, ldr, l_inf_K_dr, tau_l_K_dr)
+    du[8] = dot_ndr(V, ndr)
+    du[9] = dot_ldr(V, ldr)
     
-    du[10] = dot_x(V, nm, n_inf_K_M, tau_n_K_M)
+    du[10] = dot_nM(V, nM)
 
-    du[11] = dot_x(V, z_AHP, z_AHP_inf, tau_z_AHP)
+    du[11] = dot_zAHP(V, zAHP)
 
     return
 end
 
 function stochastic_part(du,u,p,t)
 
-    sigma_noise = p.sigma_noise
-    mu_noise = p.mu_noise
-    tau_noise = p.tau_noise
-    with_noise = p.with_noise
+    noise = p.noise
+
+    with_noise = noise.with_noise
+    sigma_noise = noise.sigma
+    mu_noise = noise.mu
+    tau_noise = noise.tau
 
     du[1] = 0.0
     du[2] = 0.0
@@ -137,6 +149,22 @@ function stochastic_part(du,u,p,t)
     end
 
     return
+end
+
+struct Solution
+    t::Vector{Float64}
+    V::Vector{Float64}
+    m3::Vector{Float64}
+    h3::Vector{Float64}
+    m7::Vector{Float64}
+    h7::Vector{Float64}
+    m8::Vector{Float64}
+    h8::Vector{Float64}
+    ndr::Vector{Float64}
+    ldr::Vector{Float64}
+    nM::Vector{Float64}
+    zAHP::Vector{Float64}
+    Inoise::Vector{Float64}
 end
 
 function simulation(u0, tspan, p)
@@ -160,9 +188,11 @@ function simulation(u0, tspan, p)
     h8     = sol[7, :]
     ndr    = sol[8, :]
     ldr    = sol[9, :]
-    nm     = sol[10, :]
-    z_AHP  = sol[11, :]
+    nM     = sol[10, :]
+    zAHP  = sol[11, :]
     Inoise = sol[12, :]
 
-    return t,V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP,Inoise
+    solution = Solution(t,V,m3,h3,m7,h7,m8,h8,ndr,ldr,nM,zAHP,Inoise)
+
+    return solution
 end

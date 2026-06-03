@@ -108,7 +108,7 @@ function steady_state_channel_availability()
     Na_1p7 = (m7.^3) .* h7 .* (V .- E_Na)
     Na_1p8 = (m8.^3) .* h8 .* (V .- E_Na)
     Kdr = (ndr.^3) .* ldr .* (V .- E_k)
-    Km = nm .* (V .- E_k)
+    K_M = nm .* (V .- E_k)
     KAHP = (z_AHP.^1) .* (V .- E_k)
 
     plt = plot(xlabel="Voltage (mV)", ylabel= "Normed Channel Availability (-)", legend=:topleft, legendfontsize=7
@@ -121,7 +121,7 @@ function steady_state_channel_availability()
     plot!(plt, V, Na_1p8 ./ maximum(abs.(Na_1p8)), label=L"NaV1.8", linestyle = :solid, color=:green, linewidth = 3)
 
     plot!(plt, V, Kdr ./ maximum(abs.(Kdr)), label=L"K_{dr}", linestyle = :solid, color=:orange, linewidth = 3)
-    plot!(plt, V, Km ./ maximum(abs.(Km)), label=L"K_{M}", linestyle = :solid, color=:purple, linewidth = 3)
+    plot!(plt, V, K_M ./ maximum(abs.(K_M)), label=L"K_{M}", linestyle = :solid, color=:purple, linewidth = 3)
     plot!(plt, V, KAHP ./ maximum(abs.(KAHP)), label=L"K_{AHP}", linestyle = :solid, color=:brown, linewidth = 3)
 
     #display(plt)

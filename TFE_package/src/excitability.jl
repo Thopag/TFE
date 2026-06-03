@@ -80,7 +80,7 @@ function global_pattern(t_spikes, n_peak, begin_stim, end_stim; window_width=100
     return f_global, pattern
 end
 
-function find_rheobase(get_param, amps, u0; duration = 1700.0)
+function find_rheobase(p_noci, p_lido, amps, u0; duration = 1700.0)
 
     is_finded = false
     rheobase = NaN32
@@ -89,8 +89,12 @@ function find_rheobase(get_param, amps, u0; duration = 1700.0)
     for (i,amp) in enumerate(amps)
         print("\rProgress: $(round(((i-1)/L*100), digits=2)) %")
         # -- Make Simulation -- #
-        param = get_param(amp)
-        t,V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP,Inoise = simulation(u0, (0.0, duration), param)
+
+        p_stim = stimulation_parameter(amp)
+        p_model = model_parameter(p_stim, p_noci; lidocaine=p_lido)
+        sol = simulation(u0, (0.0, duration), p_model)
+        t = sol.t
+        V = sol.V
 
         # ---- Peak Detection ---- #
 
@@ -98,14 +102,14 @@ function find_rheobase(get_param, amps, u0; duration = 1700.0)
         peaks_idx, peak_count, _ = get_peaks(t, V;  min_h=-5.0, min_proms=10)
         t_spikes = t[peaks_idx]
 
-        peaks_idx = peaks_idx[t_spikes .> param.stim_on]
-        t_spikes = t_spikes[t_spikes .> param.stim_on]
+        peaks_idx = peaks_idx[t_spikes .> p_stim.on]
+        t_spikes = t_spikes[t_spikes .> p_stim.on]
 
         if peak_count > 0
             peak_count = length(peaks_idx)
         end
 
-        _, pattern = global_pattern(t_spikes, peak_count, param.stim_on, param.stim_off)
+        _, pattern = global_pattern(t_spikes, peak_count, p_stim.on, p_stim.off)
 
         if (pattern >= 1) && (!is_finded)
             print("\r")
@@ -126,21 +130,24 @@ end
 
 # -------------------------- parameter_analyse -------------------------- #
 
-function parameter_analyse(param_sets, u0; duration = 1700.0)
+function parameter_analyse(VEC_p_model, u0; duration = 1700.0)
 
-    L = length(param_sets)
+    L = length(VEC_p_model)
     VEC_peak_count = Vector{Int}(undef, L)
     VEC_freq = Vector{Float32}(undef, L)
     VEC_pattern = Vector{Int}(undef, L)
     VEC_first_peak_h = Vector{Float32}(undef, L)
     VEC_first_peak_w = Vector{Float32}(undef, L)
 
-    for (i,param_set) in enumerate(param_sets)
+    for (i,p_model) in enumerate(VEC_p_model)
         print("\rProgress: $(round(((i-1)/L*100), digits=2)) %")
 
         # -- Make Simulation -- #
+        stim = p_model.stimulation
 
-        t,V,m3,h3,m7,h7,m8,h8,ndr,ldr,nm,z_AHP,Inoise = simulation(u0, (0.0, duration), param_set)
+        sol = simulation(u0, (0.0, duration), p_model)
+        t = sol.t
+        V = sol.V
 
         # ---- Peak Detection ---- #
 
@@ -150,8 +157,8 @@ function parameter_analyse(param_sets, u0; duration = 1700.0)
 
         # Remove wrong peak detection that appear before stimulation
         # Strangly happend with the configuration: DIV0 at 100 pA without Na current
-        peaks_idx = peaks_idx[t_spikes .> param_set.stim_on]
-        t_spikes = t_spikes[t_spikes .> param_set.stim_on]
+        peaks_idx = peaks_idx[t_spikes .> stim.on]
+        t_spikes = t_spikes[t_spikes .> stim.on]
 
         if peak_count > 0
             peak_count = length(peaks_idx)
@@ -172,7 +179,7 @@ function parameter_analyse(param_sets, u0; duration = 1700.0)
             first_peak_width = w_peaks[1]
         end
 
-        freq, pattern = global_pattern(t_spikes, peak_count, param_set.stim_on, param_set.stim_off)
+        freq, pattern = global_pattern(t_spikes, peak_count, stim.on, stim.off)
 
         VEC_peak_count[i]   = peak_count
         VEC_freq[i]         = freq
