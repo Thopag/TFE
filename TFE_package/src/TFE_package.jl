@@ -6,14 +6,17 @@ using Plots, Plots.Measures, LaTeXStrings, ColorSchemes, JLD2
 include("ploting.jl")
 include("utils.jl")
 include("lidocaine.jl")
+
 include("params/parameters_struct.jl")
-include("excitability.jl")
-include("bifurcation.jl")
-include("ODEs.jl")
 include("params/init_nociceptor.jl")
 include("params/initial_condition.jl")
-include("DIC.jl")
-include("ss_currents.jl")
+
+include("ODEs.jl")
+
+include("analyses/excitability.jl")
+include("analyses/bifurcation.jl")
+include("analyses/DIC.jl")
+include("analyses/ss_currents.jl")
 
 precompile(simulation, (Vector{Float64}, Tuple{Float64, Float64}, ModelParameters))
 

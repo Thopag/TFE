@@ -33,9 +33,9 @@ struct StimulationParameters
 end
 
 function stimulation_parameter(amp;
-    Ihold = 0.0,              # [pA]     # Note: In original model, Ihold = -3.0 for DIV0 and 0.0 for DIV7
-    on = 500.0,               # [ms]
-    length = 1000.0           # [ms]
+    Ihold::Float64 = 0.0,              # [pA]     # Note: In original model, Ihold = -3.0 for DIV0 and 0.0 for DIV7
+    on::Float64 = 500.0,               # [ms]
+    length::Float64 = 1000.0           # [ms]
     )
 
     off = on + length
@@ -58,10 +58,10 @@ struct NoiseParameters
 end
 
 function noise_parameter(;
-    with_noise = false,
-    mu = 0.0,
-    tau = 5.0,    # (ms)
-    sigma = 0.05
+    with_noise::Bool = false,
+    mu::Float64 = 0.0,
+    tau::Float64 = 5.0,    # (ms)
+    sigma::Float64 = 0.05
     )
 
     noise = NoiseParameters(
@@ -85,6 +85,7 @@ struct ModelParameters
     noise::NoiseParameters
 end
 
-function model_parameter(stimulation, nociceptor; lidocaine=DEFAULT_LIDOCAINE, noise=DEFAULT_NOISE)
+function model_parameter(stimulation::StimulationParameters, nociceptor::NociceptorParameters
+                    ; lidocaine::LidocaineParameters=DEFAULT_LIDOCAINE, noise::NoiseParameters=DEFAULT_NOISE)
     return ModelParameters(lidocaine, stimulation, nociceptor, noise)
 end

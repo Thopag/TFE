@@ -1,28 +1,28 @@
 
 # --------------------------- NaV1.8 --------------------------- #
 
-function alpha_m8(V; lido_shift=0)
+function alpha_m8(V::Float64; lido_shift::Float64=0)
     jp = 5.3
     return 7.21/(1+exp((V-(0.063-jp+lido_shift))/-7.86))
     #human version
     #return 7.35-7.35/(1+exp((V-(-1.38-jp+lido_shift))/10.9))
 end
 
-function alpha_h8(V; lido_shift=0)
+function alpha_h8(V::Float64; lido_shift::Float64=0)
     jp = 5.3
     return 1.63/(1+exp((V-(-68.5-jp+lido_shift))/10.01))
     #human version
     #return 0.011+1.39/(1+exp((V-(-78.04-jp+lido_shift))/11.32))
 end
 
-function beta_m8(V; lido_shift=0)
+function beta_m8(V::Float64; lido_shift::Float64=0)
     jp = 5.3
     return 7.4/(1+exp((V-(-53.06-jp+lido_shift))/19.34))
     #human version
     #return 5.97/(1+exp((V-(-56.43-jp+lido_shift))/18.26))
 end
 
-function beta_h8(V; lido_shift=0)
+function beta_h8(V::Float64; lido_shift::Float64=0)
     jp = 5.3
     return 0.81/(1+exp((V-(11.44-jp+lido_shift))/-13.12))
     #human version
@@ -31,25 +31,25 @@ end
 
 # ---- #
 
-function h8_inf(V; C_lido=0.0, shift=0.0, with_shift=false, linear_shift_mode=false)
+function h8_inf(V::Float64; C_lido::Float64=0.0, shift::Float64=0.0, with_shift::Bool=false, linear_shift_mode::Bool=false)
     # Lidocaine effect
     lido_shift = h8_shift(C_lido, shift, with_shift, linear_shift_mode)
     return alpha_h8(V; lido_shift=lido_shift) / (alpha_h8(V; lido_shift=lido_shift) + beta_h8(V; lido_shift=lido_shift))
 end
 
-function tau_h8(V)
+function tau_h8(V::Float64)
     # Lidocaine effect
     lido_shift = 0.0
     return 1 / (alpha_h8(V; lido_shift=lido_shift) + beta_h8(V; lido_shift=lido_shift))
 end
 
-function m8_inf(V; C_lido=0.0, shift=0.0, with_shift=false, linear_shift_mode=false)
+function m8_inf(V::Float64; C_lido::Float64=0.0, shift::Float64=0.0, with_shift::Bool=false, linear_shift_mode::Bool=false)
     # Lidocaine effect
     lido_shift = m8_shift(C_lido, shift, with_shift, linear_shift_mode)
     return alpha_m8(V; lido_shift=lido_shift) / (alpha_m8(V; lido_shift=lido_shift) + beta_m8(V; lido_shift=lido_shift))
 end
 
-function tau_m8(V)
+function tau_m8(V::Float64)
     # Lidocaine effect
     lido_shift = 0.0
     return 1 / (alpha_m8(V; lido_shift=lido_shift) + beta_m8(V; lido_shift=lido_shift))
@@ -57,13 +57,13 @@ end
 
 # ---- #
 
-function dot_m8(V, m8; C_lido=0.0, shift=0.0, with_shift=false, linear_shift_mode=false)
+function dot_m8(V::Float64, m8::Float64; C_lido::Float64=0.0, shift::Float64=0.0, with_shift::Bool=false, linear_shift_mode::Bool=false)
     x_inf = m8_inf(V; C_lido=C_lido, shift=shift, with_shift=with_shift, linear_shift_mode=linear_shift_mode)
     tau_x = tau_m8(V)
     return (x_inf-m8)/tau_x
 end
 
-function dot_h8(V, h8; C_lido=0.0, shift=0.0, with_shift=false, linear_shift_mode=false)
+function dot_h8(V::Float64, h8::Float64; C_lido::Float64=0.0, shift::Float64=0.0, with_shift::Bool=false, linear_shift_mode::Bool=false)
     x_inf = h8_inf(V; C_lido=C_lido, shift=shift, with_shift=with_shift, linear_shift_mode=linear_shift_mode)
     tau_x = tau_h8(V)
     return (x_inf-h8)/tau_x
