@@ -22,7 +22,7 @@ end
 
 function plot_single_simulation(sol, current, p_model, t_spikes; xlimits=(400, 1700))
 
-    n_fig = 1
+    n_fig = 3
     plt = plot(layout = (n_fig, 1), link = :x, xlims=xlimits, size = (750, 230*n_fig), xaxis = nothing,
                                                                     left_margin = 5mm,
                                                                     bottom_margin = 5mm, 
@@ -38,10 +38,10 @@ function plot_single_simulation(sol, current, p_model, t_spikes; xlimits=(400, 1
     amp = p_model.stimulation.amp
 
     voltage = 1
-    ylabel!(plt[voltage], "Voltage (mV)", legendfontsize=9, legend = :topright, ylims=(-90,50))
+    ylabel!(plt[voltage], "Voltage (mV)", ylims=(-90,50))
     xlims = Plots.xlims(plt[voltage])
     ylims = Plots.ylims(plt[voltage])
-        
+
     plot!(plt[voltage], t, V, color= :black, label="")
     #vline!(plt[voltage], t_spikes, color=:red, label="")
     annotate!(plt[voltage],
@@ -49,10 +49,16 @@ function plot_single_simulation(sol, current, p_model, t_spikes; xlimits=(400, 1
         ylims[2] - 0.05*(ylims[2]-ylims[1]),
         text( L"amp = %$amp pA", 11, :black))
 
+
+    voltage_pn = 2
+    ylabel!(plt[voltage_pn], "Voltage (mV)")
+    plot!(plt[voltage_pn], t, sol.V_pn, color= :black, label="")
+
+    plot!(plt[3], t, current.Inoci, color= :black, label="")
+
+
     # current = 2
     # ylabel!(plt[current], "Current (uA/cm2)", legendfontsize=7, legend = :bottomright)
-    # #plot!(plt[current], ylims=(-(p_model.stimulation.I0 + p_model.Excitation)*1.2, (p_model.I0 + p_model.Excitation)*1.2))
-    # #plot!(plt[current], ylims=(-20, 20))
     # plot!(plt[current], t, INaV1p3, color=:blue, label=L"I_{NaV1.3}", alpha=alpha)
     # plot!(plt[current], t, INaV1p7, color=:red, label=L"I_{NaV1.7}")
     # plot!(plt[current], t, INaV1p8, color=:green, label=L"I_{NaV1.8}")
@@ -63,17 +69,6 @@ function plot_single_simulation(sol, current, p_model, t_spikes; xlimits=(400, 1
     # plot!(plt[current], t, .- Iext, color=:black, linestyle = :dash, label=L"-I_{ext}")
     # #plot!(p[current], t, I_noise, color=:pink, label=L"I_{noise}")
 
-    current_no_zoom = 3
-    # ylabel!(plt[current_no_zoom], "Current (uA/cm2)", legendfontsize=7, legend = :bottomright)
-    # plot!(plt[current_no_zoom], t, I_NaV1p3, color=:blue, label=L"I_{NaV1.3}", alpha=alpha)
-    # plot!(plt[current_no_zoom], t, I_NaV1p7, color=:red, label=L"I_{NaV1.7}", alpha=alpha)
-    # plot!(plt[current_no_zoom], t, I_NaV1p8, color=:green, label=L"I_{NaV1.8}")
-    # plot!(plt[current_no_zoom], t, I_K_dr, color=:orange, label=L"I_{K_dr}", alpha=alpha)
-    # plot!(plt[current_no_zoom], t, I_K_M, color=:purple, label=L"I_{KM}", alpha=alpha)
-    # plot!(plt[current_no_zoom], t, I_AHP, color=:brown, label=L"I_{AHP}", alpha=alpha)
-    # plot!(plt[current_no_zoom], t, I_Leak, color=:black, label=L"I_{Leak}", alpha=alpha)
-    # plot!(plt[current_no_zoom], t, .- I_ext, color=:black, linestyle = :dash, label=L"-I_{ext}")
-    # #plot!(p[current], t, I_noise, color=:pink, label=L"I_{noise}")
 
     channel = 3
     # ylabel!(plt[channel], "Channel Availability (%)")
@@ -84,11 +79,6 @@ function plot_single_simulation(sol, current, p_model, t_spikes; xlimits=(400, 1
     # plot!(plt[channel], t, ndr.^3 .* ldr .* 100, color=:orange, label=L"K_{dr}")
     # plot!(plt[channel], t, nM .* 100, color=:purple, label=L"K_{m}")
     # plot!(plt[channel], t, zAHP .* 100, color=:brown, label=L"K_{AHP}")
-
-    # i_dV_dt = 3
-    # ylabel!(plt[i_dV_dt], "dV_dt (mV/s)")
-    # #plot!(plt[i_dV_dt], ylims=(-0.2, 0.5))
-    # plot!(plt[i_dV_dt], t, dV_dt, color=:black, label="")
 
     variable = 4
     # ylabel!(plt[variable], "Variable (-)")

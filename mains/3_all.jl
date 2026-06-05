@@ -14,7 +14,7 @@ function main()
 
     V = -120.0:0.5:60.0
     u0 = get_u0()
-    u0_bifurcation = u0[1:end-1]
+    u0_bifurcation = u0[1:11]
 
     # -------- Vectors -------- #
 

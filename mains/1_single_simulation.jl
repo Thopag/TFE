@@ -52,7 +52,8 @@ function main(;extra=0.0)
 
     if with_plot
         #xlimits = (stim_on-25, stim_on+150)
-        xlimits = (stim_on-50, stim_on+stim_length+50)
+        #xlimits = (stim_on-50, stim_on+stim_length+50)
+        xlimits = (0.0, stim_on+stim_length+50)
         plt = plot_single_simulation(sol, current, p_model, t_spikes; xlimits=xlimits)
 
         #display(plt)

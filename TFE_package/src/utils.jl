@@ -15,12 +15,18 @@ struct Current{T}
     IK_AHP::T
     ILeak::T
     Iext::T
+    ICa_L::T
+    IK_ir::T
+    IK_M_pn::T
+    ILeak_pn::T
+    Inoci::T
     Inoise::T
     dV_dt::T
 end
 
 function give_currents(sol, p_model)
 
+    # ---- #
     n = p_model.nociceptor
     stim = p_model.stimulation
     V = sol.V
@@ -51,7 +57,20 @@ function give_currents(sol, p_model)
     ILeak = g_Leak .* (V .- E_Leak)
     dV_dt = (Iext .- INaV1p3 .- INaV1p7 .- INaV1p8 .- IK_dr .- IK_M .- ILeak .- IK_AHP) ./ n.C
 
-    current = Current(INaV1p3, INaV1p7, INaV1p8, IK_dr, IK_M, IK_AHP, ILeak, Iext, sol.Inoise, dV_dt)
+    # ---- #
+    pn      = p_model.projection_neuron
+    V_pn = sol.V_pn
+
+    Inoci = (V .>= -5.0) .* pn.nociceptor_input
+
+    ICa_L   = pn.p_Ca_L .* (sol.mL.^2) .* sol.hL .* GHK.(V_pn, sol.Ca_i)
+    IK_ir   = pn.g_K_ir .* sol.mir          .* (V_pn .- pn.E_K)
+    IK_M_pn = pn.g_K_M  .* sol.mM           .* (V_pn .- pn.E_K)
+    ILeak_pn = pn.g_Leak                    .* (V_pn .- pn.E_Leak)
+
+    current = Current(INaV1p3, INaV1p7, INaV1p8, IK_dr, IK_M, IK_AHP, ILeak, Iext, 
+                        ICa_L, IK_ir, IK_M_pn, ILeak_pn, Inoci,
+                               sol.Inoise, dV_dt)
     return current
 end
 

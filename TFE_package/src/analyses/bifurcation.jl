@@ -4,75 +4,49 @@ function ODE_system_bifurcation(u,p)
 
     du = similar(u)
 
-    stim = p.stimulation
-    noise = p.noise
-    n = p.nociceptor
-    lido = p.lidocaine
-
-    # --- parameters --- #
-
-    Excitation = ((stim.amp * (10^-6)) / (n.CellArea * (10^-8))) 
-    I0         = ((stim.Ihold * (10^-6)) / (n.CellArea * (10^-8))) 
-
-    Iext = I0 + Excitation
-
-    C = n.C
-
-    g_NaV1p3 = n.g_NaV1p3
-    g_NaV1p7 = n.g_NaV1p7
-    g_NaV1p8 = n.g_NaV1p8
-    E_Na = n.E_Na
-
-    g_K_dr = n.g_K_dr
-    g_K_M = n.g_K_M
-    g_K_AHP = n.g_K_AHP
-    E_K = n.E_K
-
-    g_Leak = n.g_Leak
-    E_Leak = n.E_Leak
-
-    with_noise = noise.with_noise
-    sigma_noise = noise.sigma
-    mu_noise = noise.mu
-    tau_noise = noise.tau
+    stim    = p.stimulation
+    n       = p.nociceptor
+    pn      = p.projection_neuron
+    lido    = p.lidocaine
+    noise   = p.noise
 
     linear_shift_mode = lido.linear_shift_mode
     with_shift = lido.with_shift
     C_lido = lido.concentration
 
+    # ------------------------------------------ Nociceptor ------------------------------------------ #
+
     # --- variables --- #
 
-    V = u[1]
-
-    m3 = u[2]
-    h3 = u[3]
-
-    m7 = u[4]
-    h7 = u[5]
-
-    m8 = u[6]
-    h8 = u[7]
-
-    ndr = u[8]
-    ldr = u[9]
-
-    nM = u[10]
-
-    zAHP = u[11]
+    V       = u[1]
+    m3      = u[2]
+    h3      = u[3]
+    m7      = u[4]
+    h7      = u[5]
+    m8      = u[6]
+    h8      = u[7]
+    ndr     = u[8]
+    ldr     = u[9]
+    nM      = u[10]
+    zAHP    = u[11]
 
     # --- currents --- #
 
-    INaV1p3 = g_NaV1p3 * (m3^3) * h3 * (V-E_Na)
-    INaV1p7 = g_NaV1p7 * (m7^3) * h7 * (V-E_Na)
-    INaV1p8 = g_NaV1p8 * (m8^3) * h8 * (V-E_Na)
-    IK_dr = g_K_dr * (ndr^3) * ldr * (V-E_K)
-    IK_M = g_K_M*nM * (V-E_K)
-    IK_AHP = g_K_AHP * (zAHP^1) * (V-E_K)
-    ILeak = g_Leak * (V-E_Leak)
+    Excitation  = ((stim.amp * (10^-6))     / (n.CellArea * (10^-8))) 
+    I0          = ((stim.Ihold * (10^-6))   / (n.CellArea * (10^-8))) 
+    Iext    = I0 + Excitation
+
+    INaV1p3 = n.g_NaV1p3    * (m3^3) * h3   * (V-n.E_Na)
+    INaV1p7 = n.g_NaV1p7    * (m7^3) * h7   * (V-n.E_Na)
+    INaV1p8 = n.g_NaV1p8    * (m8^3) * h8   * (V-n.E_Na)
+    IK_dr   = n.g_K_dr      * (ndr^3) * ldr * (V-n.E_K)
+    IK_M    = n.g_K_M       * nM            * (V-n.E_K)
+    IK_AHP  = n.g_K_AHP     * (zAHP^1)      * (V-n.E_K)
+    ILeak   = n.g_Leak                      * (V-n.E_Leak)
 
     # --- ODE --- #
 
-    du[1] = (Iext-INaV1p3-INaV1p7-INaV1p8-IK_dr-IK_M-ILeak-IK_AHP)/C
+    du[1] = (Iext-INaV1p3-INaV1p7-INaV1p8-IK_dr-IK_M-IK_AHP-ILeak)/n.C
 
     du[2] = dot_m3(V, m3)
     du[3] = dot_h3(V, h3; C_lido=C_lido, shift=lido.shift_h3, with_shift=with_shift, linear_shift_mode=linear_shift_mode)

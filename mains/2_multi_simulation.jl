@@ -14,47 +14,31 @@ end
 function main()
 
     u0 = get_u0()
-    println(lidocaine_effect_setup())
 
-    amps_i_1_8 = [12.0, 12.0, 12.0, 12.0, 12.0, 12.0]
-    amps_i_1_3 = [12.0, 13.0, 15.0, 17.0, 20.0, 23.0,]
-    amps_i_1_7 = [12.0, 13.0, 14.0, 17.0, 27.0, 180.0]
     amps = [16.0, 16.0, 20.0]
-
     amps_cst = zeros(6) .+ 120
 
     amps = amps
 
-    VEC_g_nav1p7 = [3.0, 0.0, 0.0]
-    VEC_g_nav1p8 = [0.35, 0.0]
-    VEC_inhib = [0.0, 0.5]
-    VEC_shift = [10.0, 0.0]
-
-    VEC_g_1p7 = [3.0, 0.0, 0.0]
-
-    VEC_inter_param = VEC_g_1p7
-    VEC_inter_param_2 = VEC_g_1p7
-
     # -------- Timing set up -------- #
 
-    duration = 1700.0               # ms
-    stim_on = 500.0                 # ms
+    duration = 1700.0                                   # ms
+    stim_on = 500.0                                     # ms
     stim_length = duration - stim_on - 200.0            # ms
 
     # -------- Set up -------- #
 
     file_prefix = "$(folder)"
 
-    params = map( (amp, inter_param, inter_param_2) -> get_param(amp; stim_on=stim_on, stim_length=stim_length,
-                    # C_lidocaine = inter_param,
-                    #g_nav1p3 = inter_param,
-                    g_nav1p7 = inter_param,
-                    # g_nav1p8 = 30.0 * (1.0 - inter_param_2),
-                    )
-                , amps, VEC_inter_param, VEC_inter_param_2)
+    p_lido = lidocaine_parameter(;)
+    p_noci = nociceptor_parameter(;)
+    VEC_stim = map( (amp) -> stimulation_parameter(amp; on=stim_on, length=stim_length), amps)
 
-    labels = [L"g_{NaV1.7} = %$inter_param - %$ amp \: pA" for (amp, inter_param, inter_param_2) in zip(amps, VEC_inter_param, VEC_inter_param_2)]
-    L = length(params)
+    VEC_p_model = map( (changing) -> model_parameter(changing, p_noci; lidocaine=p_lido), VEC_stim)
+
+
+    labels = [L"%$ amp \: pA" for amp in amps]
+    L = length(VEC_p_model)
 
     # -------- Plot Set up -------- #
 
@@ -68,15 +52,14 @@ function main()
     println("")
 
     colors = theme_palette(:default).colors
-    for (i,(param,label)) in enumerate(zip(params, labels))
+    for (i,(p_model,label)) in enumerate(zip(VEC_p_model, labels))
         #print("\rProgress: $(round(((i-1)/L*100), digits=2)) %")
 
-        amp = param.amp
-        sol = simulation(u0, (0.0, duration), param)
+        sol = simulation(u0, (0.0, duration), p_model)
         t = sol.t
         V = sol.V
 
-        current = give_currents(sol, param)
+        current = give_currents(sol, p_model)
         peaks_idx, n_peak, w_peaks = TFE.get_peaks(t, V;  min_h=-5.0, min_proms=10.0)
         t_spikes = t[peaks_idx]
 

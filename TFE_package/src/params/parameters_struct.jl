@@ -23,6 +23,55 @@ end
 
 # initiation in "init_nociceptor.jl"
 
+# --------------- PROJECTION NEURON --------------- #
+
+struct ProjectionNeuronParameters
+    C::Float64
+    p_Ca_L::Float64
+    E_Na::Float64
+    g_Na::Float64
+    E_K::Float64
+    g_KDR::Float64
+    g_K_ir::Float64
+    g_K_M::Float64
+    E_Leak::Float64
+    g_Leak::Float64
+    nociceptor_input::Float64
+end
+
+function projection_neuron_parameter(;
+    nociceptor_input = 5.0,
+    # conductances
+    g_Na::Float64 = 30.0,         # [mS/cm^2]
+    g_KDR::Float64 = 4.0,         # [mS/cm^2]
+    g_Leak::Float64 = 0.033,      # [mS/cm^2]
+
+    # demander a annalelle
+    p_Ca_L::Float64 = 0.0,
+    g_K_ir::Float64 = 0.0,         # [mS/cm^2]
+    g_K_M::Float64 = 0.0,          # [mS/cm^2]
+
+    # Reversal Potential 
+    E_Na::Float64 = 50.0,         # [mV]
+    E_K::Float64 = -90.0,         # [mV]
+    E_Leak::Float64 = -60.1       # [mV]
+    )
+
+    C = 1.0                                 # [µF/cm^2]
+
+    projection_neuron = ProjectionNeuronParameters(
+        C, p_Ca_L,
+        E_Na, g_Na,
+        E_K, g_KDR, g_K_ir, g_K_M,
+        E_Leak, g_Leak,
+        nociceptor_input
+        )
+
+    return projection_neuron
+end
+
+const DEFAULT_PROJ_NEURON = projection_neuron_parameter()
+
 # --------------- STIMULATION --------------- #
 
 struct StimulationParameters
@@ -82,10 +131,11 @@ struct ModelParameters
     lidocaine::LidocaineParameters
     stimulation::StimulationParameters
     nociceptor::NociceptorParameters
+    projection_neuron::ProjectionNeuronParameters
     noise::NoiseParameters
 end
 
 function model_parameter(stimulation::StimulationParameters, nociceptor::NociceptorParameters
-                    ; lidocaine::LidocaineParameters=DEFAULT_LIDOCAINE, noise::NoiseParameters=DEFAULT_NOISE)
-    return ModelParameters(lidocaine, stimulation, nociceptor, noise)
+                    ;projection_neuron=DEFAULT_PROJ_NEURON, lidocaine::LidocaineParameters=DEFAULT_LIDOCAINE, noise::NoiseParameters=DEFAULT_NOISE)
+    return ModelParameters(lidocaine, stimulation, nociceptor, projection_neuron, noise)
 end
