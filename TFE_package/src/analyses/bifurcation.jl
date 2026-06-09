@@ -84,7 +84,94 @@ function make_bifurcation(p_model, u0, lens_param, p_min, p_max)
         detect_event = 0
     )
     br = continuation(prob, PALC(), opts)
+
     return br
+end
+
+function get_limit_cycle(u, bif_param, p_model; inter_value=1.0, max_inter=5.0)
+
+    println("")
+
+    duration = 2000.0
+    u0 = copy(u)
+    i_p_stim = stimulation_parameter(bif_param; on=0.0, length=duration)
+    i_p_model = model_parameter(i_p_stim, p_model.nociceptor; lidocaine=p_model.lidocaine)
+
+    max = NaN64
+    min = NaN64
+
+    # check if it is not just an instable point
+    # In the futur can use an extra arg stability, instead of it !!!!!!!!
+    sol = simulation(u, (0.0, duration), i_p_model)
+    pattern = get_pattern(sol, i_p_stim)
+    if pattern == 4
+        return min, max
+    end
+
+    finded_min = false
+    finded_max = false
+    for i in inter_value:inter_value:max_inter*inter_value
+
+        print("\rProgress: $(round(i/max_inter*inter_value, digits=2)) % - $bif_param & $i")
+        # idx=1 because we are focused on V
+        u0[1] = u[1] - i
+        sol = simulation(u0, (0.0, duration), i_p_model)
+        pattern = get_pattern(sol, i_p_stim)
+        if pattern == 4 && !finded_min
+            min = u0[1]
+            finded_min = true
+        end
+        u0[1] = u[1] + i
+        sol = simulation(u0, (0.0, duration), i_p_model)
+        pattern = get_pattern(sol, i_p_stim)
+        if pattern == 4 && !finded_max
+            max = u0[1]
+            finded_max = true
+        end
+
+        if finded_max && finded_min
+            print("\r")
+            return min, max
+        end
+    end
+    print("\r")
+    return min, max
+end
+
+function search_all_limit_cycle(br, p_model; bif_param_incr=30.0)
+
+    println("Start limit cycle searching")
+    VEC_u = br.branch.x 
+    VEC_bif_param = br.branch.param
+    init_L = length(VEC_bif_param)
+
+    VEC_min = Float64[]
+    VEC_max = Float64[]
+    VEC_plot_bif_param = eltype(VEC_bif_param)[]
+
+    stop = false
+    while !stop
+        L = length(VEC_bif_param)
+        print("\rProgress: $(round(1-(L/init_L), digits=2)) %")
+        start_val = VEC_bif_param[1]
+        idx = findfirst(x -> abs(x - start_val) >= bif_param_incr, VEC_bif_param)
+
+        if (isnothing(idx)) || (idx == length(VEC_bif_param))
+            stop = true
+        else
+            if VEC_bif_param[idx] >= 0.0
+                min, max = get_limit_cycle(VEC_u[idx], VEC_bif_param[idx], p_model)
+                push!(VEC_min, min)
+                push!(VEC_max, max)
+                push!(VEC_plot_bif_param, VEC_bif_param[idx])
+            end
+            VEC_u = VEC_u[(idx+1):end]
+            VEC_bif_param = VEC_bif_param[(idx+1):end]
+        end
+    end
+    print("\r")
+    println("End limit cycle searching")
+    return VEC_min, VEC_max, VEC_plot_bif_param
 end
 
 
@@ -115,27 +202,30 @@ function iteration_bifurcation(plt, i, p_model, u0, lens_param, p_min, p_max,
 
     # ----  Plot result ---- #
     V =  [x[1] for x in br.branch.x]
-    bif_param = br.branch.param
-    stability = br.branch.stable
+    VEC_bif_param = br.branch.param
+    VEC_stability = br.branch.stable
 
-    #color_stability = [:red, :blue]
     color_stability = [reds[i], greens[i]]
     linestyle_stability = [:dash, :solid]
-
-    # plot!(plt, bif_param , V, c=color_stability[stability .+ 1], linestyle=linestyle_stability[stability .+ 1], label="", linewidth = 1.0)
 
     start_idx = 1
     # Add special point and trajectories
     for specialpoint in br.specialpoint
         sp_idx = specialpoint.idx
 
-        plot!(plt, bif_param[start_idx:sp_idx] , V[start_idx:sp_idx], c=color_stability[stability[start_idx] + 1], linestyle=linestyle_stability[stability[start_idx] + 1] 
+        plot!(plt, VEC_bif_param[start_idx:sp_idx] , V[start_idx:sp_idx], c=color_stability[VEC_stability[start_idx] + 1], linestyle=linestyle_stability[VEC_stability[start_idx] + 1] 
                                                         ,alpha=0.7, label="", linewidth = 1.0)
         start_idx = sp_idx + 1
 
         symbol_type = specialpoint.type
         colors = get(color_specialpoint, symbol_type, :blue)
-        scatter!(plt, [bif_param[sp_idx]], [V[sp_idx]], label="", c=colors[i], markersize = 4, alpha=1)
+        scatter!(plt, [VEC_bif_param[sp_idx]], [V[sp_idx]], label="", c=colors[i], markersize = 4, alpha=1)
     end
+
+    VEC_min, VEC_max, VEC_plot_bif_param = search_all_limit_cycle(br, p_model)
+
+    p_temp = plot(VEC_plot_bif_param, VEC_min)
+    plot!(p_temp, VEC_plot_bif_param, VEC_max)
+    display(p_temp)
     return br
 end

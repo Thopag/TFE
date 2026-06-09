@@ -44,7 +44,7 @@ function main(;extra=0.0)
 
     freqs = TFE.instant_freqs(t_spikes, n_peak)
 
-    freq, pattern = global_pattern(t_spikes, n_peak, p_stim.on, p_stim.off; window_width=100)
+    freq, pattern = global_pattern(t_spikes, n_peak, p_stim.off)
     pred_pattern = Ploting.pattern_list[pattern+1]
     println("Predicted pattern : $pred_pattern")
 

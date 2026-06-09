@@ -103,24 +103,26 @@ function ODE_system(du,u,p,t)
 
     # --- currents --- #
 
-    Inoci = (V >= -5.0) * pn.nociceptor_input  # TO CHANGE
+    # Inoci = (V >= -5.0) * pn.nociceptor_input  # TO CHANGE
 
-    ICa_L   = pn.p_Ca_L * (mL^2) * hL * GHK(V_pn, Ca_i)
-    IK_ir   = pn.g_K_ir * mir         * (V_pn - pn.E_K)
-    IK_M_pn = pn.g_K_M  * mM          * (V_pn - pn.E_K)
-    ILeak_pn = pn.g_Leak              * (V_pn - pn.E_Leak)
+    # ICa_L   = pn.p_Ca_L * (mL^2) * hL * GHK(V_pn, Ca_i)
+    # IK_ir   = pn.g_K_ir * mir         * (V_pn - pn.E_K)
+    # IK_M_pn = pn.g_K_M  * mM          * (V_pn - pn.E_K)
+    # ILeak_pn = pn.g_Leak              * (V_pn - pn.E_Leak)
 
     # --- ODE --- #
 
-    du[12] = (Inoci-ICa_L-IK_ir-IK_M_pn-ILeak_pn)/pn.C
+    # du[12] = (Inoci-ICa_L-IK_ir-IK_M_pn-ILeak_pn)/pn.C
 
-    du[13] = dot_mL(V_pn, mL)
-    du[14] = dot_hL(V_pn, hL)
-    du[15] = dot_Ca_i(Ca_i, ICa_L)
+    # du[13] = dot_mL(V_pn, mL)
+    # du[14] = dot_hL(V_pn, hL)
+    # du[15] = dot_Ca_i(Ca_i, ICa_L)
 
-    du[16] = dot_mir(V_pn, mir)
+    # du[16] = dot_mir(V_pn, mir)
 
-    du[17] = dot_mM(V_pn, mM)
+    # du[17] = dot_mM(V_pn, mM)
+
+    du[12:17] .= 0.0
 
     # -------------------- noise -------------------- #
 
@@ -176,6 +178,13 @@ struct Solution
 end
 
 function simulation(u0, tspan, p)
+
+    # Padding if necessary
+    padding_size = max(0, 18 - length(u0))
+    if padding_size > 0
+        u0 = vcat(u0, zeros(eltype(u0), padding_size))
+        u0[12] = -60.0
+    end
 
     # -- SDE Simulation -- #
     prob = SDEProblem(ODE_system, stochastic_part, u0, tspan, p) 

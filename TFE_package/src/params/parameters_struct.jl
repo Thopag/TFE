@@ -40,13 +40,13 @@ struct ProjectionNeuronParameters
 end
 
 function projection_neuron_parameter(;
+
     nociceptor_input = 5.0,
     # conductances
     g_Na::Float64 = 30.0,         # [mS/cm^2]
     g_KDR::Float64 = 4.0,         # [mS/cm^2]
     g_Leak::Float64 = 0.033,      # [mS/cm^2]
 
-    # demander a annalelle
     p_Ca_L::Float64 = 0.0,
     g_K_ir::Float64 = 0.0,         # [mS/cm^2]
     g_K_M::Float64 = 0.0,          # [mS/cm^2]

@@ -14,7 +14,7 @@ function main()
 
     # ---- bifurcation set up ---- #
 
-    u0 = get_u0()[1:end-1]
+    u0 = get_u0()[1:11]
     #u0 = [-7.0407356746133765, 0.9870854072159283, 2.9653217237358692e-5, 0.9627214745221165, 7.519051987830313e-6, 0.8677369807299044, 0.009428204942099143, 0.992282714087809, 0.014777919108885743, 0.996285733438894, 0.04696791243885193]
 
     p_min = -300.0
@@ -26,7 +26,7 @@ function main()
 
     # ---- inter bifurcation parameter ---- #
 
-    inhibs = [0.0, 0.3, 0.5, 0.7, 0.9, 0.95, 1.0]
+    inhibs = [0.0]#[0.0, 0.3, 0.5, 0.7, 0.9, 0.95, 1.0]
     inter_params = inhibs
     L = length(inter_params)
 
@@ -40,14 +40,14 @@ function main()
     plt, color_specialpoint = init_bifurcation(intra_axe_label, p_min, p_max, reds, greens, greys)
 
     for (i,inter_parameter) in enumerate(inter_params)
-        inter_label = L"g_{NaV1.3} = %$(inter_parameter) "
+        inter_label = L""
 
         println("Inter value : $inter_parameter -- $(round(((i-1)/L*100), digits=2)) % is done")
 
         # ---- Make bifurcations ---- #
 
         p_lido = lidocaine_parameter(;)
-        p_noci = nociceptor_parameter(; g_NaV1p8 = 30.0 * (1.0-inter_parameter))
+        p_noci = nociceptor_parameter(;)
         p_model = model_parameter(default_stim, p_noci; lidocaine=p_lido)
 
         br = iteration_bifurcation(plt, i, p_model, u0, lens_param, p_min, p_max,

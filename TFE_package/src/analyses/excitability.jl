@@ -44,7 +44,7 @@ function instant_freqs(t_spikes, n_peak)
 end
 
 
-function global_pattern(t_spikes, n_peak, begin_stim, end_stim; window_width=100)
+function global_pattern(t_spikes, n_peak, end_stim)
     """
     Value of pattern :
     0 : No spike
@@ -109,7 +109,7 @@ function find_rheobase(p_noci, p_lido, amps, u0; duration = 1700.0)
             peak_count = length(peaks_idx)
         end
 
-        _, pattern = global_pattern(t_spikes, peak_count, p_stim.on, p_stim.off)
+        _, pattern = global_pattern(t_spikes, peak_count, p_stim.off)
 
         if (pattern >= 1) && (!is_finded)
             print("\r")
@@ -126,6 +126,18 @@ function find_rheobase(p_noci, p_lido, amps, u0; duration = 1700.0)
 
     print("\r")
     return rheobase, spiking
+end
+
+# ----- small function used in bifurcation limit cycle ----- #
+
+function get_pattern(sol, stim)
+    t = sol.t
+    V = sol.V
+    peaks_idx, n_peak, w_peaks = get_peaks(t, V;  min_h=-5.0, min_proms=10.0)
+    t_spikes = t[peaks_idx]
+    _, pattern = global_pattern(t_spikes, n_peak, stim.off)
+    pred_pattern = pattern_list[pattern+1]
+    return pred_pattern
 end
 
 # -------------------------- parameter_analyse -------------------------- #
@@ -179,7 +191,7 @@ function parameter_analyse(VEC_p_model, u0; duration = 1700.0)
             first_peak_width = w_peaks[1]
         end
 
-        freq, pattern = global_pattern(t_spikes, peak_count, stim.on, stim.off)
+        freq, pattern = global_pattern(t_spikes, peak_count, stim.off)
 
         VEC_peak_count[i]   = peak_count
         VEC_freq[i]         = freq
