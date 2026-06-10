@@ -136,8 +136,7 @@ function get_pattern(sol, stim)
     peaks_idx, n_peak, w_peaks = get_peaks(t, V;  min_h=-5.0, min_proms=10.0)
     t_spikes = t[peaks_idx]
     _, pattern = global_pattern(t_spikes, n_peak, stim.off)
-    pred_pattern = pattern_list[pattern+1]
-    return pred_pattern
+    return pattern
 end
 
 # -------------------------- parameter_analyse -------------------------- #

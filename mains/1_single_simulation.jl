@@ -15,10 +15,10 @@ function main(;extra=0.0)
 
     with_plot = true
 
-    amp = 20.0                                      # pA
+    amp = 150.0                                      # pA
     duration = 1700.0                               # ms
-    stim_on = 500.0                                 # ms
-    stim_length = duration - stim_on - 200.0        # ms
+    stim_on = 0.0                                 # ms
+    stim_length = duration #- stim_on - 200.0        # ms
 
     p_lido = lidocaine_parameter()
     p_noci = nociceptor_parameter()
@@ -28,6 +28,7 @@ function main(;extra=0.0)
     file_prefix = "$(folder)"
 
     u0 = get_u0()
+    u0[1:11] = [10.0407356746133765, 0.9870854072159283, 2.9653217237358692e-5, 0.9627214745221165, 7.519051987830313e-6, 0.8677369807299044, 0.009428204942099143, 0.992282714087809, 0.014777919108885743, 0.996285733438894, 0.04696791243885193]
  
     print("------------------------------\n")
     println("Parameter set type : $folder")

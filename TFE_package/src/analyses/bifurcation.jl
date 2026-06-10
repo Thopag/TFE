@@ -88,9 +88,7 @@ function make_bifurcation(p_model, u0, lens_param, p_min, p_max)
     return br
 end
 
-function get_limit_cycle(u, bif_param, p_model; inter_value=1.0, max_inter=5.0)
-
-    println("")
+function get_limit_cycle(u, bif_param, p_model; inter_value=2.5, max_inter=20.0)
 
     duration = 2000.0
     u0 = copy(u)
@@ -111,8 +109,8 @@ function get_limit_cycle(u, bif_param, p_model; inter_value=1.0, max_inter=5.0)
     finded_min = false
     finded_max = false
     for i in inter_value:inter_value:max_inter*inter_value
+        print("\rProgress: $(round((i/(max_inter*inter_value))*100, digits=2)) % - $(round(bif_param, digits=2))\e[K")
 
-        print("\rProgress: $(round(i/max_inter*inter_value, digits=2)) % - $bif_param & $i")
         # idx=1 because we are focused on V
         u0[1] = u[1] - i
         sol = simulation(u0, (0.0, duration), i_p_model)
@@ -121,6 +119,7 @@ function get_limit_cycle(u, bif_param, p_model; inter_value=1.0, max_inter=5.0)
             min = u0[1]
             finded_min = true
         end
+
         u0[1] = u[1] + i
         sol = simulation(u0, (0.0, duration), i_p_model)
         pattern = get_pattern(sol, i_p_stim)
@@ -138,9 +137,10 @@ function get_limit_cycle(u, bif_param, p_model; inter_value=1.0, max_inter=5.0)
     return min, max
 end
 
-function search_all_limit_cycle(br, p_model; bif_param_incr=30.0)
+function search_all_limit_cycle(br, p_model; bif_param_incr=7.5)
 
     println("Start limit cycle searching")
+    println()
     VEC_u = br.branch.x 
     VEC_bif_param = br.branch.param
     init_L = length(VEC_bif_param)
@@ -152,7 +152,7 @@ function search_all_limit_cycle(br, p_model; bif_param_incr=30.0)
     stop = false
     while !stop
         L = length(VEC_bif_param)
-        print("\rProgress: $(round(1-(L/init_L), digits=2)) %")
+        print("\e[1AProgress: $(round((1-(L/init_L))*100, digits=2)) %\e[K\n")
         start_val = VEC_bif_param[1]
         idx = findfirst(x -> abs(x - start_val) >= bif_param_incr, VEC_bif_param)
 
@@ -169,8 +169,8 @@ function search_all_limit_cycle(br, p_model; bif_param_incr=30.0)
             VEC_bif_param = VEC_bif_param[(idx+1):end]
         end
     end
-    print("\r")
-    println("End limit cycle searching")
+    println("End limit cycle searching\e[K")
+
     return VEC_min, VEC_max, VEC_plot_bif_param
 end
 
@@ -224,8 +224,7 @@ function iteration_bifurcation(plt, i, p_model, u0, lens_param, p_min, p_max,
 
     VEC_min, VEC_max, VEC_plot_bif_param = search_all_limit_cycle(br, p_model)
 
-    p_temp = plot(VEC_plot_bif_param, VEC_min)
-    plot!(p_temp, VEC_plot_bif_param, VEC_max)
-    display(p_temp)
+    plot!(plt, VEC_plot_bif_param, VEC_min, color= :purple, marker=:circle, markersize=2, linealpha=0.5, markeralpha=0.9, label="", markerstrokecolor = :match, markerstrokewidth = 0.0)
+    plot!(plt, VEC_plot_bif_param, VEC_max, color= :purple, marker=:circle, markersize=2, linealpha=0.5, markeralpha=0.9, label="", markerstrokecolor = :match, markerstrokewidth = 0.0)
     return br
 end
