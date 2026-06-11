@@ -88,7 +88,56 @@ function make_bifurcation(p_model, u0, lens_param, p_min, p_max)
     return br
 end
 
-function get_limit_cycle(u, bif_param, p_model; inter_value=2.5, max_inter=20.0)
+# ------------------------- limit cycle -----------------------------#
+
+function get_limit_scyle(amp, p_model, u0)
+
+    duration = 5000.0
+    stim_on = 500.0
+    max = NaN64
+    min = NaN64
+
+    i_p_stim = stimulation_parameter(amp; on=stim_on, length=duration-stim_on)
+    i_p_model = model_parameter(i_p_stim, p_model.nociceptor; lidocaine=p_model.lidocaine)
+
+    sol = simulation(u0, (0.0, duration), i_p_model)
+    t = sol.t
+    V = sol.V
+
+    peaks_idx, peak_count, w_peaks = get_peaks(t, V;  min_h=-5.0, min_proms=10)
+    t_spikes = t[peaks_idx]
+    _, pattern = global_pattern(t_spikes, peak_count, i_p_stim.off)
+    if pattern < 4
+        return min, max
+    end
+    V_last_spikes = V[peaks_idx[end-1]:peaks_idx[end]]
+    max = maximum(V_last_spikes)
+    min = minimum(V_last_spikes)
+    return min, max
+end
+
+function search_all_limit_cycle(amps, p_model, u0)
+
+    println("Start limit cycle searching")
+
+    L = length(amps)
+    VEC_min = Vector{Float64}(undef, L)
+    VEC_max = Vector{Float64}(undef, L)
+
+    for (i,amp) in enumerate(amps)
+        print("\e[1AProgress: $(round((i/L)*100, digits=2)) %\e[K\n")
+        min, max = get_limit_scyle(amp, p_model, u0)
+        VEC_min[i] = min
+        VEC_max[i] = max
+    end
+    println("End limit cycle searching\e[K")
+    return VEC_min, VEC_max
+end
+
+# ------------------------- attraction pools -----------------------------#
+# Not usefull
+
+function get_attraction_pool(u, bif_param, p_model; inter_value=2.5, max_inter=20.0)
 
     duration = 2000.0
     u0 = copy(u)
@@ -137,7 +186,7 @@ function get_limit_cycle(u, bif_param, p_model; inter_value=2.5, max_inter=20.0)
     return min, max
 end
 
-function search_all_limit_cycle(br, p_model; bif_param_incr=7.5)
+function search_all_attraction_pool(br, p_model; bif_param_incr=7.5)
 
     println("Start limit cycle searching")
     println()
@@ -174,6 +223,7 @@ function search_all_limit_cycle(br, p_model; bif_param_incr=7.5)
     return VEC_min, VEC_max, VEC_plot_bif_param
 end
 
+#------------------------ iterations---------------------------#
 
 function init_bifurcation(param_label, p_min, p_max, reds, greens, greys; xlimits=:native)
 
@@ -222,9 +272,10 @@ function iteration_bifurcation(plt, i, p_model, u0, lens_param, p_min, p_max,
         scatter!(plt, [VEC_bif_param[sp_idx]], [V[sp_idx]], label="", c=colors[i], markersize = 4, alpha=1)
     end
 
-    VEC_min, VEC_max, VEC_plot_bif_param = search_all_limit_cycle(br, p_model)
+    VEC_amps = 0:5.0:300.0
+    VEC_min, VEC_max = search_all_limit_cycle(VEC_amps, p_model, u0)
 
-    plot!(plt, VEC_plot_bif_param, VEC_min, color= :purple, marker=:circle, markersize=2, linealpha=0.5, markeralpha=0.9, label="", markerstrokecolor = :match, markerstrokewidth = 0.0)
-    plot!(plt, VEC_plot_bif_param, VEC_max, color= :purple, marker=:circle, markersize=2, linealpha=0.5, markeralpha=0.9, label="", markerstrokecolor = :match, markerstrokewidth = 0.0)
+    plot!(plt, VEC_amps, VEC_min, color= :purple, marker=:circle, markersize=2, linealpha=0.5, markeralpha=0.9, label="", markerstrokecolor = :match, markerstrokewidth = 0.0)
+    plot!(plt, VEC_amps, VEC_max, color= :purple, marker=:circle, markersize=2, linealpha=0.5, markeralpha=0.9, label="", markerstrokecolor = :match, markerstrokewidth = 0.0)
     return br
 end

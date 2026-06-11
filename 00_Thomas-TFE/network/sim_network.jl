@@ -1,4 +1,4 @@
-using Plots,LaTeXStrings,DifferentialEquations,JLD,Statistics
+using Plots,LaTeXStrings,DifferentialEquations,Statistics
 
 include("gates.jl")
 

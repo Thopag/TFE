@@ -134,6 +134,7 @@ struct ModelParameters
     projection_neuron::ProjectionNeuronParameters
     noise::NoiseParameters
 end
+    #::Union{Nothing, Struct}
 
 function model_parameter(stimulation::StimulationParameters, nociceptor::NociceptorParameters
                     ;projection_neuron=DEFAULT_PROJ_NEURON, lidocaine::LidocaineParameters=DEFAULT_LIDOCAINE, noise::NoiseParameters=DEFAULT_NOISE)
