@@ -54,6 +54,7 @@ include("gates.jl")
     tau_fac_NMDA = 0.1      #[ms]
     tau_rec_NMDA = 0.1      #[ms]
     U1_AMPA = 1.            #[.]
+
     tau_rise_AMPA = 0.1     #[ms]
     tau_decay_AMPA = 5.     #[ms]
     tau_fac_AMPA = 0.1      #[ms]

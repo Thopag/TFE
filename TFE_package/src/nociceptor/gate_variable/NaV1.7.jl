@@ -60,19 +60,3 @@ function dot_h7(V, h7; C_lido::Float64=0.0, shift::Float64=0.0, with_shift::Bool
     tau_x = tau_h7(V)
     return (x_inf-h7)/tau_x
 end
-
-# ---- #
-# Differential modulation of Nav1.7 and Nav1.8 peripheral nerve sodium channels by the local anesthetic lidocaine
-# Other gate function that was tested should be removed in the final code
-
-function control_1_7_activation(V; C_lido=0) 
-    # With 100 µM lidocaine 
-    # Boltzmann(V, 1.0, -23.92, -3.89, 0.0, 0.0, 1.0)
-    return Boltzmann(V, 1.0, -25.56, -3.75, 0.0, 0.0, 1.0)
-end
-
-function control_1_7_inactivation(V; C_lido=0)
-    # With 100 µM lidocaine 
-    # Boltzmann(V, 1.0, -79.02, 5.52, 0.0, 0.0, 1.0)
-    return Boltzmann(V, 1.0, -68.38, 4.37, 0.0, 0.0, 1.0)
-end

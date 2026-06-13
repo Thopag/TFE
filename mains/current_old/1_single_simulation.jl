@@ -5,51 +5,40 @@ folder = "DIV0"
 
 if folder == "DIV0"
     nociceptor_parameter = DIV0_parameter
-    set_u0_noci = DIV0_u0
-    get_u0_noci = get_DIV0_u0
-    Ihold = -3.0
+    get_u0 = DIV0_u0
 elseif folder == "DIV7"
     nociceptor_parameter = DIV7_parameter
-    set_u0_noci = DIV7_u0
-    get_u0_noci = get_DIV7_u0
-    Ihold = 0.0
+    get_u0 = DIV7_u0
 end
 
 function main(;extra=0.0)
 
     with_plot = true
 
-    amp = 51.0                                      # pA
+    amp = 150.0                                      # pA
     duration = 1700.0                               # ms
-    stim_on = 500.0                                 # ms
-    stim_length = duration - stim_on - 200.0        # ms
+    stim_on = 0.0                                 # ms
+    stim_length = duration #- stim_on - 200.0        # ms
 
     p_lido = lidocaine_parameter()
     p_noci = nociceptor_parameter()
-    p_pn = projection_neuron_parameter()
-    p_s = synapse_parameter()
-    p_stim = stimulation_parameter(amp; on=stim_on, length=stim_length, Ihold=Ihold)
-    p_model = model_parameter(p_stim, p_noci; projection_neuron=p_pn, synapse=p_s, lidocaine=p_lido)
+    p_stim = stimulation_parameter(amp; on=stim_on, length=stim_length)
+    p_model = model_parameter(p_stim, p_noci; lidocaine=p_lido)
 
+    file_prefix = "$(folder)"
+
+    u0 = get_u0()
+    u0[1:11] = [10.0407356746133765, 0.9870854072159283, 2.9653217237358692e-5, 0.9627214745221165, 7.519051987830313e-6, 0.8677369807299044, 0.009428204942099143, 0.992282714087809, 0.014777919108885743, 0.996285733438894, 0.04696791243885193]
+ 
     print("------------------------------\n")
     println("Parameter set type : $folder")
     println("I_ext : $amp pA")
 
-    file_prefix = "$(folder)"
-
-    #u0 = get_projection_neuron_u0()
-    u0 = get_synapse_u0(set_u0_noci)
-
-    #@time sol = nociceptor_simulation(u0, (0.0, duration), p_model)
-    #@time sol = projection_neuron_simulation(u0, (0.0, duration), p_model)
-    @time _, _, sol = with_synapse_simulation(u0, (0.0, duration), p_model)
-
+    sol = simulation(u0, (0.0, duration), p_model)
     t = sol.t
     V = sol.V
 
-    #current = retrieve_nociceptor_currents(sol, p_model)
-    #current = retrieve_projection_neuron_currents(sol, p_model)
-    current = nothing
+    current = give_currents(sol, p_model)
     peaks_idx, n_peak, w_peaks = TFE.get_peaks(t, V;  min_h=-5.0, min_proms=10.0)
 
     t_spikes = t[peaks_idx]
@@ -64,13 +53,14 @@ function main(;extra=0.0)
 
     if with_plot
         #xlimits = (stim_on-25, stim_on+150)
-        #xlimits = (stim_on-50, duration)
+        #xlimits = (stim_on-50, stim_on+stim_length+50)
         xlimits = (0.0, stim_on+stim_length+50)
         plt = plot_single_simulation(sol, current, p_model, t_spikes; xlimits=xlimits)
 
         #display(plt)
         savefig(plt, "plots/simulation/$(file_prefix)_all.png")
         savefig(plt, "plots/simulation/$(file_prefix)_all.pdf")
+
     end
 
     if n_peak > 1

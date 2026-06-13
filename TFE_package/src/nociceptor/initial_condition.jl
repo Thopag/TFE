@@ -1,9 +1,9 @@
-export DIV0_u0, DIV7_u0
+export DIV0_u0, DIV7_u0, get_DIV0_u0, get_DIV7_u0
 
-function DIV0_u0()
+# use @views u0[a:b]
+# to give the pointer to the sub_vector and not a copy
 
-    u0 = zeros(18)
-
+function DIV0_u0(u0)
     u0[1] = -69.5         # V
     u0[2] = 0.0           # m3
     u0[3] = 0.0           # h3
@@ -15,23 +15,10 @@ function DIV0_u0()
     u0[9] = 0.6487        # ldr
     u0[10] = 0.0014       # nm 
     u0[11] = 0.0          # zAHP
-
-    u0[12] = -70.0          # V_pn
-    u0[13] = 0.0          # mL
-    u0[14] = 0.0          # hL
-    u0[15] = 0.0          # Ca_i
-    u0[16] = 0.0          # mir
-    u0[17] = 0.0          # mM
-
-    u0[18] = 0.0          # Inoise
-
-    return u0
+    return
 end
 
-function DIV7_u0()
-
-    u0 = zeros(18)
-
+function DIV7_u0(u0)
     u0[1] = -70.0         # V
     u0[2] = 0.0           # m3
     u0[3] = 0.7191        # h3
@@ -43,15 +30,17 @@ function DIV7_u0()
     u0[9] = 0.6058        # ldr
     u0[10] = 0.0          # nm 
     u0[11] = 0.0          # zAHP
+    return
+end
 
-    u0[12] = -70.0          # V_pn
-    u0[13] = 0.0          # mL
-    u0[14] = 0.0          # hL
-    u0[15] = 0.0          # Ca_i
-    u0[16] = 0.0          # mir
-    u0[17] = 0.0          # mM
+function get_DIV0_u0()
+    u0 = zeros(Float64, 12)
+    DIV0_u0(view(u0, 1:11))
+    return u0
+end
 
-    u0[18] = 0.0          # Inoise
-
+function get_DIV7_u0()
+    u0 = zeros(Float64, 12)
+    DIV0_u7(view(u0, 1:11))
     return u0
 end

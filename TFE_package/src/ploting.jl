@@ -22,7 +22,7 @@ end
 
 function plot_single_simulation(sol, current, p_model, t_spikes; xlimits=(400, 1700))
 
-    n_fig = 3
+    n_fig = 1
     plt = plot(layout = (n_fig, 1), link = :x, xlims=xlimits, size = (750, 230*n_fig), xaxis = nothing,
                                                                     left_margin = 5mm,
                                                                     bottom_margin = 5mm, 
@@ -50,11 +50,11 @@ function plot_single_simulation(sol, current, p_model, t_spikes; xlimits=(400, 1
         text( L"amp = %$amp pA", 11, :black))
 
 
-    voltage_pn = 2
-    ylabel!(plt[voltage_pn], "Voltage (mV)")
-    plot!(plt[voltage_pn], t, sol.V_pn, color= :black, label="")
+    # voltage_pn = 2
+    # ylabel!(plt[voltage_pn], "Voltage (mV)")
+    # plot!(plt[voltage_pn], t, sol.V_pn, color= :black, label="")
 
-    plot!(plt[3], t, current.Inoci, color= :black, label="")
+    # plot!(plt[3], t, current.Inoci, color= :black, label="")
 
 
     # current = 2

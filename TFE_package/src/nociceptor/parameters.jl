@@ -1,5 +1,20 @@
 export DIV0_parameter, DIV7_parameter
 
+struct NociceptorParameters
+    C::Float64
+    CellArea::Float64
+    E_Na::Float64
+    g_NaV1p3::Float64
+    g_NaV1p7::Float64
+    g_NaV1p8::Float64
+    E_K::Float64
+    g_K_dr::Float64
+    g_K_M::Float64
+    g_K_AHP::Float64
+    E_Leak::Float64
+    g_Leak::Float64
+end
+
 function DIV0_parameter(;
 
     # Na conductances
@@ -85,3 +100,5 @@ function DIV7_parameter(;
     
     return nociceptor
 end
+
+const DEFAULT_NOCICEPTOR =  DIV0_parameter()
