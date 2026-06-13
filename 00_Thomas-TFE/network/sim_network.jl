@@ -29,11 +29,11 @@ tf1=350
 
     p_indices = indices_states(p_syn_var_n1,p_syn_var_n2)
     
-    w_NMDA___n1_to_n2 = 0.003*8 
-    w_AMPA___n1_to_n2 = 0.00225*8 
+    w_NMDA___n1_to_n2 = 0.003*8     #w_NMDA
+    w_AMPA___n1_to_n2 = 0.00225*8   #w_AMPA
 
-    d_NMDA___n1_to_n2 = 0.5
-    d_AMPA___n1_to_n2 = 0.5
+    d_NMDA___n1_to_n2 = 0.5         #d_NMDA
+    d_AMPA___n1_to_n2 = 0.5         #d_AMPA
 
     p_conn_d___n1_to_n2 = [d_NMDA___n1_to_n2,d_AMPA___n1_to_n2]
     p_conn_w___n1_to_n2 = [w_NMDA___n1_to_n2,w_AMPA___n1_to_n2]

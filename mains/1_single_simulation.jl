@@ -37,28 +37,23 @@ function main(;extra=0.0)
 
     file_prefix = "$(folder)"
 
-    #u0 = get_projection_neuron_u0()
     u0 = get_synapse_u0(set_u0_noci)
 
     #@time sol = nociceptor_simulation(u0, (0.0, duration), p_model)
     #@time sol = projection_neuron_simulation(u0, (0.0, duration), p_model)
-    @time _, _, sol = with_synapse_simulation(u0, (0.0, duration), p_model)
+    @time sol_n, sol_pn, sol_s = with_synapse_simulation(u0, (0.0, duration), p_model)
+    sol = sol_n
 
-    t = sol.t
-    V = sol.V
+    t_spikes = sol.t_spikes
+    n_peak = length(t_spikes)
 
-    #current = retrieve_nociceptor_currents(sol, p_model)
-    #current = retrieve_projection_neuron_currents(sol, p_model)
-    current = nothing
-    peaks_idx, n_peak, w_peaks = TFE.get_peaks(t, V;  min_h=-5.0, min_proms=10.0)
-
-    t_spikes = t[peaks_idx]
-
+    #peaks_idx, n_peak, w_peaks = TFE.get_peaks(t, V;  min_h=-5.0, min_proms=10.0)
     freqs = TFE.instant_freqs(t_spikes, n_peak)
 
     freq, pattern = global_pattern(t_spikes, n_peak, p_stim.off)
     pred_pattern = Ploting.pattern_list[pattern+1]
     println("Predicted pattern : $pred_pattern")
+
 
     # --- Plots --- #
 
@@ -66,7 +61,7 @@ function main(;extra=0.0)
         #xlimits = (stim_on-25, stim_on+150)
         #xlimits = (stim_on-50, duration)
         xlimits = (0.0, stim_on+stim_length+50)
-        plt = plot_single_simulation(sol, current, p_model, t_spikes; xlimits=xlimits)
+        plt = plot_single_simulation(sol_n, sol_pn, sol_s, p_model; xlimits=xlimits)
 
         #display(plt)
         savefig(plt, "plots/simulation/$(file_prefix)_all.png")

@@ -20,9 +20,9 @@ function sodium_palettes(L; dark=0.95, light=0.4)
     return reds, blues, greens, greys
 end
 
-function plot_single_simulation(sol, current, p_model, t_spikes; xlimits=(400, 1700))
+function plot_single_simulation(sol_n, sol_pn, sol_s, p_model; xlimits=(400, 1700))
 
-    n_fig = 1
+    n_fig = 3
     plt = plot(layout = (n_fig, 1), link = :x, xlims=xlimits, size = (750, 230*n_fig), xaxis = nothing,
                                                                     left_margin = 5mm,
                                                                     bottom_margin = 5mm, 
@@ -33,8 +33,8 @@ function plot_single_simulation(sol, current, p_model, t_spikes; xlimits=(400, 1
 
     alpha = 0.4
 
-    t = sol.t
-    V = sol.V
+    t = sol_n.t
+    V = sol_n.V
     amp = p_model.stimulation.amp
 
     voltage = 1
@@ -43,19 +43,20 @@ function plot_single_simulation(sol, current, p_model, t_spikes; xlimits=(400, 1
     ylims = Plots.ylims(plt[voltage])
 
     plot!(plt[voltage], t, V, color= :black, label="")
-    #vline!(plt[voltage], t_spikes, color=:red, label="")
+    vline!(plt[voltage], sol_n.t_spikes, color=:red, label="")
     annotate!(plt[voltage],
         xlims[2] - 0.1*(xlims[2]-xlims[1]),
         ylims[2] - 0.05*(ylims[2]-ylims[1]),
         text( L"amp = %$amp pA", 11, :black))
 
 
-    # voltage_pn = 2
-    # ylabel!(plt[voltage_pn], "Voltage (mV)")
-    # plot!(plt[voltage_pn], t, sol.V_pn, color= :black, label="")
+    voltage_pn = 2
+    ylabel!(plt[voltage_pn], "Voltage (mV)")
+    plot!(plt[voltage_pn], t, sol_pn.V, color= :black, label="")
 
-    # plot!(plt[3], t, current.Inoci, color= :black, label="")
-
+    s_current = retrieve_synapse_currents(sol_s, p_model)
+    plot!(plt[3], t, s_current.INMDA, color= :black, label="")
+    vline!(plt[3], sol_s.t_NMDA_response, color=:red, label="")
 
     # current = 2
     # ylabel!(plt[current], "Current (uA/cm2)", legendfontsize=7, legend = :bottomright)

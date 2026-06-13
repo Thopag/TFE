@@ -95,7 +95,8 @@ function DIV7_parameter(;
         C, CellArea,
         E_Na, g_NaV1p3, g_NaV1p7, g_NaV1p8,
         E_K, g_K_dr, g_K_M, g_K_AHP,
-        E_Leak, g_Leak
+        E_Leak, g_Leak,
+        Float64[], Float64[]
     )
     
     return nociceptor

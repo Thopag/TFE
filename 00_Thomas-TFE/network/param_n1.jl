@@ -32,18 +32,6 @@ include("gates.jl")
     p_glob_n1 = (I_s_n1,k,F,L,D)
     p_fixed_n1 = (C,eNa,eK,eCa,eleak,Ca_o,Ca_i_0,tau_Ca,d,Ra)
   
-    ## Initial conditions
-    V_ic = -66.5 # [mV]
-    Ca_ic = 5.0e-5 # [mM]
-    A_ic = 0
-    B_ic = 0
-    Use_ic = 0
-    P_ic = 1
-    mKir_ic = 1
-    ic_n1 = [V_ic,mNa(V_ic),hNa(V_ic),mKDR(V_ic),Ca_ic,
-        #A_ic,B_ic,Use_ic,P_ic,A_ic,B_ic,Use_ic,P_ic,A_ic,B_ic,Use_ic,P_ic,mKir(V_ic)
-        ]
-
     ## Varying parameters
     gNa_s = 30 #mS/cm²
     gKDR_s = 4 #mS/cm²
@@ -66,6 +54,7 @@ include("gates.jl")
     tau_fac_NMDA = 0.1      #[ms]
     tau_rec_NMDA = 0.1      #[ms]
     U1_AMPA = 1.            #[.]
+
     tau_rise_AMPA = 0.1     #[ms]
     tau_decay_AMPA = 5.     #[ms]
     tau_fac_AMPA = 0.1      #[ms]
@@ -77,4 +66,17 @@ include("gates.jl")
     gAMPA = 0 #mS/cm²
     gGRPR = 0 #mS/cm²
     p_syn_var_n1 = (gNMDA,gAMPA)
+
+    ## Initial conditions
+    V_ic = -66.5 # [mV]
+    Ca_ic = 5.0e-5 # [mM]
+    A_ic = 0
+    B_ic = 0
+    Use_ic = 0
+    P_ic = 1
+    mKir_ic = 1
+    ic_n1 = [V_ic,mNa(V_ic),hNa(V_ic),mKDR(V_ic),Ca_ic,
+        #A_ic,B_ic,Use_ic,P_ic,A_ic,B_ic,Use_ic,P_ic,A_ic,B_ic,Use_ic,P_ic,mKir(V_ic)
+        ]
+
 

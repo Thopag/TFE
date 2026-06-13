@@ -48,7 +48,6 @@ function inc_syn_AMPA_states_n!(integrator,p_syn_fixed_,p_conn_w_,i_syn_r_i_)
 end
 
 
-
 #-------------------------------------------------------------------------------
 #                          CALLBACKS DEFINITION
 #

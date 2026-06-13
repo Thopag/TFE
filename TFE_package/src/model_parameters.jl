@@ -61,6 +61,17 @@ end
 
 const DEFAULT_NOISE = noise_parameter()
 
+# --------------- DATA SAVING --------------- #
+
+struct SavedEvents
+    n_t_spikes::Vector{Float64}
+    n_V_spikes::Vector{Float64}
+    pn_t_spikes::Vector{Float64}
+    pn_V_spikes::Vector{Float64}
+    t_NMDA_response::Vector{Float64}
+    t_AMPA_response::Vector{Float64}
+end
+
 # --------------- MODEL PARAMETER --------------- #
 
 struct ModelParameters{F}
@@ -70,14 +81,16 @@ struct ModelParameters{F}
     synapse::SynapseParameters
     lidocaine::LidocaineParameters
     noise::NoiseParameters
+    save::SavedEvents
 end
-    #::Union{Nothing, Struct}
 
 function model_parameter(stimulation::StimulationParameters, nociceptor::NociceptorParameters;
                     projection_neuron::ProjectionNeuronParameters   = DEFAULT_PROJ_NEURON, 
                     lidocaine::LidocaineParameters                  = DEFAULT_LIDOCAINE, 
                     synapse::SynapseParameters                      = DEFAULT_SYNAPSE,
                     noise::NoiseParameters                          = DEFAULT_NOISE)
+
+    saved_events = SavedEvents(Float64[],Float64[],Float64[],Float64[],Float64[],Float64[])
         
-    return ModelParameters(stimulation, nociceptor, projection_neuron, synapse, lidocaine, noise)
+    return ModelParameters(stimulation, nociceptor, projection_neuron, synapse, lidocaine, noise, saved_events)
 end

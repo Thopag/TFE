@@ -22,10 +22,10 @@ function retrieve_synapse_currents(s_sol, p_model)
     s = p_model.synapse
     V = s_sol.V
 
-    tmp = INMDA.(V, A_NMDA, B_NMDA, s.g_NMDA, s.E_NMDA)
+    tmp = INMDA.(V, s_sol.A_NMDA, s_sol.B_NMDA, s.g_NMDA, s.E_NMDA)
 
-    projection_neuron_current = SynapseNeuronCurrent(tmp,
-                                    IAMPA(V, A_AMPA, B_AMPA, s.g_AMPA, s.E_AMPA),
+    projection_neuron_current = SynapseCurrent(tmp,
+                                    IAMPA.(V, s_sol.A_AMPA, s_sol.B_AMPA, s.g_AMPA, s.E_AMPA),
                                     tmp .* s.ratio
                         )
     return projection_neuron_current

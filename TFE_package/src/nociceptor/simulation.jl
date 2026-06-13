@@ -1,6 +1,7 @@
 export nociceptor_simulation
 
 include("initial_condition.jl")
+include("simulation_events.jl")
 include("ODE.jl")
 
 struct NociceptorSolution
@@ -17,9 +18,16 @@ struct NociceptorSolution
     nM::Vector{Float64}
     zAHP::Vector{Float64}
     Inoise::Vector{Float64}
+    t_spikes::Vector{Float64}
+    V_spikes::Vector{Float64}
 end
 
 function nociceptor_simulation(u0, tspan, p)
+
+    L = length(u0)
+    if L == 25
+        u0 = u0[1:11]
+    end
 
     L = length(u0)
     if (L > 12) || (L < 11)
@@ -31,9 +39,12 @@ function nociceptor_simulation(u0, tspan, p)
         push!(u0, 0.0)
     end
 
+    # -- callbacks set up -- #
+    cbs = CallbackSet(cb_n_spike)
+
     # -- Simulation -- #
     prob = SDEProblem(ODE_system_nociceptor, stochastic_system_nociceptor, u0, tspan, p) 
-    sol = solve(prob,dtmax=0.01, maxiters=1e7)
+    sol = solve(prob, callback=cbs, dtmax=0.01, maxiters=1e7)
 
     # -- Simulation results -- #
     t      = sol.t
@@ -51,7 +62,8 @@ function nociceptor_simulation(u0, tspan, p)
 
     Inoise = sol[end, :]
 
-    nociceptor_solution = NociceptorSolution(t,V,m3,h3,m7,h7,m8,h8,ndr,ldr,nM,zAHP,Inoise)
+    nociceptor_solution = NociceptorSolution(t,V,m3,h3,m7,h7,m8,h8,ndr,ldr,nM,zAHP,Inoise,
+                                                    p.save.n_t_spikes, p.save.n_V_spikes)
 
     return nociceptor_solution
 end
