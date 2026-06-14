@@ -50,12 +50,9 @@ function noise_parameter(;
     )
 
     noise = NoiseParameters(
-        sigma,
-        mu,
-        tau,
+        sigma, mu, tau,
         with_noise,
         )
-
     return noise
 end
 

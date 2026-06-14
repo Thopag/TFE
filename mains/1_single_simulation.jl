@@ -29,19 +29,26 @@ function main(;extra=0.0)
     p_pn = projection_neuron_parameter()
     p_s = synapse_parameter()
     p_stim = stimulation_parameter(amp; on=stim_on, length=stim_length, Ihold=Ihold)
+
+    #p_stim, tstops = test_n1_n2_stimulation_parameter(;scenario = "BT")
     p_model = model_parameter(p_stim, p_noci; projection_neuron=p_pn, synapse=p_s, lidocaine=p_lido)
 
     print("------------------------------\n")
-    println("Parameter set type : $folder")
-    println("I_ext : $amp pA")
+    # println("Parameter set type : $folder")
+    # println("I_ext : $amp pA")
 
-    file_prefix = "$(folder)"
+    #file_prefix = "$(folder)"
+    file_prefix = "test"
 
     u0 = get_synapse_u0(set_u0_noci)
 
     #@time sol = nociceptor_simulation(u0, (0.0, duration), p_model)
     #@time sol = projection_neuron_simulation(u0, (0.0, duration), p_model)
     @time sol_n, sol_pn, sol_s = with_synapse_simulation(u0, (0.0, duration), p_model)
+
+    #u0 = get_test_u0()
+    #@time sol_n, sol_pn, sol_s = test_n1_n2_simulation(u0, (0.0, duration), p_model, tstops)
+    
     sol = sol_n
 
     t_spikes = sol.t_spikes
@@ -60,7 +67,8 @@ function main(;extra=0.0)
     if with_plot
         #xlimits = (stim_on-25, stim_on+150)
         #xlimits = (stim_on-50, duration)
-        xlimits = (0.0, stim_on+stim_length+50)
+        #xlimits = (0.0, stim_on+stim_length+50)
+        xlimits = (0.0, duration)
         plt = plot_single_simulation(sol_n, sol_pn, sol_s, p_model; xlimits=xlimits)
 
         #display(plt)

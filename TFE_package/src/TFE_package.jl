@@ -10,6 +10,7 @@ include("model_parameters.jl")
 include("nociceptor/simulation.jl")
 include("projection_neuron/simulation.jl")
 include("with_synapse/simulation.jl")
+include("test_n1_n2/simulation.jl")
 
 include("analyses/excitability.jl")
 # include("analyses/bifurcation.jl")

@@ -2,7 +2,7 @@ using Plots,LaTeXStrings,DifferentialEquations,Statistics
 
 include("gates.jl")
 
-i_scenario = 2
+i_scenario = 1
 list_scenarios = ["BT","SS"]
 
 include("param_n1.jl")

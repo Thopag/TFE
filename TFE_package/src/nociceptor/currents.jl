@@ -37,6 +37,7 @@ struct NociceptorCurrent{T}
     IK_M::T
     IK_AHP::T
     ILeak::T
+    Iext::T
 end
 
 function retrieve_nociceptor_currents(noci_sol, p_model)
@@ -45,9 +46,10 @@ function retrieve_nociceptor_currents(noci_sol, p_model)
     n = p_model.nociceptor
     stim = p_model.stimulation
     V = noci_sol.V
+    t = noci_sol.t
 
-    # Iext = stim.Ihold + (stim.is_activated(t)*stim.amp)  # [pA]
-    # Iext = Iext * (10^-6) / (n.CellArea * (10^-8))      # [µA/cm^2]
+    Iext = stim.Ihold .+ (stim.is_activated.(t) .* stim.amp)  # [pA]
+    Iext = Iext .* (10.0 .^(-6)) ./ (n.CellArea .* (10 .^(-8)))      # [µA/cm^2]
 
     nociceptor_current = NociceptorCurrent(INaV1p3.(V, noci_sol.m3, noci_sol.h3, n.g_NaV1p3, n.E_Na),
                                     INaV1p7.(V, noci_sol.m7, noci_sol.h7, n.g_NaV1p7, n.E_Na),
@@ -55,7 +57,7 @@ function retrieve_nociceptor_currents(noci_sol, p_model)
                                     IK_dr.(V, noci_sol.ndr, noci_sol.ldr, n.g_K_dr, n.E_K),
                                     IK_M.(V, noci_sol.nM, n.g_K_M, n.E_K),
                                     IK_AHP.(V, noci_sol.zAHP, n.g_K_AHP, n.E_K),
-                                    ILeak.(V, n.g_Leak, n.E_Leak)
+                                    ILeak.(V, n.g_Leak, n.E_Leak), Iext
                         )
     return nociceptor_current
 end

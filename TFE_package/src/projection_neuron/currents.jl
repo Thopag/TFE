@@ -33,6 +33,7 @@ struct ProjectionNeuronCurrent{T}
     INa::T
     IK_dr::T
     ILeak::T
+    Iext::T
 end
 
 function retrieve_projection_neuron_currents(pn_sol, p_model)
@@ -41,13 +42,14 @@ function retrieve_projection_neuron_currents(pn_sol, p_model)
     pn = p_model.projection_neuron
     stim = p_model.stimulation
     V = pn_sol.V
+    t = pn_sol.t
 
-    # Iext = stim.Ihold + (stim.is_activated(t)*stim.amp)  # [pA]
-    # Iext = Iext * (10^-6) / (pn.CellArea * (10^-8))      # [µA/cm^2]
+    Iext = stim.Ihold .+ (stim.is_activated.(t) .* stim.amp)  # [pA]
+    Iext = Iext .* (10.0 .^(-6)) ./ (pn.CellArea .* (10 .^(-8)))      # [µA/cm^2]
 
     projection_neuron_current = ProjectionNeuronCurrent(INa.(V, pn_sol.mNa, pn_sol.hNa, pn.g_Na, pn.E_Na),
                                     IK_dr_pn.(V, pn_sol.mdr, pn.g_K_dr, pn.E_K),
-                                    ILeak_pn.(V, pn.g_Leak, pn.E_Leak)
+                                    ILeak_pn.(V, pn.g_Leak, pn.E_Leak), Iext
                         )
     return projection_neuron_current
 end

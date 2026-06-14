@@ -23,6 +23,8 @@ struct SynapseParameters
     ratio::Float64
     delay_AMPA::Float64
     delay_NMDA::Float64
+    resp_time_AMPA::Float64
+    resp_time_NMDA::Float64
 end
 
 function synapse_parameter(;
@@ -34,6 +36,8 @@ function synapse_parameter(;
 
     delay_AMPA = 0.5,        # [mV]
     delay_NMDA = 0.5,        # [mV]
+    resp_time_AMPA = 0.01,        # [mV]
+    resp_time_NMDA = 0.01,        # [mV]
 
     w_AMPA          = 0.00225*8,
     tau_rise_AMPA   = 0.1,       # [ms]
@@ -58,7 +62,7 @@ function synapse_parameter(;
         E_NMDA, E_AMPA,
         w_AMPA, tau_rise_AMPA, tau_decay_AMPA, tau_fac_AMPA, tau_rec_AMPA,U1_AMPA,
         w_NMDA, tau_rise_NMDA, tau_decay_NMDA, tau_fac_NMDA, tau_rec_NMDA,U1_NMDA,
-        ratio, delay_AMPA, delay_NMDA
+        ratio, delay_AMPA, delay_NMDA, resp_time_AMPA, resp_time_NMDA
         )
 
     return synapse

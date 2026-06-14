@@ -21,13 +21,19 @@ function NMDA_spike_response_condition(u,t,integrator)
   if L == 0
     return false
   end
-  # Check if it has not already responsed
+
+  s = integrator.p.synapse
   t_NMDA_response = integrator.p.save.t_NMDA_response
+  # Check if it has not already started to response
   if length(t_NMDA_response) == L
-    return false
+    # check if we are in the duration of response
+    if (integrator.t - t_NMDA_response[end]) < s.resp_time_NMDA
+      return true
+    else
+      return false
+    end
   end
   # Check if the delay has passed
-  s = integrator.p.synapse
   if (t_spikes[end] + s.delay_NMDA) >= integrator.t
     return false
   end
@@ -42,13 +48,19 @@ function AMPA_spike_response_condition(u,t,integrator)
   if L == 0
     return false
   end
-  # Check if it has not already responsed
+
+  s = integrator.p.synapse
   t_AMPA_response = integrator.p.save.t_AMPA_response
+  # Check if it has not already started to response
   if length(t_AMPA_response) == L
-    return false
+    # check if we are in the duration of response
+    if (integrator.t - t_AMPA_response[end]) < s.resp_time_AMPA
+      return true
+    else
+      return false
+    end
   end
   # Check if the delay has passed
-  s = integrator.p.synapse
   if (t_spikes[end] + s.delay_AMPA) >= integrator.t
     return false
   end

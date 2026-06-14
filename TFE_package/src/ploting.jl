@@ -20,30 +20,35 @@ function sodium_palettes(L; dark=0.95, light=0.4)
     return reds, blues, greens, greys
 end
 
+# Made by gemine, have to remake 
+function reponse_time(t_resp, sol_t, dt)
+    time_grid = sol_t[1]:dt:sol_t[end]
+    mask = [any(tp <= t <= (tp + dt) for tp in t_resp) for t in time_grid]
+    return time_grid, Int.(mask)
+end
+
 function plot_single_simulation(sol_n, sol_pn, sol_s, p_model; xlimits=(400, 1700))
 
-    n_fig = 3
+    n_fig = 4
     plt = plot(layout = (n_fig, 1), link = :x, xlims=xlimits, size = (750, 230*n_fig), xaxis = nothing,
                                                                     left_margin = 5mm,
                                                                     bottom_margin = 5mm, 
                                                                     margin = 5mm)
 
-    xticks = xlimits[1]:100:xlimits[end]
+    xticks = :native #xlimits[1]:100:xlimits[end]
     plot!(plt[n_fig], xaxis = "Time (ms)", xticks=xticks)
-
-    alpha = 0.4
 
     t = sol_n.t
     V = sol_n.V
     amp = p_model.stimulation.amp
 
     voltage = 1
-    ylabel!(plt[voltage], "Voltage (mV)", ylims=(-90,50))
+    ylabel!(plt[voltage], "Voltage (mV)", ylims=(-100,50))
     xlims = Plots.xlims(plt[voltage])
     ylims = Plots.ylims(plt[voltage])
 
     plot!(plt[voltage], t, V, color= :black, label="")
-    vline!(plt[voltage], sol_n.t_spikes, color=:red, label="")
+    #vline!(plt[voltage], sol_n.t_spikes, color=:red, label="")
     annotate!(plt[voltage],
         xlims[2] - 0.1*(xlims[2]-xlims[1]),
         ylims[2] - 0.05*(ylims[2]-ylims[1]),
@@ -51,55 +56,28 @@ function plot_single_simulation(sol_n, sol_pn, sol_s, p_model; xlimits=(400, 170
 
 
     voltage_pn = 2
-    ylabel!(plt[voltage_pn], "Voltage (mV)")
+    ylabel!(plt[voltage_pn], "Voltage (mV)", ylims=(-100,50))
     plot!(plt[voltage_pn], t, sol_pn.V, color= :black, label="")
 
     s_current = retrieve_synapse_currents(sol_s, p_model)
-    plot!(plt[3], t, s_current.INMDA, color= :black, label="")
-    vline!(plt[3], sol_s.t_NMDA_response, color=:red, label="")
+    syn_curr = 3
+    plot!(plt[syn_curr], t, .-s_current.INMDA, label="-INMDA")
+    plot!(plt[syn_curr], t, .-s_current.IAMPA, label="-IAMPA")
+    #vline!(plt[3], sol_s.t_NMDA_response, color=:red, label="")
 
-    # current = 2
-    # ylabel!(plt[current], "Current (uA/cm2)", legendfontsize=7, legend = :bottomright)
-    # plot!(plt[current], t, INaV1p3, color=:blue, label=L"I_{NaV1.3}", alpha=alpha)
-    # plot!(plt[current], t, INaV1p7, color=:red, label=L"I_{NaV1.7}")
-    # plot!(plt[current], t, INaV1p8, color=:green, label=L"I_{NaV1.8}")
-    # plot!(plt[current], t, IK_dr, color=:orange, label=L"I_{K_dr}", alpha=alpha)
-    # plot!(plt[current], t, IK_M, color=:purple, label=L"I_{KM}", alpha=alpha)
-    # plot!(plt[current], t, IK_AHP, color=:brown, label=L"I_{AHP}", alpha=alpha)
-    # plot!(plt[current], t, ILeak, color=:black, label=L"I_{Leak}")
-    # plot!(plt[current], t, .- Iext, color=:black, linestyle = :dash, label=L"-I_{ext}")
-    # #plot!(p[current], t, I_noise, color=:pink, label=L"I_{noise}")
+    # syn_variables = 4
+    # plot!(plt[syn_variables], t, sol_s.A_NMDA,  label="A_NMDA", color= :purple)
+    # plot!(plt[syn_variables], t, sol_s.B_NMDA,  label="B_NMDA", color= :blue)
+    # plot!(plt[syn_variables], t, sol_s.Use_NMDA,  label="Use_NMDA", color= :green)
+    # plot!(plt[syn_variables], t, sol_s.P_NMDA,  label="P_NMDA ", color= :orange)
+    # plot!(plt[syn_variables], t, sol_s.B_NMDA .- sol_s.A_NMDA,  label="B_NMDA - A_NMDA", color= :red)
 
+    t_resp, resp = reponse_time(p_model.save.t_NMDA_response, t, p_model.synapse.resp_time_NMDA)
+    response = 4
+    plot!(plt[response], t_resp, resp,  label="response", color= :black)
 
-    channel = 3
-    # ylabel!(plt[channel], "Channel Availability (%)")
-    # plot!(plt[channel], ylims=(-0.05,1))
-    # plot!(plt[channel], t, m3.^3 .* h3 .* 100, color=:blue, label=L"NaV_{1.3}")
-    # plot!(plt[channel], t, m7.^3 .* h7 .* 100, color=:red, label=L"NaV_{1.7}")
-    # plot!(plt[channel], t, m8.^3 .* h8 .* 100, color=:green, label=L"NaV_{1.8}")
-    # plot!(plt[channel], t, ndr.^3 .* ldr .* 100, color=:orange, label=L"K_{dr}")
-    # plot!(plt[channel], t, nM .* 100, color=:purple, label=L"K_{m}")
-    # plot!(plt[channel], t, zAHP .* 100, color=:brown, label=L"K_{AHP}")
-
-    variable = 4
-    # ylabel!(plt[variable], "Variable (-)")
-    # #plot!(plt[variable], ylims=(0, 0.25))
-    # plot!(plt[variable], legend = :bottomright)
-    # plot!(plt[variable], t, m3, label=L"m_{3}", linestyle = :solid, color=:blue)
-    # plot!(plt[variable], t, h3, label=L"h_{3}", linestyle = :dash, color=:blue)
-    # plot!(plt[variable], t, m7, label=L"m_{7}", linestyle = :solid, color=:red)
-    # plot!(plt[variable], t, h7, label=L"h_{7}", linestyle = :dash, color=:red)
-    # plot!(plt[variable], t, m8, label=L"m_{8}", linestyle = :solid, color=:green)
-    # plot!(plt[variable], t, h8, label=L"h_{8}", linestyle = :dash, color=:green)
-    # plot!(plt[variable], t, ndr, label=L"n_{dr}", linestyle = :solid, color=:orange)
-    # plot!(plt[variable], t, ldr, label=L"l_{dr}", linestyle = :dash, color=:orange)
-    # plot!(plt[variable], t, nM, label=L"n_{m}", linestyle = :solid, color=:purple)
-    # plot!(plt[variable], t, zAHP, label=L"z_{AHP}", linestyle = :solid, color=:brown)
-
-    # global_current = 5
-    # ylabel!(plt[global_current], "Current (uA/cm2)")
-    # plot!(plt[global_current], t, I_NaV1p3 .+ I_NaV1p7 .+ I_NaV1p8, color=:red, label="Sodium")
-    # plot!(plt[global_current], t, I_K_dr .+ I_K_M .+ I_AHP, color=:blue , label="Potassium")
+    # n_current = retrieve_projection_neuron_currents(sol_n, p_model)
+    # plot!(plt[4], t, n_current.Iext, label="Iext")
 
     return plt
 end
