@@ -66,7 +66,7 @@ function ODE_system_with_synapse(du,u,p,t)
     Iext = Iext * (10^-6) / (n.CellArea * (10^-8))      # [µA/cm^2]
 
     # -- update nociceptor variables -- #
-    nociceptor_state(view(du, 1:11), view(u, 1:11), p, Iext, Inoise)
+    nociceptor_state(view(du, 1:11), view(u, 1:11), p, Iext; Inoise=Inoise)
 
     # -- update synapse -- #
     V_post_syn = u[12]

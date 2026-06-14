@@ -1,4 +1,4 @@
-
+export retrieve_synapse_currents
 
 function INMDA(V, A_NMDA, B_NMDA, g_NMDA, E_NMDA)
     I = (B_NMDA-A_NMDA) * g_NMDA *NMDA_Mg_block(V)*(V-E_NMDA)   # [µA/cm^2]
