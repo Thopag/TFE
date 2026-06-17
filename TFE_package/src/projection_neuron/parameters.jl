@@ -53,5 +53,3 @@ function projection_neuron_parameter(;
 
     return projection_neuron
 end
-
-const DEFAULT_PROJ_NEURON = projection_neuron_parameter()

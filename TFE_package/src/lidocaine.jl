@@ -33,8 +33,6 @@ function lidocaine_parameter(;
     return lidocaine
 end
 
-const DEFAULT_LIDOCAINE = lidocaine_parameter()
-
 # ----------------- Lidocaine Staidy state shift----------------- #
 
 # 1.3 inactivation

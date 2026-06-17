@@ -100,5 +100,3 @@ function DIV7_parameter(;
     
     return nociceptor
 end
-
-const DEFAULT_NOCICEPTOR =  DIV0_parameter()

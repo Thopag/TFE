@@ -67,5 +67,3 @@ function synapse_parameter(;
 
     return synapse
 end
-
-const DEFAULT_SYNAPSE = synapse_parameter()

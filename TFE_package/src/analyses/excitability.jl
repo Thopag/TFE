@@ -1,38 +1,31 @@
-export global_pattern, find_rheobase, parameter_analyse, init_parameter_analyses, iteration_parameter_analyses, end_parameter_analyses
+export get_excitability, find_rheobase, parameter_analyses
 
-function get_peaks(t, x; min_h=-5.0, min_proms=10.0, max_w=Inf)
+function get_first_peak_height_and_width(t, x; min_h=-70.0, min_proms=10.0, max_w=Inf)
 
     peaks = findmaxima(x)
-    if length(peaks[1]) == 0
-        return peaks[1], 0, []
-    end
-    r = peaks[1]
     peaks = peakheights(peaks; min=min_h)
-    if length(peaks[1]) == 0
-        return r, 0, []
-    end
-    r = peaks[1]
     peaks = peakproms(peaks; min=min_proms)
-    if length(peaks) == 0
-        return r, 0, []
-    end
     peaks_idx, h, data, proms, w, edges = peakwidths(peaks)
 
+    # edges is a vector of tuple (start, end)
     right = last.(edges)
     left = first.(edges)
     right = Int.(trunc.(right))
     left = Int.(trunc.(left))
-
     w = t[right] .- t[left]
     peaks_idx = peaks_idx[w .< max_w]
 
-    w_peaks = w[w .< max_w]
-
-    return peaks_idx, length(peaks_idx), w_peaks
+    if length(peaks_idx) == 0
+        return nothing, nothing
+    end
+    w_peak = w[w .< max_w]
+    h_peak = h[w .< max_w]
+    return h_peak[1], w_peak[1]
 end
 
-function instant_freqs(t_spikes, n_peak)
+function instant_freqs(t_spikes)
 
+    n_peak = length(t_spikes)
     #If there is only 0 or 1 spike, we got a null frequence
     if n_peak <= 1
         return [0]
@@ -44,43 +37,42 @@ function instant_freqs(t_spikes, n_peak)
 end
 
 
-function global_pattern(t_spikes, n_peak, end_stim)
+function get_excitability(t_spikes, end_stim)
     """
-    Value of pattern :
+    Value of excitability :
     0 : No spike
     1 : Single spike 
     2 : Two spikes 
     3 : Transient
     4 : Spikling
     """
-    freqs = instant_freqs(t_spikes, n_peak)
-    f_global = mean(freqs)
+    freqs = instant_freqs(t_spikes)
+    f_mean = mean(freqs)
 
-    
+    n_peak = length(t_spikes)
     if n_peak == 0
         pattern = 0
-        return f_global, pattern
+        return f_mean, pattern
     elseif n_peak == 1
         pattern = 1
-        return f_global, pattern
+        return f_mean, pattern
     elseif n_peak == 2
         pattern = 2
-        return f_global, pattern
+        return f_mean, pattern
     end
 
     # Do not verify if length freq > 0
     # If pass the previous "if", it is supposed to be OK
-    last_delta_t = 1000 / freqs[end]
+    last_delta_t = t_spikes[end]-t_spikes[end-1]
     if (t_spikes[end] + last_delta_t*1.2) > end_stim
         pattern = 4
     else
         pattern = 3
     end
-    
-    return f_global, pattern
+    return f_mean, pattern
 end
 
-function find_rheobase(p_noci, p_lido, amps, u0; duration = 1700.0)
+function find_rheobase(amps, p_model, stim, u0; duration = 1700.0)
 
     is_finded = false
     rheobase = NaN32
@@ -88,35 +80,24 @@ function find_rheobase(p_noci, p_lido, amps, u0; duration = 1700.0)
     L = length(amps)
     for (i,amp) in enumerate(amps)
         print("\rProgress: $(round(((i-1)/L*100), digits=2)) %")
+
         # -- Make Simulation -- #
+        i_stim = change_stimulation_amp(amp, stim)
+        i_p_model = from_model_parameter(p_model; stimulation=i_stim)
+        sol = nociceptor_simulation(u0, (0.0, duration), i_p_model)
 
-        p_stim = stimulation_parameter(amp)
-        p_model = model_parameter(p_stim, p_noci; lidocaine=p_lido)
-        sol = simulation(u0, (0.0, duration), p_model)
-        t = sol.t
-        V = sol.V
+        # -- Get predicted pattern -- #
+        _, pattern = get_excitability(sol.t_spikes, i_stim.off)
 
-        # ---- Peak Detection ---- #
 
-        # Peak detection
-        peaks_idx, peak_count, _ = get_peaks(t, V;  min_h=-5.0, min_proms=10)
-        t_spikes = t[peaks_idx]
-
-        peaks_idx = peaks_idx[t_spikes .> p_stim.on]
-        t_spikes = t_spikes[t_spikes .> p_stim.on]
-
-        if peak_count > 0
-            peak_count = length(peaks_idx)
-        end
-
-        _, pattern = global_pattern(t_spikes, peak_count, p_stim.off)
-
+        # Check if there is at least one spike
         if (pattern >= 1) && (!is_finded)
             print("\r")
             rheobase = amp
             is_finded = true
         end
 
+        # Check if there is spiking
         if (pattern == 4)
             print("\r")
             spiking = amp
@@ -128,122 +109,108 @@ function find_rheobase(p_noci, p_lido, amps, u0; duration = 1700.0)
     return rheobase, spiking
 end
 
-# ----- small function used in bifurcation limit cycle ----- #
-
-function get_pattern(sol, stim)
-    t = sol.t
-    V = sol.V
-    peaks_idx, n_peak, w_peaks = get_peaks(t, V;  min_h=-5.0, min_proms=10.0)
-    t_spikes = t[peaks_idx]
-    _, pattern = global_pattern(t_spikes, n_peak, stim.off)
-    return pattern
-end
-
 # -------------------------- parameter_analyse -------------------------- #
 
-function parameter_analyse(VEC_p_model, u0; duration = 1700.0)
+function analyse(p_model, u0; duration = 1700.0)
 
-    L = length(VEC_p_model)
+    stim = p_model.stimulation
+    sol = nociceptor_simulation(u0, (0.0, duration), p_model)
+
+    first_h, first_w = get_first_peak_height_and_width(sol.t, sol.V)
+    freq, pattern = get_excitability(sol.t_spikes, stim.off)
+    n_peak = length(sol.t_spikes)
+
+    return first_h, first_w, freq, n_peak, pattern
+end
+
+function make_analyse(amps_p_model, u0; duration = 1700.0)
+
+    L = length(amps_p_model)
     VEC_peak_count = Vector{Int}(undef, L)
     VEC_freq = Vector{Float32}(undef, L)
     VEC_pattern = Vector{Int}(undef, L)
-    VEC_first_peak_h = Vector{Float32}(undef, L)
-    VEC_first_peak_w = Vector{Float32}(undef, L)
+    VEC_first_peak_h = Vector{Union{Nothing,Float32}}(undef, L)
+    VEC_first_peak_w = Vector{Union{Nothing,Float32}}(undef, L)
 
-    for (i,p_model) in enumerate(VEC_p_model)
+    for (i,p_model) in enumerate(amps_p_model)
         print("\rProgress: $(round(((i-1)/L*100), digits=2)) %")
+        first_h, first_w, freq, n_peak, pattern = analyse(p_model, u0; duration = duration)
 
-        # -- Make Simulation -- #
-        stim = p_model.stimulation
-
-        sol = simulation(u0, (0.0, duration), p_model)
-        t = sol.t
-        V = sol.V
-
-        # ---- Peak Detection ---- #
-
-        # Peak detection
-        peaks_idx, peak_count, w_peaks = get_peaks(t, V;  min_h=-5.0, min_proms=10)
-        t_spikes = t[peaks_idx]
-
-        # Remove wrong peak detection that appear before stimulation
-        # Strangly happend with the configuration: DIV0 at 100 pA without Na current
-        peaks_idx = peaks_idx[t_spikes .> stim.on]
-        t_spikes = t_spikes[t_spikes .> stim.on]
-
-        if peak_count > 0
-            peak_count = length(peaks_idx)
-        end
-        
-        # Default values
-        first_peak_height = -65.0
-        first_peak_width = 0.0
-
-        # "length(peaks_idx)" is use instead of "peak_count",
-        # because peaks_idx can contain peaks even if peak_count==0
-        if length(peaks_idx) > 0
-            first_peak_height = V[peaks_idx[1]]
-        end
-
-        # if not, w_peaks = [] (see get_peaks() function)
-        if peak_count > 0
-            first_peak_width = w_peaks[1]
-        end
-
-        freq, pattern = global_pattern(t_spikes, peak_count, stim.off)
-
-        VEC_peak_count[i]   = peak_count
+        VEC_first_peak_h[i] = first_h
+        VEC_first_peak_w[i] = first_w
         VEC_freq[i]         = freq
+        VEC_peak_count[i]   = n_peak
         VEC_pattern[i]      = pattern
-        VEC_first_peak_h[i] = first_peak_height
-        VEC_first_peak_w[i] = first_peak_width
     end
 
     print("\r")
-    return VEC_peak_count, VEC_freq, VEC_pattern, VEC_first_peak_h, VEC_first_peak_w
+    return VEC_first_peak_h, VEC_first_peak_w, VEC_freq, VEC_peak_count, VEC_pattern
 end
 
-function init_parameter_analyses(VEC_intra_parameter, VEC_inter_parameter)
-    n_row = length(VEC_intra_parameter)
-    n_col = length(VEC_inter_parameter)
 
-    M_peak_count = Matrix{Int}(undef, n_row, n_col)
+# -------------------------- analyse result creation and filling -------------------------- #
+
+struct AnalyseResults
+    M_first_peak_h::Matrix{Union{Nothing,Float32}}
+    M_first_peak_w::Matrix{Union{Nothing,Float32}}
+    M_freq::Matrix{Float32}
+    M_peak_count::Matrix{Int}
+    M_pattern::Matrix{Int}
+    VEC_rheobase::Vector{Union{Nothing,Float32}}
+    VEC_label::Vector{String}
+    VEC_p_model::Vector{ModelParameters}
+    VEC_amp::Vector{Float64}
+end
+
+# --- init --- #
+
+function analyse_result(VEC_amp, VEC_p_model, VEC_label)
+    n_row = length(VEC_amp)
+    n_col = length(VEC_p_model)
+
+    M_first_peak_h = Matrix{Union{Nothing,Float32}}(undef, n_row, n_col)
+    M_first_peak_w = Matrix{Union{Nothing,Float32}}(undef, n_row, n_col)
     M_freq = Matrix{Float32}(undef, n_row, n_col)
+    M_peak_count = Matrix{Int}(undef, n_row, n_col)
     M_pattern = Matrix{Int}(undef, n_row, n_col)
-    M_first_peak_h = Matrix{Float32}(undef, n_row, n_col)
-    M_first_peak_w = Matrix{Float32}(undef, n_row, n_col)
 
-    inter_with_rheobase = Vector{String}()
-    rheobases = Vector{Float32}()
+    VEC_rheobase = Vector{Union{Nothing,Float32}}(undef, n_row)
 
-    return M_peak_count, M_freq, M_pattern, M_first_peak_h, M_first_peak_w, inter_with_rheobase, rheobases
+    return AnalyseResults(M_first_peak_h, M_first_peak_w, M_freq, M_peak_count, M_pattern, VEC_rheobase, VEC_label, VEC_p_model, VEC_amp)
 end
 
-function iteration_parameter_analyses(i, params, u0, label, VEC_intra_parameter,
-                                M_peak_count, M_freq, M_pattern, M_first_peak_h, M_first_peak_w, inter_with_rheobase, rheobases)
+# --- filling --- #
 
-    VEC_peak_count, VEC_freq, VEC_pattern, VEC_first_peak_h, VEC_first_peak_w = parameter_analyse(params, u0;)
+function fill_analyse_result(i::Int, results::AnalyseResults, u0; duration = 1700.0)
 
-    # Get the first parameter that has a spike
-    # This is mainly used when the intra_parameter is "Amp"
+    L = length(results.VEC_label)
+    println("$(results.VEC_label[i]) -- $(round(((i-1)/L*100), digits=2)) % is done")
+
+    p_model = results.VEC_p_model[i]
+
+    VEC_stim = map( (amp) -> change_stimulation_amp(amp, p_model.stimulation), results.VEC_amp)
+    amps_p_model = map( (stim) -> from_model_parameter(p_model; stimulation=stim), VEC_stim)
+
+    VEC_first_peak_h, VEC_first_peak_w, VEC_freq, VEC_peak_count, VEC_pattern = make_analyse(amps_p_model, u0; duration = duration)
+
     rheobase_idx = findfirst(x -> x >= 1, VEC_pattern)
-    if !isnothing(rheobase_idx)
-        push!(inter_with_rheobase, label)
-        push!(rheobases, VEC_intra_parameter[rheobase_idx])
+    results.VEC_rheobase[i] = results.VEC_amp[rheobase_idx]
+
+    results.M_first_peak_h[:, i] = VEC_first_peak_h
+    results.M_first_peak_w[:, i] = VEC_first_peak_w 
+    results.M_freq[:, i] = VEC_freq
+    results.M_peak_count[:, i] = VEC_peak_count
+    results.M_pattern[:, i] = VEC_pattern
+    return
+end
+
+function parameter_analyses(VEC_amp, VEC_p_model, VEC_label, duration, u0)
+
+    results = analyse_result(VEC_amp, VEC_p_model, VEC_label)
+
+    for i in 1:length(VEC_p_model)
+        fill_analyse_result(i, results, u0; duration = duration)
     end
 
-    M_peak_count[:, i] = VEC_peak_count
-    M_freq[:, i] = VEC_freq
-    M_pattern[:, i] = VEC_pattern
-    M_first_peak_h[:, i] = VEC_first_peak_h
-    M_first_peak_w[:, i] = VEC_first_peak_w 
-end
-
-function end_parameter_analyses(VEC_intra_parameter, VEC_inter_parameter, 
-                                    M_peak_count, M_freq, M_pattern, M_first_peak_h, M_first_peak_w, inter_with_rheobase, rheobases
-                                                                                    , intra_axe_label, inter_axe_label, inter_labels)
-    
-    return plot_parameter_analyses(VEC_intra_parameter, VEC_inter_parameter, 
-                                    M_peak_count, M_freq, M_pattern, M_first_peak_h, M_first_peak_w, inter_with_rheobase, rheobases
-                                                                                    , intra_axe_label, inter_axe_label, inter_labels)
+    return results
 end
