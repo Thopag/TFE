@@ -26,6 +26,6 @@ Manifest.toml
 # random files / folders
 
 plots
-saved_plots
+JLD2_save
 
 TFE_package\Manifest.toml
