@@ -1,15 +1,13 @@
-
-JLD2.writeas(::Type{<:Function}) = Nothing
 ############################ PARAMETER SET TYPE ############################
-folder = "DIV0"
+DIV = "DIV0"
 ############################ PARAMETER SET TYPE ############################
 
-if folder == "DIV0"
+if DIV == "DIV0"
     nociceptor_parameter = DIV0_parameter
     set_u0_noci = DIV0_u0
     get_u0_noci = get_DIV0_u0
     Ihold = -3.0
-elseif folder == "DIV7"
+elseif DIV == "DIV7"
     nociceptor_parameter = DIV7_parameter
     set_u0_noci = DIV7_u0
     get_u0_noci = get_DIV7_u0
@@ -26,7 +24,7 @@ function main(;)
 
     # -------- amp vectors -------- #
 
-    VEC_amp = 0.0:50:300.0
+    VEC_amp = 0.0:150:300.0
     p_stim = stimulation_parameter(0.0; on=stim_on, length=stim_length, Ihold=Ihold)
 
     # -------- Inter Parameter -------- #
@@ -35,11 +33,12 @@ function main(;)
 
     VEC_inter_parameter = inhibs
     VEC_label = ["$k" for k in VEC_inter_parameter]
+    parameter_label = "inhibition (-)"
 
     # -------- Parameter looping -------- #
 
     println("%%%%%%%%%%%%%%%%%%%%%%% INFO %%%%%%%%%%%%%%%%%%%%%%%")
-    println("Parameter set type : $folder")
+    println("Parameter set type : $DIV")
     println("")
     println("Amps values : $VEC_amp")
     println("")
@@ -55,10 +54,13 @@ function main(;)
     VEC_p_model = map( (n) -> model_parameter(;stimulation=p_stim, nociceptor=n), VEC_p_noci)
 
     println("################ Start Looping ################ ")
-    @time results = parameter_analyses(VEC_amp, VEC_p_model, VEC_label, duration, u0)
+    @time results = parameter_analyses(VEC_amp, VEC_p_model, duration, u0, VEC_label, parameter_label)
     println("################ End Looping ################ ")
 
-    jldsave("plots/default/test.jld2"; results)
+    # Mute the warning about function saving
+    with_logger(ConsoleLogger(stderr, Logging.Error)) do
+        jldsave("plots/JLD2_save/$(DIV)_test.jld2"; results)
+    end
     return
 end
 

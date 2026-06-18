@@ -12,5 +12,5 @@ function projection_neuron_spike_detection_affect!(integrator)
     push!(save.pn_V_spikes, integrator.u[1]) 
 end
 
-# spike_detection_condition defined in utils.jl
+# spike_detection_condition defined in nociceptor/simulation_events.jl
 const cb_pn_spike = ContinuousCallback(spike_detection_condition, projection_neuron_spike_detection_affect!, nothing, save_positions=(true,false))

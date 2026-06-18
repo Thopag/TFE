@@ -1,21 +1,6 @@
+export single_simulation
 
-############################ PARAMETER SET TYPE ############################
-folder = "DIV0"
-############################ PARAMETER SET TYPE ############################
-
-if folder == "DIV0"
-    nociceptor_parameter = DIV0_parameter
-    set_u0_noci = DIV0_u0
-    get_u0_noci = get_DIV0_u0
-    Ihold = -3.0
-elseif folder == "DIV7"
-    nociceptor_parameter = DIV7_parameter
-    set_u0_noci = DIV7_u0
-    get_u0_noci = get_DIV7_u0
-    Ihold = 0.0
-end
-
-function main(;extra=0.0)
+function single_simulation(DIV, nociceptor_parameter, set_u0_noci, get_u0_noci, Ihold;)
 
     with_plot = true
 
@@ -29,13 +14,13 @@ function main(;extra=0.0)
     p_pn = projection_neuron_parameter()
     p_s = synapse_parameter()
     p_stim = stimulation_parameter(amp; on=stim_on, length=stim_length, Ihold=Ihold)
-    p_model = model_parameter(p_stim, p_noci; projection_neuron=p_pn, synapse=p_s, lidocaine=p_lido)
+    p_model = model_parameter(stimulation= p_stim, nociceptor=p_noci, projection_neuron=p_pn, synapse=p_s, lidocaine=p_lido)
 
     print("------------------------------\n")
-    println("Parameter set type : $folder")
+    println("Parameter set type : $DIV")
     println("I_ext : $amp pA")
 
-    file_prefix = "$(folder)"
+    file_prefix = "$(DIV)"
     file_prefix = "test"
 
     u0 = get_synapse_u0(set_u0_noci)
@@ -45,15 +30,13 @@ function main(;extra=0.0)
     @time sol_n, sol_pn, sol_s = with_synapse_simulation(u0, (0.0, duration), p_model)
 
     sol = sol_n
-
     t_spikes = sol.t_spikes
     n_peak = length(t_spikes)
 
-    #peaks_idx, n_peak, w_peaks = TFE.get_peaks(t, V;  min_h=-5.0, min_proms=10.0)
-    freqs = TFE.instant_freqs(t_spikes, n_peak)
+    freqs = instant_freqs(t_spikes)
 
-    freq, pattern = global_pattern(t_spikes, n_peak, p_stim.off)
-    pred_pattern = Ploting.pattern_list[pattern+1]
+    freq, pattern = get_excitability(t_spikes, p_stim.off)
+    pred_pattern = pattern_list[pattern+1]
     println("Predicted pattern : $pred_pattern")
 
 
@@ -75,6 +58,5 @@ function main(;extra=0.0)
     savefig(p_freq, "plots/simulation/$(file_prefix)_freqs.pdf")
 
     print("------------------------------\n")
+    return
 end
-
-main()

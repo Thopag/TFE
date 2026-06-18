@@ -4,18 +4,21 @@ using DifferentialEquations, Peaks, Statistics, ForwardDiff, BifurcationKit, Acc
 using Plots, Plots.Measures, LaTeXStrings, ColorSchemes, JLD2
 
 include("ploting.jl")
-include("utils.jl")
-include("model_parameters.jl")
+include("system/model_parameters.jl")
 
-include("nociceptor/simulation.jl")
-include("projection_neuron/simulation.jl")
-include("with_synapse/simulation.jl")
-include("test_n1_n2/simulation.jl")
+include("system/nociceptor/simulation.jl")
+include("system/projection_neuron/simulation.jl")
+include("system/with_synapse/simulation.jl")
+include("system/test_n1_n2/simulation.jl")
 
-include("analyses/excitability.jl")
+include("tools/excitability.jl")
 # include("analyses/bifurcation.jl")
 # include("analyses/DIC.jl")
 # include("analyses/ss_currents.jl")
+
+# RUNS
+include("run/run_single_simulation.jl")
+include("run/run_parameter_analyses.jl")
 
 # precompile(simulation, (Vector{Float64}, Tuple{Float64, Float64}, ModelParameters))
 

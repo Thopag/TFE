@@ -15,4 +15,4 @@ const Ploting = TFE_package
 # @time TFE.warm_up()
 # println("End Warm up")
 
-using Plots, LaTeXStrings, ColorSchemes, Accessors, Plots.Measures, JLD2
+using Plots, LaTeXStrings, ColorSchemes, Accessors, Plots.Measures, JLD2, Logging

@@ -111,6 +111,36 @@ end
 
 # -------------------------- parameter_analyse -------------------------- #
 
+struct AnalyseResults
+    M_first_peak_h::Matrix{Union{Nothing,Float32}}
+    M_first_peak_w::Matrix{Union{Nothing,Float32}}
+    M_freq::Matrix{Float32}
+    M_peak_count::Matrix{Int}
+    M_pattern::Matrix{Int}
+    VEC_rheobase::Vector{Union{Nothing,Float32}}
+    VEC_p_model::Vector{ModelParameters}
+    VEC_amp::Vector{Float64}
+    VEC_label::Vector{String}
+    parameter_label::String
+end
+
+# --- init --- #
+function analyse_result(VEC_amp, VEC_p_model, VEC_label, parameter_label)
+    n_row = length(VEC_amp)
+    n_col = length(VEC_p_model)
+
+    M_first_peak_h = Matrix{Union{Nothing,Float32}}(undef, n_row, n_col)
+    M_first_peak_w = Matrix{Union{Nothing,Float32}}(undef, n_row, n_col)
+    M_freq = Matrix{Float32}(undef, n_row, n_col)
+    M_peak_count = Matrix{Int}(undef, n_row, n_col)
+    M_pattern = Matrix{Int}(undef, n_row, n_col)
+
+    VEC_rheobase = Vector{Union{Nothing,Float32}}(undef, n_row)
+
+    return AnalyseResults(M_first_peak_h, M_first_peak_w, M_freq, M_peak_count, M_pattern, VEC_rheobase, 
+                                                    VEC_p_model, VEC_amp, VEC_label, parameter_label)
+end
+
 function analyse(p_model, u0; duration = 1700.0)
 
     stim = p_model.stimulation
@@ -147,40 +177,6 @@ function make_analyse(amps_p_model, u0; duration = 1700.0)
     return VEC_first_peak_h, VEC_first_peak_w, VEC_freq, VEC_peak_count, VEC_pattern
 end
 
-
-# -------------------------- analyse result creation and filling -------------------------- #
-
-struct AnalyseResults
-    M_first_peak_h::Matrix{Union{Nothing,Float32}}
-    M_first_peak_w::Matrix{Union{Nothing,Float32}}
-    M_freq::Matrix{Float32}
-    M_peak_count::Matrix{Int}
-    M_pattern::Matrix{Int}
-    VEC_rheobase::Vector{Union{Nothing,Float32}}
-    VEC_label::Vector{String}
-    VEC_p_model::Vector{ModelParameters}
-    VEC_amp::Vector{Float64}
-end
-
-# --- init --- #
-
-function analyse_result(VEC_amp, VEC_p_model, VEC_label)
-    n_row = length(VEC_amp)
-    n_col = length(VEC_p_model)
-
-    M_first_peak_h = Matrix{Union{Nothing,Float32}}(undef, n_row, n_col)
-    M_first_peak_w = Matrix{Union{Nothing,Float32}}(undef, n_row, n_col)
-    M_freq = Matrix{Float32}(undef, n_row, n_col)
-    M_peak_count = Matrix{Int}(undef, n_row, n_col)
-    M_pattern = Matrix{Int}(undef, n_row, n_col)
-
-    VEC_rheobase = Vector{Union{Nothing,Float32}}(undef, n_row)
-
-    return AnalyseResults(M_first_peak_h, M_first_peak_w, M_freq, M_peak_count, M_pattern, VEC_rheobase, VEC_label, VEC_p_model, VEC_amp)
-end
-
-# --- filling --- #
-
 function fill_analyse_result(i::Int, results::AnalyseResults, u0; duration = 1700.0)
 
     L = length(results.VEC_label)
@@ -204,10 +200,9 @@ function fill_analyse_result(i::Int, results::AnalyseResults, u0; duration = 170
     return
 end
 
-function parameter_analyses(VEC_amp, VEC_p_model, VEC_label, duration, u0)
+function parameter_analyses(VEC_amp, VEC_p_model, duration, u0, VEC_label, parameter_label)
 
-    results = analyse_result(VEC_amp, VEC_p_model, VEC_label)
-
+    results = analyse_result(VEC_amp, VEC_p_model, VEC_label, parameter_label)
     for i in 1:length(VEC_p_model)
         fill_analyse_result(i, results, u0; duration = duration)
     end

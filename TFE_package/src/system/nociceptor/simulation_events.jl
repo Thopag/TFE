@@ -4,6 +4,10 @@
 
 # ------------ spike detection ------------ #
 
+function spike_detection_condition(u,t,integrator)
+    return u[1]  # u[1] is supposed to be V
+end
+
 function nociceptor_spike_detection_affect!(integrator)
     # Save the time and the amplitude of V at event
     # In the parameter's vectors
@@ -12,5 +16,4 @@ function nociceptor_spike_detection_affect!(integrator)
     push!(save.n_V_spikes, integrator.u[1]) 
 end
 
-# spike_detection_condition defined in utils.jl
 const cb_n_spike = ContinuousCallback(spike_detection_condition, nociceptor_spike_detection_affect!, nothing, save_positions=(true,false))
