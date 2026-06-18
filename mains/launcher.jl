@@ -2,6 +2,9 @@
 
 function main()
 
+    analyse_r = nothing
+    bifurcation_r = nothing
+
     #### PARAMETER SET TYPE ####
     DIV = "DIV0"
     ############################
@@ -17,13 +20,15 @@ function main()
         get_u0_noci = get_DIV7_u0
         Ihold = 0.0
     end
-    
+
     # single_simulation(DIV, nociceptor_parameter, set_u0_noci, get_u0_noci, Ihold;)
 
-    results = run_parameter_analyses(DIV, nociceptor_parameter, set_u0_noci, get_u0_noci, Ihold;)
+    #analyse_r = run_parameter_analyses(DIV, nociceptor_parameter, set_u0_noci, get_u0_noci, Ihold;)
+    #bifurcation_r = run_bifurcation_analyses(DIV, nociceptor_parameter, set_u0_noci, get_u0_noci, Ihold;)
+
     # Mute the warning about function saving
     with_logger(ConsoleLogger(stderr, Logging.Error)) do
-        jldsave("JLD2_save/$(DIV)_test.jld2"; results)
+        jldsave("JLD2_save/$(DIV)_test.jld2"; analyse_r, bifurcation_r)
     end
 
 end

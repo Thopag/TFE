@@ -66,7 +66,7 @@ function ODE_system_with_synapse(du,u,p,t)
     Iext = Iext * (10^-6) / (n.CellArea * (10^-8))      # [µA/cm^2]
 
     # -- update nociceptor variables -- #
-    nociceptor_state(view(du, 1:11), view(u, 1:11), p, Iext; Inoise=Inoise)
+    nociceptor_state(view(du, 1:11), view(u, 1:11), p; Iext=Iext, Inoise=Inoise)
 
     # -- update synapse -- #
     V_post_syn = u[12]
@@ -92,4 +92,27 @@ function stochastic_system_with_synapse(du,u,p,t)
         du[end] = sigma_noise * sqrt(2.0 / tau_noise)
     end
     return
+end
+
+# ----------- for bifurcation ----------- #
+
+function bifurcation_system_with_synapse(du,u,p)
+
+    # -- Iext value on nociceptor -- #
+    stim    = p.stimulation
+    n       = p.nociceptor
+
+    Iext = stim.Ihold + stim.amp # [pA]
+    Iext = Iext * (10^-6) / (n.CellArea * (10^-8))      # [µA/cm^2]
+
+    # -- update nociceptor variables -- #
+    nociceptor_state(view(du, 1:11), view(u, 1:11), p; Iext=Iext, Inoise=Inoise)
+
+    # -- update synapse -- #
+    V_post_syn = u[12]
+    Isyn, ICa_from_syn = synapse_state(view(du, 17:24),view(u, 17:24),p,V_post_syn)
+
+    # -- update projection_neuron variables -- #
+    projection_neuron_state(view(du, 12:16), view(u, 12:16), p; Isyn=Isyn, ICa_from_syn=ICa_from_syn)
+    return du
 end

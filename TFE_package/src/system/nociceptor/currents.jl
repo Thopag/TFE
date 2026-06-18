@@ -88,7 +88,8 @@ function nociceptor_SS_currents(p_model, V)
                                     IK_dr.(V, ndr, ldr, n.g_K_dr, n.E_K),
                                     IK_M.(V, nM, n.g_K_M, n.E_K),
                                     IK_AHP.(V, zAHP, n.g_K_AHP, n.E_K),
-                                    ILeak.(V, n.g_Leak, n.E_Leak)
+                                    ILeak.(V, n.g_Leak, n.E_Leak),
+                                    V .* 0.0
                         )
     return nociceptor_current
 end

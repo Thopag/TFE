@@ -64,7 +64,8 @@ function projection_neuron_SS_currents(p_model, V)
 
     projection_neuron_current = ProjectionNeuronCurrent(INa.(V, mNa, hNa, pn.g_Na, pn.E_Na),
                                     IK_dr_pn.(V, mdr, pn.g_K_dr, pn.E_K),
-                                    ILeak_pn.(V, pn.g_Leak, pn.E_Leak)
+                                    ILeak_pn.(V, pn.g_Leak, pn.E_Leak),
+                                    V .* 0.0
                         )
     return projection_neuron_current
 end

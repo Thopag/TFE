@@ -62,3 +62,18 @@ function stochastic_system_projection_neuron(du,u,p,t)
     return
 end
 
+# ----------- for bifurcation ----------- #
+
+function bifurcation_system_projection_neuron(du,u,p)
+
+    # -- Iext value -- #
+    stim  = p.stimulation
+    pn    = p.projection_neuron
+
+    Iext = stim.Ihold + stim.amp  # [pA]
+    Iext = Iext * (10^-6) / (pn.CellArea * (10^-8))      # [µA/cm^2]
+
+    # -- update projection_neuron variables -- #
+    projection_neuron_state(du, u, p; Iext=Iext)
+    return du
+end

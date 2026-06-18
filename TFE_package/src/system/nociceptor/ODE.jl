@@ -12,7 +12,7 @@ include("currents.jl")
 
 # --------------------------- ODE systems --------------------------- #
 
-function nociceptor_state(du,u,p,Iext;Inoise=0.0)
+function nociceptor_state(du,u,p;Iext= 0.0, Inoise=0.0)
 
     n       = p.nociceptor
     lido    = p.lidocaine
@@ -89,7 +89,7 @@ function ODE_system_nociceptor(du,u,p,t)
     Iext = Iext * (10^-6) / (n.CellArea * (10^-8))      # [µA/cm^2]
 
     # -- update nociceptor variables -- #
-    nociceptor_state(view(du, 1:11), view(u, 1:11), p, Iext; Inoise=Inoise)
+    nociceptor_state(view(du, 1:11), view(u, 1:11), p; Iext=Iext, Inoise=Inoise)
     return
 end
 
@@ -110,3 +110,19 @@ function stochastic_system_nociceptor(du,u,p,t)
     return
 end
 
+
+# ----------- for bifurcation ----------- #
+
+function bifurcation_system_nociceptor(du,u,p)
+
+    # -- Iext value -- #
+    stim    = p.stimulation
+    n       = p.nociceptor
+
+    Iext = stim.Ihold + stim.amp # [pA]
+    Iext = Iext * (10^-6) / (n.CellArea * (10^-8))      # [µA/cm^2]
+
+    # -- update nociceptor variables -- #
+    nociceptor_state(view(du, 1:11), view(u, 1:11), p; Iext=Iext)
+    return du
+end
