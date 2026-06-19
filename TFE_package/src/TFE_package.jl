@@ -12,14 +12,21 @@ include("system/with_synapse/simulation.jl")
 include("system/test_n1_n2/simulation.jl")
 
 include("tools/excitability.jl")
+
+include("tools/parameter_analyses.jl")
 include("tools/bifurcation.jl")
-# include("analyses/DIC.jl")
-# include("analyses/ss_currents.jl")
+include("tools/DIC.jl")
+include("tools/SS_currents.jl")
+include("tools/excitability_plan.jl")
 
 # RUNS
 include("run/run_single_simulation.jl")
+
 include("run/run_parameter_analyses.jl")
 include("run/run_bifurcation_analyses.jl")
+include("run/run_DIC_analyses.jl")
+include("run/run_SS_current_analyses.jl")
+include("run/run_excitability_plan.jl")
 
 # precompile(simulation, (Vector{Float64}, Tuple{Float64, Float64}, ModelParameters))
 

@@ -1,47 +1,95 @@
-export run_parameter_analyses
+export run_parameter_analyses, plot_parameter_analyses
 
-function run_parameter_analyses(DIV, nociceptor_parameter, set_u0_noci, get_u0_noci, Ihold;)
-
-    u0 = get_u0_noci()
-
-    duration = 1700.0
-    stim_on = 500.0                                 # ms
-    stim_length = duration - stim_on - 200.0        # ms
+function run_parameter_analyses(u0, VEC_p_model, VEC_label, parameter_label, duration)
 
     # -------- amp vectors -------- #
 
-    VEC_amp = 0.0:150:300.0
-    p_stim = stimulation_parameter(0.0; on=stim_on, length=stim_length, Ihold=Ihold)
+    VEC_amp = 0.0:100:300.0
 
-    # -------- Inter Parameter -------- #
-
-    inhibs = 0:0.5:1.0
-
-    VEC_inter_parameter = inhibs
-    VEC_label = ["$k" for k in VEC_inter_parameter]
-    parameter_label = "inhibition (-)"
-
-    # -------- Parameter looping -------- #
-
-    println("%%%%%%%%%%%%%%%%%%%%%%% INFO %%%%%%%%%%%%%%%%%%%%%%%")
-    println("Parameter set type : $DIV")
     println("")
-    println("Amps values : $VEC_amp")
+    println("----------- Start Parameter Analyses -----------")
+    println("With amps values : [$VEC_amp]")
     println("")
-    println("INTER values :  $VEC_inter_parameter")
-    println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
 
-
-    VEC_p_noci = map( (inter_parameter) -> nociceptor_parameter(; 
-                                                g_NaV1p8 = 30.0 * (1.0-inter_parameter))
-
-                                                , VEC_inter_parameter)
-
-    VEC_p_model = map( (n) -> model_parameter(;stimulation=p_stim, nociceptor=n), VEC_p_noci)
-
-    println("################ Start Looping ################ ")
     @time results = parameter_analyses(VEC_amp, VEC_p_model, duration, u0, VEC_label, parameter_label)
-    println("################ End Looping ################ ")
+    println("------------ End Parameter Analyses ------------")
 
     return results
+end
+
+function plot_parameter_analyses(results::AnalyseResults; file_prefix = "default")
+
+    # ----- INIT PLOTS ----- #
+
+    VEC_label = results.VEC_label
+    inter_axe_label = results.parameter_label
+
+    VEC_amp = results.VEC_amp
+    amp_label = "Amp (pA)"
+    xticks = VEC_amp[1]:30:VEC_amp[end]
+    
+    p_peaks   = plot(xlabel=amp_label, ylabel= "Peaks count (-)", xticks=xticks)
+    p_freqs   = plot(xlabel=amp_label, ylabel= "Frequence (Hz)" , xticks=xticks)
+    p_height  = plot(xlabel=amp_label, ylabel= "Height (mV)"    , xticks=xticks)
+    p_width   = plot(xlabel=amp_label, ylabel= "width (ms)"     , xticks=xticks)
+
+    p_rheo    = plot(xlabel=inter_axe_label, ylabel="rheobase (pA)")
+    p_pattern = plot(xlabel=amp_label, ylabel=inter_axe_label, yticks = (1:length(VEC_label), VEC_label), xticks=xticks, legend=:topright, legendfontsize=7)
+
+    # Add color legend
+    for (c, l) in zip(colors_list, pattern_list)
+        scatter!(p_pattern, [], [], marker=:square, color = c, label = l, markersize = 4)
+    end
+    
+    # ----- Fill plots ----- #
+
+    M_first_h = first.(results.M_first_peak_h_w)
+    M_first_w = last.(results.M_first_peak_h_w)
+
+    M_freq       = results.M_freq
+    M_peak_count = results.M_peak_count
+    M_pattern    = results.M_pattern
+
+    for (i,(VEC_first_h, VEC_first_w, VEC_freq, VEC_peak_count, VEC_pattern, label)) in 
+                        enumerate(zip(eachcol(M_first_h), eachcol(M_first_w), eachcol(M_freq), eachcol(M_peak_count), eachcol(M_pattern), VEC_label))
+
+        pattern_form  = markers_list[VEC_pattern .+ 1]
+        pattern_color = colors_list[VEC_pattern .+ 1]
+
+        plot!(p_height, VEC_amp, VEC_first_h    , marker=:circle     , markersize=2, linealpha=0.6, markeralpha=0.9, label=label, markerstrokecolor = :match, markerstrokewidth = 0.0)
+        plot!(p_width , VEC_amp, VEC_first_w    , marker=:circle     , markersize=2, linealpha=0.6, markeralpha=0.9, label=label, markerstrokecolor = :match, markerstrokewidth = 0.0)
+
+        plot!(p_peaks , VEC_amp, VEC_peak_count , marker=pattern_form, markersize=2, linealpha=0.5, markeralpha=0.9, label=label, markerstrokecolor = :match, markerstrokewidth = 0.0)
+        plot!(p_freqs , VEC_amp, VEC_freq       , marker=pattern_form, markersize=2, linealpha=0.5, markeralpha=0.9, label=label, markerstrokecolor = :match, markerstrokewidth = 0.0)
+
+        bar!(p_pattern, VEC_amp, fill(i+0.5, length(VEC_amp)), fillto=fill(i-0.45, length(VEC_amp)), 
+                                                                        lw=0, linecolor=:match, bar_width=(VEC_amp[1]-VEC_amp[2])*1.05, label="", color=pattern_color)
+    end
+
+    # -------- Finish Ploting -------- #
+
+    # --- first peak height --- #
+    hline!(p_height, [0.0], color=:red, linestyle = :dash, label="")
+
+    # --- rheobase barplot --- #
+    VEC_rheobase = results.VEC_rheobase
+    not_nothing_idx = .!isnothing.(VEC_rheobase)
+
+    labels_not_nothing = VEC_label[not_nothing_idx]
+    bars_not_nothing = VEC_rheobase[not_nothing_idx]
+    
+    bar!(p_rheo, labels_not_nothing, bars_not_nothing, label="")
+    annotate!(labels_not_nothing, bars_not_nothing ./ 2, text.(string.(bars_not_nothing), :center, :center, :white, 7))
+
+    # --- save --- #
+
+    savefig(p_peaks, "plots/default/$(file_prefix)_peaks-curve.pdf")
+    savefig(p_freqs, "plots/default/$(file_prefix)_F-I-curve.pdf")
+    savefig(p_height, "plots/default/$(file_prefix)_first_height.pdf")
+    savefig(p_width, "plots/default/$(file_prefix)_first_width.pdf")
+
+    savefig(p_pattern, "plots/default/$(file_prefix)_pattern.pdf")
+    savefig(p_rheo, "plots/default/$(file_prefix)_rheobases.pdf")
+
+    return p_peaks, p_freqs, p_height, p_width, p_rheo, p_pattern
 end

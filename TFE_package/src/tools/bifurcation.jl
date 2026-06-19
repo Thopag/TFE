@@ -1,5 +1,3 @@
-export make_bifurcation, init_bifurcation, iteration_bifurcation
-
 
 struct BifurcationResults
     VEC_br::Vector{<:BifurcationKit.ContResult}

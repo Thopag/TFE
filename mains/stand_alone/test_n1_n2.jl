@@ -34,7 +34,7 @@ function plot_test(sol_n, sol_pn, sol_s, p_model; xlimits=(400, 1700))
     plot!(plt[syn_variables], t, sol_s.B_NMDA .- sol_s.A_NMDA,  label="B_NMDA - A_NMDA", color= :red)
 
     # response = 4
-    # t_resp, resp = TFE.reponse_time(p_model.save.t_NMDA_response, t, p_model.synapse.resp_time_NMDA)
+    # t_resp, resp = reponse_time(p_model.save.t_NMDA_response, t, p_model.synapse.resp_time_NMDA)
     # plot!(plt[response], t_resp, resp,  label="response", color= :black)
 
     return plt

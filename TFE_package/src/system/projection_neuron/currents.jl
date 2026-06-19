@@ -54,7 +54,7 @@ function retrieve_projection_neuron_currents(pn_sol, p_model)
     return projection_neuron_current
 end
 
-function projection_neuron_SS_currents(p_model, V)
+function projection_neuron_SS_currents(V, p_model)
 
     pn = p_model.projection_neuron
 

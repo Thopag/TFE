@@ -62,7 +62,7 @@ function retrieve_nociceptor_currents(noci_sol, p_model)
     return nociceptor_current
 end
 
-function nociceptor_SS_currents(p_model, V)
+function nociceptor_SS_currents(V, p_model)
 
     n = p_model.nociceptor
     lido = p_model.lidocaine
