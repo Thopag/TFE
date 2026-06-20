@@ -6,6 +6,7 @@ function main()
     bifurcation_r = nothing
     DIC_r = nothing
     SS_current_r = nothing
+    plan_r = nothing
 
     # -------- PARAMETER SET TYPE -------- #
 
@@ -83,7 +84,7 @@ function main()
         println("----------- Start Saving -----------")
         # Mute the warning about function saving
         with_logger(ConsoleLogger(stderr, Logging.Error)) do
-            @time jldsave("JLD2_save/$(DIV)_plan_test.jld2"; plan_r)
+            @time jldsave("JLD2_save/$(DIV)_plan_test.jld2"; analyse_r, bifurcation_r, DIC_r, SS_current_r, plan_r)
         end
         println("----------- Finish Saving -----------")
 
@@ -111,7 +112,7 @@ function main()
         println("----------- Start Saving -----------")
         # Mute the warning about function saving
         with_logger(ConsoleLogger(stderr, Logging.Error)) do
-            @time jldsave("JLD2_save/$(DIV)_test.jld2"; analyse_r, bifurcation_r, DIC_r, SS_current_r)
+            @time jldsave("JLD2_save/$(DIV)_test.jld2"; analyse_r, bifurcation_r, DIC_r, SS_current_r, plan_r)
         end
         println("----------- Finish Saving -----------")
 

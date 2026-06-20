@@ -2,8 +2,10 @@
 
 function main()
 
-    file = "DIV0_test"
+    load_excitability_plan = true
 
+    file = "DIV0_plan_test"
+    
     println("")
     println("----------- Start Loading -----------")
     @time data = load("JLD2_save/$(file).jld2")
@@ -12,15 +14,24 @@ function main()
     bifurcation_r   = data["bifurcation_r"]
     DIC_r           = data["DIC_r"]
     SS_current_r    = data["SS_current_r"]
+    plan_r          = data["plan_r"]
     println("----------- End Loading -----------")
 
     println("")
     println("----------- Start Ploting -----------")
 
-    if !isnothing(analyse_r)
-        plot_parameter_analyses(analyse_r; file_prefix = "default")
+    if load_excitability_plan
+        if !isnothing(plan_r)
+            plot_excitability_plan(plan_r; file_prefix = "default")
+        else
+            print("No plan_r")
+        end
     else
-        print("No analyse_r")
+        if !isnothing(analyse_r)
+            plot_parameter_analyses(analyse_r; file_prefix = "default")
+        else
+            print("No analyse_r")
+        end
     end
 
     println("----------- End Ploting -----------")
