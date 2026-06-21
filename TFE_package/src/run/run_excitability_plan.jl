@@ -4,18 +4,18 @@ function run_excitability_plan(u0, nociceptor_parameter, p_stim, duration)
 
     # -------- amp vectors -------- #
 
-    VEC_amp = 0.0:25:300.0
+    VEC_amp = [0.0:1:49.0; 50.0:5:95.0; 100.0:25:300.0]
 
     # -------- Row Parameter -------- #
 
-    inhibs = 0:0.25:1.0
+    inhibs = 0:0.5:1.0
 
     VEC_row_param = inhibs
     row_label = "inhibition NaV1.8 (-)"
 
     # -------- Col Parameter -------- #
 
-    inhibs = 0:0.25:1.0
+    inhibs = 0:0.5:1.0
 
     VEC_col_param = inhibs
     col_label = "inhibition NaV1.7 (-)"
@@ -30,6 +30,8 @@ function run_excitability_plan(u0, nociceptor_parameter, p_stim, duration)
     println("")
     println("----------- Start Excitability Plan -----------")
     println("With amps values : [$VEC_amp]")
+    println("With row values : [$VEC_row_param]")
+    println("With col values : [$VEC_col_param]")
     println("")
 
     @time results = excitability_plan(VEC_amp, M_p_model, VEC_row_param, VEC_col_param, row_label, col_label, duration, u0)

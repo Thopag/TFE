@@ -47,7 +47,7 @@ function main()
 
     # -------- Inter Parameter -------- #
 
-    inhibs = 0:0.5:1.0
+    inhibs = 0:0.1:1.0
 
     VEC_inter_parameter = inhibs
     VEC_label = ["$k" for k in VEC_inter_parameter]
