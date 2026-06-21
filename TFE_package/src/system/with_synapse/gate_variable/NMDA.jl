@@ -16,7 +16,6 @@ function dot_P_NMDA(P_NMDA, tau_rec_NMDA)
     return (1-P_NMDA)/tau_rec_NMDA
 end
 
-# Not used
 function NMDA_Mg_block(V) 
     mgo = 1.0               #[mM]
     m = 1 / (1 + exp(0.062 * -V) * (mgo / 3.57 ))
