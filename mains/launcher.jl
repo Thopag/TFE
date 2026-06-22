@@ -100,7 +100,7 @@ function main()
         println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
         println("")
         # -------- Analyses -------- #
-    
+
         analyse_r     = run_parameter_analyses(u0, VEC_p_model, VEC_label, parameter_label, duration)
         bifurcation_r = run_bifurcation_analyses(u0, VEC_p_model, VEC_label)
         DIC_r         = run_DIC_analyses(VEC_p_model, VEC_label)

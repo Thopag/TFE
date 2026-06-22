@@ -48,8 +48,13 @@ function test_n1_n2_simulation(u0, tspan, p, tstops)
                     )
 
     # -- Simulation -- #
-    prob = SDEProblem(ODE_system_test_n1_n2, stochastic_system_with_synapse, u0, tspan, p) 
-    sol = solve(prob, callback=cbs, tstops=tstops, maxiters=1e7)
+    # prob = SDEProblem(ODE_system_test_n1_n2, stochastic_system_with_synapse, u0, tspan, p) 
+    # sol = solve(prob, callback=cbs, tstops=tstops, maxiters=1e7)
+
+    prob = ODEProblem(ODE_system_test_n1_n2, u0,tspan,p)
+    sol = solve(prob,Rodas5(),callback=cbs, tstops=tstops) #, maxiters=1e7)
+    #sol = solve(prob,callback=cbs, tstops=tstops) #, maxiters=1e7)
+    println(sol.retcode)
 
     # -- Simulation results -- #
 

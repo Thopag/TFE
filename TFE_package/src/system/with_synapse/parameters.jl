@@ -36,8 +36,8 @@ function synapse_parameter(;
 
     delay_AMPA = 0.5,        # [mV]
     delay_NMDA = 0.5,        # [mV]
-    resp_time_AMPA = 0.01,        # [mV]
-    resp_time_NMDA = 0.01,        # [mV]
+    resp_time_AMPA = 0.0,        # [mV]
+    resp_time_NMDA = 0.0,        # [mV]
 
     w_AMPA          = 0.00225*8,
     tau_rise_AMPA   = 0.1,       # [ms]

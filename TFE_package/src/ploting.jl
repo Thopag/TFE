@@ -22,7 +22,6 @@ end
 
 # Made by gemini, have to remake 
 function reponse_time(t_resp, sol_t, dt)
-    time_grid = sol_t[1]:dt:sol_t[end]
-    mask = [any(tp <= t <= (tp + dt) for tp in t_resp) for t in time_grid]
-    return time_grid, Int.(mask)
+    mask = [any(tp <= t <= (tp + dt) for tp in t_resp) for t in sol_t]
+    return sol_t, Int.(mask)
 end

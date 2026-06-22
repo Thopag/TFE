@@ -5,9 +5,11 @@
 ## Condition to update state after a fixed delay when spikes are detected
   function condition(u, t, integrator, delay, t_inc) 
     if length(t_inc)==0
-        return length(ts)>0 && length(t_inc) != length(ts) && minimum(abs.((ts.+delay).-t))<dt_  
+        bool = length(ts)>0 && length(t_inc) != length(ts) && minimum(abs.((ts.+delay).-t))<dt_ 
+        return bool
     else
-        return length(ts)>0 && length(t_inc) != length(ts) && minimum(abs.((ts.+delay).-t))<dt_ && !(t in t_inc) && abs(t-t_inc[end])>2*dt_
+        bool = length(ts)>0 && length(t_inc) != length(ts) && minimum(abs.((ts.+delay).-t))<dt_ && !(t in t_inc) && abs(t-t_inc[end])>2*dt_
+        return bool
     end
   end
 
@@ -21,7 +23,7 @@ function inc_syn_NMDA_states_n!(integrator,p_syn_fixed_,p_conn_w_,i_syn_r_i_)
 
       tp_NMDA = (tau_rise_NMDA*tau_decay_NMDA)/(tau_decay_NMDA-tau_rise_NMDA)*log(tau_decay_NMDA/tau_rise_NMDA)
       fact_NMDA = 1/(-exp(-tp_NMDA/tau_rise_NMDA)+exp(-tp_NMDA/tau_decay_NMDA))
-      
+
       integrator.u[i_Use_NMDA] +=  U1_NMDA*(1-integrator.u[i_Use_NMDA]) 
       integrator.u[i_A_NMDA] += w_NMDA*fact_NMDA*(integrator.u[i_Use_NMDA] * integrator.u[i_P_NMDA])
       integrator.u[i_B_NMDA] += w_NMDA*fact_NMDA*(integrator.u[i_Use_NMDA] * integrator.u[i_P_NMDA])

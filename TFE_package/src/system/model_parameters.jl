@@ -85,24 +85,25 @@ struct ModelParameters{F}
     save::SavedEvents
 end
 
-const DEFAULT_STIMULATION   = stimulation_parameter(0.0)
-const DEFAULT_NOCICEPTOR    = DIV0_parameter()
-const DEFAULT_PROJ_NEURON   = projection_neuron_parameter()
-const DEFAULT_SYNAPSE       = synapse_parameter()
-const DEFAULT_LIDOCAINE     = lidocaine_parameter()
-const DEFAULT_NOISE         = noise_parameter()
-
 function model_parameter(; 
-                    stimulation::StimulationParameters              = DEFAULT_STIMULATION,
-                    nociceptor::NociceptorParameters                = DEFAULT_NOCICEPTOR,
-                    projection_neuron::ProjectionNeuronParameters   = DEFAULT_PROJ_NEURON, 
-                    synapse::SynapseParameters                      = DEFAULT_SYNAPSE,
-                    lidocaine::LidocaineParameters                  = DEFAULT_LIDOCAINE,
-                    noise::NoiseParameters                          = DEFAULT_NOISE)
+                    stimulation::Union{Nothing,StimulationParameters}              = nothing,
+                    nociceptor::Union{Nothing,NociceptorParameters}                = nothing,
+                    projection_neuron::Union{Nothing,ProjectionNeuronParameters}   = nothing, 
+                    synapse::Union{Nothing,SynapseParameters}                      = nothing,
+                    lidocaine::Union{Nothing,LidocaineParameters}                  = nothing,
+                    noise::Union{Nothing,NoiseParameters}                          = nothing)
+
+    # someting -> return the first none "nothing" argument
+    stim        = something(stimulation         , stimulation_parameter(0.0))
+    n           = something(nociceptor          , DIV0_parameter())
+    pn          = something(projection_neuron   , projection_neuron_parameter())
+    s           = something(synapse             , synapse_parameter())
+    lido        = something(lidocaine           , lidocaine_parameter())
+    new_noise   = something(noise               , noise_parameter())
 
     saved_events = SavedEvents(Float64[],Float64[],Float64[],Float64[],Float64[],Float64[])
         
-    return ModelParameters(stimulation, nociceptor, projection_neuron, synapse, lidocaine, noise, saved_events)
+    return ModelParameters(stim, n, pn, s, lido, new_noise, saved_events)
 end
 
 function from_model_parameter(p_model::ModelParameters; 
