@@ -83,7 +83,7 @@ function NMDA_spike_response_affect!(integrator)
     
     integrator.u[17] += s.w_NMDA   * fact_NMDA  * (Use_NMDA * P_NMDA)
     integrator.u[18] += s.w_NMDA   * fact_NMDA  * (Use_NMDA * P_NMDA)
-    integrator.u[19] += s.U1_NMDA  *(1-Use_NMDA)
+    integrator.u[19] += s.U1_NMDA  * (1-Use_NMDA)
     integrator.u[20] -= Use_NMDA * P_NMDA
 end
 
