@@ -71,6 +71,7 @@ function NMDA_spike_response_affect!(integrator)
     tp_NMDA = (s.tau_rise_NMDA * s.tau_decay_NMDA)/(s.tau_decay_NMDA-s.tau_rise_NMDA)*log(s.tau_decay_NMDA/s.tau_rise_NMDA)
     fact_NMDA = 1/(-exp(-tp_NMDA/s.tau_rise_NMDA)+exp(-tp_NMDA/s.tau_decay_NMDA))
 
+    # The order of the update is important
     integrator.u[i_Use_NMDA] += s.U1_NMDA  * (1-integrator.u[i_Use_NMDA])
     integrator.u[i_A_NMDA] += s.w_NMDA   * fact_NMDA  * (integrator.u[i_Use_NMDA] * integrator.u[i_P_NMDA])
     integrator.u[i_B_NMDA] += s.w_NMDA   * fact_NMDA  * (integrator.u[i_Use_NMDA] * integrator.u[i_P_NMDA])
@@ -88,6 +89,7 @@ function AMPA_spike_response_affect!(integrator)
     tp_AMPA = (s.tau_rise_AMPA * s.tau_decay_AMPA)/(s.tau_decay_AMPA-s.tau_rise_AMPA)*log(s.tau_decay_AMPA/s.tau_rise_AMPA)
     fact_AMPA = 1/(-exp(-tp_AMPA/s.tau_rise_AMPA)+exp(-tp_AMPA/s.tau_decay_AMPA))
 
+    # The order of the update is important
     integrator.u[i_Use_AMPA] += s.U1_AMPA  * (1-integrator.u[i_Use_AMPA])
     integrator.u[i_A_AMPA] += s.w_AMPA   * fact_AMPA  * (integrator.u[i_Use_AMPA] * integrator.u[i_P_AMPA])
     integrator.u[i_B_AMPA] += s.w_AMPA   * fact_AMPA  * (integrator.u[i_Use_AMPA] * integrator.u[i_P_AMPA])
