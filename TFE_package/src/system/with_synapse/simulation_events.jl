@@ -26,12 +26,7 @@ function NMDA_spike_response_condition(u,t,integrator)
   t_NMDA_response = integrator.p.save.t_NMDA_response
   # Check if it has not already started to response
   if length(t_NMDA_response) == L
-    # check if we are in the duration of response
-    if (integrator.t - t_NMDA_response[end]) < s.resp_time_NMDA
-      return true
-    else
-      return false
-    end
+    return false
   end
   # Check if the delay has passed
   if (t_spikes[end] + s.delay_NMDA) >= integrator.t
@@ -53,12 +48,7 @@ function AMPA_spike_response_condition(u,t,integrator)
   t_AMPA_response = integrator.p.save.t_AMPA_response
   # Check if it has not already started to response
   if length(t_AMPA_response) == L
-    # check if we are in the duration of response
-    if (integrator.t - t_AMPA_response[end]) < s.resp_time_AMPA
-      return true
-    else
-      return false
-    end
+    return false
   end
   # Check if the delay has passed
   if (t_spikes[end] + s.delay_AMPA) >= integrator.t
@@ -73,35 +63,35 @@ end
 function NMDA_spike_response_affect!(integrator) 
     s = integrator.p.synapse
 
-    A_NMDA   = integrator.u[17]
-    B_NMDA   = integrator.u[18]
-    Use_NMDA = integrator.u[19]
-    P_NMDA   = integrator.u[20]
+    i_A_NMDA = 17
+    i_B_NMDA = 18
+    i_Use_NMDA = 19
+    i_P_NMDA = 20
 
     tp_NMDA = (s.tau_rise_NMDA * s.tau_decay_NMDA)/(s.tau_decay_NMDA-s.tau_rise_NMDA)*log(s.tau_decay_NMDA/s.tau_rise_NMDA)
     fact_NMDA = 1/(-exp(-tp_NMDA/s.tau_rise_NMDA)+exp(-tp_NMDA/s.tau_decay_NMDA))
-    
-    integrator.u[17] += s.w_NMDA   * fact_NMDA  * (Use_NMDA * P_NMDA)
-    integrator.u[18] += s.w_NMDA   * fact_NMDA  * (Use_NMDA * P_NMDA)
-    integrator.u[19] += s.U1_NMDA  * (1-Use_NMDA)
-    integrator.u[20] -= Use_NMDA * P_NMDA
+
+    integrator.u[i_Use_NMDA] += s.U1_NMDA  * (1-integrator.u[i_Use_NMDA])
+    integrator.u[i_A_NMDA] += s.w_NMDA   * fact_NMDA  * (integrator.u[i_Use_NMDA] * integrator.u[i_P_NMDA])
+    integrator.u[i_B_NMDA] += s.w_NMDA   * fact_NMDA  * (integrator.u[i_Use_NMDA] * integrator.u[i_P_NMDA])
+    integrator.u[i_P_NMDA] -= integrator.u[i_Use_NMDA] * integrator.u[i_P_NMDA]
 end
 
 function AMPA_spike_response_affect!(integrator) 
     s = integrator.p.synapse
 
-    A_AMPA   = integrator.u[21]
-    B_AMPA   = integrator.u[22]
-    Use_AMPA = integrator.u[23]
-    P_AMPA   = integrator.u[24]
+    i_A_AMPA = 21
+    i_B_AMPA = 22
+    i_Use_AMPA = 23
+    i_P_AMPA = 24
 
     tp_AMPA = (s.tau_rise_AMPA * s.tau_decay_AMPA)/(s.tau_decay_AMPA-s.tau_rise_AMPA)*log(s.tau_decay_AMPA/s.tau_rise_AMPA)
     fact_AMPA = 1/(-exp(-tp_AMPA/s.tau_rise_AMPA)+exp(-tp_AMPA/s.tau_decay_AMPA))
-    
-    integrator.u[21] += s.w_AMPA   * fact_AMPA  * (Use_AMPA * P_AMPA)
-    integrator.u[22] += s.w_AMPA   * fact_AMPA  * (Use_AMPA * P_AMPA)
-    integrator.u[23] += s.U1_AMPA  *(1-Use_AMPA) 
-    integrator.u[24] -= Use_AMPA * P_AMPA
+
+    integrator.u[i_Use_AMPA] += s.U1_AMPA  * (1-integrator.u[i_Use_AMPA])
+    integrator.u[i_A_AMPA] += s.w_AMPA   * fact_AMPA  * (integrator.u[i_Use_AMPA] * integrator.u[i_P_AMPA])
+    integrator.u[i_B_AMPA] += s.w_AMPA   * fact_AMPA  * (integrator.u[i_Use_AMPA] * integrator.u[i_P_AMPA])
+    integrator.u[i_P_AMPA] -= integrator.u[i_Use_AMPA] * integrator.u[i_P_AMPA]
 end
 
 const cb_NMDA_spike_response = DiscreteCallback(NMDA_spike_response_condition, NMDA_spike_response_affect!,save_positions=(true,true))

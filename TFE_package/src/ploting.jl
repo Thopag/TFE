@@ -21,7 +21,7 @@ function NaV_palettes(L; dark=0.95, light=0.4)
 end
 
 # Made by gemini, have to remake 
-function reponse_time(t_resp, sol_t, dt)
-    mask = [any(tp <= t <= (tp + dt) for tp in t_resp) for t in sol_t]
+function reponse_time(t_resp, sol_t)
+    mask = [any(tp == t for tp in t_resp) for t in sol_t]
     return sol_t, Int.(mask)
 end
