@@ -71,14 +71,14 @@ end
 
 function ODE_system_nociceptor(du,u,p,t)
 
+    idx = p.idx
     # -- update noise -- #
     noise = p.noise
-    Inoise = u[end]
+    Inoise = 0.0
 
     if noise.with_noise
-        du[end] = - ( Inoise - noise.mu) / noise.tau
-    else
-        du[end] = 0.0
+        Inoise = u[idx.noise]
+        du[idx.noise] = - ( Inoise - noise.mu) / noise.tau
     end
 
     # -- Iext value -- #
@@ -89,7 +89,7 @@ function ODE_system_nociceptor(du,u,p,t)
     Iext = Iext * (10^-6) / (n.CellArea * (10^-8))      # [µA/cm^2]
 
     # -- update nociceptor variables -- #
-    nociceptor_state(view(du, 1:11), view(u, 1:11), p; Iext=Iext, Inoise=Inoise)
+    nociceptor_state(view(du, idx.n), view(u, idx.n), p; Iext=Iext, Inoise=Inoise)
     return
 end
 
@@ -105,7 +105,7 @@ function stochastic_system_nociceptor(du,u,p,t)
     du[:] .= 0.0
 
     if with_noise
-        du[end] = sigma_noise * sqrt(2.0 / tau_noise)
+        du[p.idx.noise] = sigma_noise * sqrt(2.0 / tau_noise)
     end
     return
 end
@@ -115,6 +115,7 @@ end
 
 function bifurcation_system_nociceptor(du,u,p)
 
+    idx = p.idx
     # -- Iext value -- #
     stim    = p.stimulation
     n       = p.nociceptor
@@ -123,6 +124,6 @@ function bifurcation_system_nociceptor(du,u,p)
     Iext = Iext * (10^-6) / (n.CellArea * (10^-8))      # [µA/cm^2]
 
     # -- update nociceptor variables -- #
-    nociceptor_state(view(du, 1:11), view(u, 1:11), p; Iext=Iext)
+    nociceptor_state(view(du, idx.n), view(u, idx.n), p; Iext=Iext)
     return du
 end

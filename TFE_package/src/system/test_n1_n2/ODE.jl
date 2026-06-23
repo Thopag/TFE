@@ -1,16 +1,40 @@
 
 
+function old_projection_neuron_state(du,u,p; Iext=0.0, Isyn=0.0, ICa_from_syn=0.0)
+
+    pn   = p.projection_neuron
+
+    # --- variables --- #
+
+    V       = u[1]
+    mNa     = u[2]
+    hNa     = u[3]
+    mdr     = u[4]
+    Ca_i    = u[5]
+
+    # --- currents --- #
+
+    Iion = 0.0
+    Iion += INa(V, mNa, hNa, pn.g_Na, pn.E_Na)
+    Iion += IK_dr_pn(V, mdr, pn.g_K_dr, pn.E_K)
+    Iion += ILeak_pn(V, pn.g_Leak, pn.E_Leak)
+
+    # --- du --- #
+
+    du[1] = (Iext-Iion-Isyn)/pn.C
+
+    du[2] = dot_mNa(V, mNa)
+    du[3] = dot_hNa(V, hNa)
+    du[4] = dot_mdr(V, mdr)
+
+    du[5] = dot_Ca_i(Ca_i, 0.0+ICa_from_syn, pn)
+
+    return
+end
+
 function ODE_system_test_n1_n2(du,u,p,t)
 
-    # -- update noise -- #
-    noise = p.noise
-    Inoise = u[end]
-
-    if noise.with_noise
-        du[end] = - ( Inoise - noise.mu) / noise.tau
-    else
-        du[end] = 0.0
-    end
+    idx = p.idx
 
     # -- Iext value on nociceptor -- #
     stim     = p.stimulation
@@ -19,14 +43,14 @@ function ODE_system_test_n1_n2(du,u,p,t)
     Iext = stim.Ihold + (stim.is_activated(t)*stim.amp) # [pA]
     Iext = Iext * (10^-6) / (pn.CellArea * (10^-8))      # [µA/cm^2]
 
-    # -- update n1 variables -- #
-    projection_neuron_state(view(du, 1:11), view(u, 1:11), p; Iext=Iext)
+    # -- update nociceptor variables -- #
+    old_projection_neuron_state(view(du, idx.n), view(u, idx.n), p; Iext=Iext)
 
     # -- update synapse -- #
-    V_post_syn = u[12]
-    Isyn, ICa_from_syn = synapse_state(view(du, 17:24),view(u, 17:24),p,V_post_syn)
+    V_post_syn = u[idx.pn[1]]
+    Isyn, ICa_from_syn = synapse_state(view(du, idx.s),view(u, idx.s),p,V_post_syn)
 
-    # -- update n2 variables -- #
-    projection_neuron_state(view(du, 12:16), view(u, 12:16), p; Isyn=Isyn, ICa_from_syn=ICa_from_syn)
+    # -- update projection_neuron variables -- #
+    old_projection_neuron_state(view(du, idx.pn), view(u, idx.pn), p; Isyn=Isyn, ICa_from_syn=ICa_from_syn)
     return
 end

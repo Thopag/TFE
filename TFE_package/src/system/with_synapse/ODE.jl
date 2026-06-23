@@ -48,14 +48,14 @@ end
 
 function ODE_system_with_synapse(du,u,p,t)
 
+    idx = p.idx
     # -- update noise -- #
     noise = p.noise
-    Inoise = u[end]
+    Inoise = 0.0
 
     if noise.with_noise
-        du[end] = - ( Inoise - noise.mu) / noise.tau
-    else
-        du[end] = 0.0
+        Inoise = u[idx.noise]
+        du[idx.noise] = - ( Inoise - noise.mu) / noise.tau
     end
 
     # -- Iext value on nociceptor -- #
@@ -66,14 +66,14 @@ function ODE_system_with_synapse(du,u,p,t)
     Iext = Iext * (10^-6) / (n.CellArea * (10^-8))      # [µA/cm^2]
 
     # -- update nociceptor variables -- #
-    nociceptor_state(view(du, 1:11), view(u, 1:11), p; Iext=Iext, Inoise=Inoise)
+    nociceptor_state(view(du, idx.n), view(u, idx.n), p; Iext=Iext, Inoise=Inoise)
 
     # -- update synapse -- #
-    V_post_syn = u[12]
-    Isyn, ICa_from_syn = synapse_state(view(du, 17:24),view(u, 17:24),p,V_post_syn)
+    V_post_syn = u[idx.pn[1]]
+    Isyn, ICa_from_syn = synapse_state(view(du, idx.s),view(u, idx.s),p,V_post_syn)
 
     # -- update projection_neuron variables -- #
-    projection_neuron_state(view(du, 12:16), view(u, 12:16), p; Isyn=Isyn, ICa_from_syn=ICa_from_syn)
+    projection_neuron_state(view(du, idx.pn), view(u, idx.pn), p; Isyn=Isyn, ICa_from_syn=ICa_from_syn)
     return
 end
 
@@ -89,7 +89,7 @@ function stochastic_system_with_synapse(du,u,p,t)
     du[:] .= 0.0
 
     if with_noise
-        du[end] = sigma_noise * sqrt(2.0 / tau_noise)
+        du[p.idx.noise] = sigma_noise * sqrt(2.0 / tau_noise)
     end
     return
 end
@@ -98,6 +98,7 @@ end
 
 function bifurcation_system_with_synapse(du,u,p)
 
+    idx = p.idx
     # -- Iext value on nociceptor -- #
     stim    = p.stimulation
     n       = p.nociceptor
@@ -106,13 +107,13 @@ function bifurcation_system_with_synapse(du,u,p)
     Iext = Iext * (10^-6) / (n.CellArea * (10^-8))      # [µA/cm^2]
 
     # -- update nociceptor variables -- #
-    nociceptor_state(view(du, 1:11), view(u, 1:11), p; Iext=Iext, Inoise=Inoise)
+    nociceptor_state(view(du, idx.n), view(u, idx.n), p; Iext=Iext, Inoise=Inoise)
 
     # -- update synapse -- #
-    V_post_syn = u[12]
-    Isyn, ICa_from_syn = synapse_state(view(du, 17:24),view(u, 17:24),p,V_post_syn)
+    V_post_syn = u[idx.pn[1]]
+    Isyn, ICa_from_syn = synapse_state(view(du, idx.s),view(u, idx.s),p,V_post_syn)
 
     # -- update projection_neuron variables -- #
-    projection_neuron_state(view(du, 12:16), view(u, 12:16), p; Isyn=Isyn, ICa_from_syn=ICa_from_syn)
+    projection_neuron_state(view(du, idx.pn), view(u, idx.pn), p; Isyn=Isyn, ICa_from_syn=ICa_from_syn)
     return du
 end

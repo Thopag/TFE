@@ -1,4 +1,4 @@
-export stimulation_parameter, change_stimulation_amp, noise_parameter, model_parameter, from_model_parameter
+export stimulation_parameter, change_stimulation_amp, noise_parameter, model_parameter, from_model_parameter, indexes_parameter
 
 include("lidocaine.jl")
 include("nociceptor/parameters.jl")
@@ -73,6 +73,24 @@ struct SavedEvents
     t_AMPA_response::Vector{Float64}
 end
 
+# --------------- INDEX --------------- #
+
+struct IndexesParameters
+    n::Vector{Int}
+    pn::Vector{Int}
+    s::Vector{Int}
+    noise::Int
+end
+
+function indexes_parameter(;
+    n = 1:11,
+    pn = 13:17,
+    s = 18:25
+    )
+    noise = n[end] + 1
+    return IndexesParameters(n, pn, s, noise)
+end
+
 # --------------- MODEL PARAMETER --------------- #
 
 struct ModelParameters{F}
@@ -83,6 +101,7 @@ struct ModelParameters{F}
     lidocaine::LidocaineParameters
     noise::NoiseParameters
     save::SavedEvents
+    idx::IndexesParameters
 end
 
 function model_parameter(; 
@@ -91,7 +110,9 @@ function model_parameter(;
                     projection_neuron::Union{Nothing,ProjectionNeuronParameters}   = nothing, 
                     synapse::Union{Nothing,SynapseParameters}                      = nothing,
                     lidocaine::Union{Nothing,LidocaineParameters}                  = nothing,
-                    noise::Union{Nothing,NoiseParameters}                          = nothing)
+                    noise::Union{Nothing,NoiseParameters}                          = nothing,
+                    idx::Union{Nothing,IndexesParameters}                          = nothing,
+                    )
 
     # someting -> return the first none "nothing" argument
     stim        = something(stimulation         , stimulation_parameter(0.0))
@@ -100,10 +121,11 @@ function model_parameter(;
     s           = something(synapse             , synapse_parameter())
     lido        = something(lidocaine           , lidocaine_parameter())
     new_noise   = something(noise               , noise_parameter())
+    new_idx     = something(idx                 , indexes_parameter())
 
     saved_events = SavedEvents(Float64[],Float64[],Float64[],Float64[],Float64[],Float64[])
         
-    return ModelParameters(stim, n, pn, s, lido, new_noise, saved_events)
+    return ModelParameters(stim, n, pn, s, lido, new_noise, saved_events, new_idx)
 end
 
 function from_model_parameter(p_model::ModelParameters; 
@@ -112,7 +134,9 @@ function from_model_parameter(p_model::ModelParameters;
                     projection_neuron::Union{Nothing,ProjectionNeuronParameters}   = nothing, 
                     synapse::Union{Nothing,SynapseParameters}                      = nothing,
                     lidocaine::Union{Nothing,LidocaineParameters}                  = nothing,
-                    noise::Union{Nothing,NoiseParameters}                          = nothing)
+                    noise::Union{Nothing,NoiseParameters}                          = nothing,
+                    idx::Union{Nothing,IndexesParameters}                          = nothing
+                    )
 
     # someting -> return the first none "nothing" argument
     stim        = something(stimulation         , p_model.stimulation)
@@ -121,8 +145,9 @@ function from_model_parameter(p_model::ModelParameters;
     s           = something(synapse             , p_model.synapse)
     lido        = something(lidocaine           , p_model.lidocaine)
     new_noise   = something(noise               , p_model.noise)
+    new_idx     = something(idx                 , p_model.idx)
 
     saved_events = SavedEvents(Float64[],Float64[],Float64[],Float64[],Float64[],Float64[])
         
-    return ModelParameters(stim, n, pn, s, lido, new_noise, saved_events)
+    return ModelParameters(stim, n, pn, s, lido, new_noise, saved_events, new_idx)
 end

@@ -17,14 +17,10 @@ end
 
 function projection_neuron_simulation(u0, tspan, p)
 
+    idx = p.idx
     L = length(u0)
-    if L == 25
-        u0 = u0[12:16]
-    end
-
-    L = length(u0)
-    if L != 5
-        println("projection_neuron_simulation is not supposed to get a length(u0) = $L")
+    if L < (length(idx.pn))
+        println("(projection_neuron_simulation) Size of u0 can not match : $L")
     end
 
     # -- callbacks set up -- #
@@ -36,11 +32,11 @@ function projection_neuron_simulation(u0, tspan, p)
 
     # -- Simulation results -- #
     t      = sol.t
-    V      = sol[1, :]
-    mNa    = sol[2, :]
-    hNa    = sol[3, :]
-    mdr    = sol[4, :]
-    Ca_i   = sol[5, :]
+    V      = sol[idx.pn[1], :]
+    mNa    = sol[idx.pn[2], :]
+    hNa    = sol[idx.pn[3], :]
+    mdr    = sol[idx.pn[4], :]
+    Ca_i   = sol[idx.pn[5], :]
 
     projection_neuron_solution = ProjectionNeuronSolution(t,V,mNa,hNa,mdr,Ca_i,
                                                             p.save.pn_t_spikes, p.save.pn_V_spikes)

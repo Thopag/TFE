@@ -3,15 +3,6 @@
 # ContinuousCallback event when the condition is == 0
 # DiscreteCallback event when the condition is true
 
-# ------------ spike detection ------------ #
-
-function post_synaptic_spike_detection_condition(u,t,integrator)
-    return u[12]  # u[12] is supposed to be V of the projection neuron
-end
-
-# projection_neuron_spike_detection_affect! defined in simulation_event.jl in projection_neuron
-const cb_syn_pn_spike = ContinuousCallback(post_synaptic_spike_detection_condition, projection_neuron_spike_detection_affect!, nothing, save_positions=(true,false))
-
 # ------------ delay spike response ------------ #
 
 function NMDA_spike_response_condition(u,t,integrator)
@@ -62,11 +53,12 @@ end
 
 function NMDA_spike_response_affect!(integrator) 
     s = integrator.p.synapse
+    idx = integrator.p.idx
 
-    i_A_NMDA = 17
-    i_B_NMDA = 18
-    i_Use_NMDA = 19
-    i_P_NMDA = 20
+    i_A_NMDA = idx.s[1]
+    i_B_NMDA = idx.s[2]
+    i_Use_NMDA = idx.s[3]
+    i_P_NMDA = idx.s[4]
 
     tp_NMDA = (s.tau_rise_NMDA * s.tau_decay_NMDA)/(s.tau_decay_NMDA-s.tau_rise_NMDA)*log(s.tau_decay_NMDA/s.tau_rise_NMDA)
     fact_NMDA = 1/(-exp(-tp_NMDA/s.tau_rise_NMDA)+exp(-tp_NMDA/s.tau_decay_NMDA))
@@ -80,11 +72,12 @@ end
 
 function AMPA_spike_response_affect!(integrator) 
     s = integrator.p.synapse
+    idx = integrator.p.idx
 
-    i_A_AMPA = 21
-    i_B_AMPA = 22
-    i_Use_AMPA = 23
-    i_P_AMPA = 24
+    i_A_AMPA = idx.s[5]
+    i_B_AMPA = idx.s[6]
+    i_Use_AMPA = idx.s[7]
+    i_P_AMPA = idx.s[8]
 
     tp_AMPA = (s.tau_rise_AMPA * s.tau_decay_AMPA)/(s.tau_decay_AMPA-s.tau_rise_AMPA)*log(s.tau_decay_AMPA/s.tau_rise_AMPA)
     fact_AMPA = 1/(-exp(-tp_AMPA/s.tau_rise_AMPA)+exp(-tp_AMPA/s.tau_decay_AMPA))

@@ -43,6 +43,7 @@ end
 
 function ODE_system_projection_neuron(du,u,p,t)
 
+    idx = p.idx
     # -- Iext value -- #
     stim  = p.stimulation
     pn    = p.projection_neuron
@@ -51,14 +52,13 @@ function ODE_system_projection_neuron(du,u,p,t)
     Iext = Iext * (10^-6) / (pn.CellArea * (10^-8))      # [µA/cm^2]
 
     # -- update projection_neuron variables -- #
-    projection_neuron_state(du, u, p; Iext=Iext)
+    projection_neuron_state(view(du, idx.pn), view(u, idx.pn), p; Iext=Iext)
     return
 end
 
 function stochastic_system_projection_neuron(du,u,p,t)
 
     du[:] .= 0.0
-
     return
 end
 
@@ -66,6 +66,7 @@ end
 
 function bifurcation_system_projection_neuron(du,u,p)
 
+    idx = p.idx
     # -- Iext value -- #
     stim  = p.stimulation
     pn    = p.projection_neuron
@@ -74,6 +75,6 @@ function bifurcation_system_projection_neuron(du,u,p)
     Iext = Iext * (10^-6) / (pn.CellArea * (10^-8))      # [µA/cm^2]
 
     # -- update projection_neuron variables -- #
-    projection_neuron_state(du, u, p; Iext=Iext)
+    projection_neuron_state(view(du, idx.pn), view(u, idx.pn), p; Iext=Iext)
     return du
 end

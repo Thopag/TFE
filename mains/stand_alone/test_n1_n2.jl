@@ -46,12 +46,12 @@ function main(;extra=0.0)
     with_plot = true
 
     duration = 15000.0
-    scenario = "SS"
+    scenario = "BT"
     file_prefix = "test_n1_n2_$scenario"
 
     p_noci = DIV0_parameter()
     p_stim, tstops = test_n1_n2_stimulation_parameter(;scenario = scenario)
-    p_model = model_parameter(;synapse=synapse_parameter(), stimulation=p_stim, nociceptor=p_noci)
+    p_model = model_parameter(;synapse=synapse_parameter(), stimulation=p_stim, nociceptor=p_noci, idx=indexes_parameter(;n = 1:5, pn=13:17))
 
     u0 = get_test_u0()
     @time sol_n, sol_pn, sol_s = test_n1_n2_simulation(u0, (0.0, duration), p_model, tstops)

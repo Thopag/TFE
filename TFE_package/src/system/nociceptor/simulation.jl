@@ -24,18 +24,16 @@ end
 
 function nociceptor_simulation(u0, tspan, p)
 
+    idx = p.idx
     L = length(u0)
-    if L == 25
-        u0 = u0[1:11]
+    if L < (length(idx.n))
+        println("(nociceptor_simulation) Size of u0 can not match : $L")
     end
 
-    L = length(u0)
-    if (L > 12) || (L < 11)
-        println("nociceptor_simulation is not supposed to get a length(u0) = $L")
-    end
+    if L >= (length(idx.n))
+        u0 = u0[idx.n]
 
-    # add an element for noise if needed
-    if L == 11
+        # add an element for noise
         push!(u0, 0.0)
     end
 
@@ -48,19 +46,19 @@ function nociceptor_simulation(u0, tspan, p)
 
     # -- Simulation results -- #
     t      = sol.t
-    V      = sol[1, :]
-    m3     = sol[2, :]
-    h3     = sol[3, :]
-    m7     = sol[4, :]
-    h7     = sol[5, :]
-    m8     = sol[6, :]
-    h8     = sol[7, :]
-    ndr    = sol[8, :]
-    ldr    = sol[9, :]
-    nM     = sol[10, :]
-    zAHP  = sol[11, :]
+    V      = sol[idx.n[1], :]
+    m3     = sol[idx.n[2], :]
+    h3     = sol[idx.n[3], :]
+    m7     = sol[idx.n[4], :]
+    h7     = sol[idx.n[5], :]
+    m8     = sol[idx.n[6], :]
+    h8     = sol[idx.n[7], :]
+    ndr    = sol[idx.n[8], :]
+    ldr    = sol[idx.n[9], :]
+    nM     = sol[idx.n[10], :]
+    zAHP   = sol[idx.n[11], :]
 
-    Inoise = sol[end, :]
+    Inoise = sol[idx.noise, :]
 
     nociceptor_solution = NociceptorSolution(t,V,m3,h3,m7,h7,m8,h8,ndr,ldr,nM,zAHP,Inoise,
                                                     p.save.n_t_spikes, p.save.n_V_spikes)
