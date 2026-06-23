@@ -84,8 +84,8 @@ end
 
 function indexes_parameter(;
     n = 1:11,
-    pn = 13:17,
-    s = 18:25
+    pn = 13:23,
+    s = 24:31
     )
     noise = n[end] + 1
     return IndexesParameters(n, pn, s, noise)

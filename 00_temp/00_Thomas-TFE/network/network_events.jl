@@ -88,7 +88,7 @@ function membrane(x,p)
 	dmNa_ = (mNa.(V_)-mNa_)/(tau_mNa.(V_))
 	dhNa_ = (hNa.(V_)-hNa_)/(tau_hNa.(V_))
  	dmKDR_ = (mKDR.(V_)-mKDR_)/(tau_mKDR.(V_))
-  
+
     dCa_ = dCa_from_ICa(0+ICa_from_syn,[p[1],p[2]]) - ((Ca_-Ca_i_0)/tau_Ca)
 
     dx = [dV_,dmNa_,dhNa_,dmKDR_,dCa_]

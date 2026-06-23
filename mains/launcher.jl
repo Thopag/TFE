@@ -23,7 +23,7 @@ function main()
         Ihold = 0.0
     end
 
-    make_single_simulation = false
+    make_single_simulation = true
     make_excitability_plan = false
 
     # -------- Initial Condition -------- #

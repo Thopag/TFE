@@ -69,9 +69,16 @@ function with_synapse_simulation(u0, tspan, p)
     mNa    = sol[idx.pn[2], :]
     hNa    = sol[idx.pn[3], :]
     mdr    = sol[idx.pn[4], :]
-    Ca_i   = sol[idx.pn[5], :]
+    mir  = sol[idx.pn[5], :]
+    mM   = sol[idx.pn[6], :]
 
-    projection_neuron_solution = ProjectionNeuronSolution(t,V,mNa,hNa,mdr,Ca_i,
+    mLs  = sol[idx.pn[7], :]
+    hLs  = sol[idx.pn[8], :]
+    mLf  = sol[idx.pn[9], :]
+    hLf  = sol[idx.pn[10], :]
+    Ca_i    = sol[idx.pn[11], :]
+
+    projection_neuron_solution = ProjectionNeuronSolution(t,V,mNa,hNa,mdr,mir,mM,mLs,hLs,mLf,hLf,Ca_i,
                                                             p.save.pn_t_spikes, p.save.pn_V_spikes)
 
     # -- Synapse -- #

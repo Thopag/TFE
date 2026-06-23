@@ -15,7 +15,7 @@ function tau_mLf(V)
     return tau_m
 end
 
-function hLf(V)
+function hLf_inf(V)
     zshift=0 
 	zpente=0
     h_inf =   1 / (1+exp((V+(14+zshift))/(zpente+4.03)))

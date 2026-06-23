@@ -15,9 +15,9 @@ function synapse_u0(u0)
 end
 
 function get_synapse_u0(nociceptor_u0)
-    u0 = zeros(Float64, 25)
+    u0 = zeros(Float64, 31)
     nociceptor_u0(view(u0, 1:11))
-    projection_neuron_u0(view(u0, 13:17))
-    synapse_u0(view(u0, 18:25))
+    projection_neuron_u0(view(u0, 13:23))
+    synapse_u0(view(u0, 24:31))
     return u0
 end

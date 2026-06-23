@@ -22,13 +22,13 @@ end
 function dot_Ca_i(Ca_i, ICa_i, pn)
 
     ICa_i = ICa_i/1000.0  # [mA/cm^2] instead of [µA/cm^2]
-    drive_channel = - ICa_i * pn.k /(2*pn.F*pn.d)
+    drive_channel = - ICa_i * pn.k /(2.0*pn.F*pn.d)
     if drive_channel <= 0.0
         tmp = 0.0
     else
         tmp = - ICa_i * pn.k /(2.0*pn.F*pn.d) 
     end
-    return tmp - ((Ca_i-pn.Ca_i0)/pn.tau_Ca)
+    return tmp - ((Ca_i-pn.Ca_0)/pn.tau_Ca)
 end
 
 function ghk_LeFranc( V, ci, co) #v(mV), ci(mM), co(mM), z) 
@@ -39,7 +39,7 @@ function ghk_LeFranc( V, ci, co) #v(mV), ci(mM), co(mM), z)
     z = (1e-3)*2*FARADAY*V/(R*(celsius+273.15))
 	eco = co*efun(z)
 	eci = ci*efun(-z)
-	ghk = (.001)*2*FARADAY*(eci - eco)  
+	ghk = (0.001)*2*FARADAY*(eci - eco)  
 
     return ghk
 end
