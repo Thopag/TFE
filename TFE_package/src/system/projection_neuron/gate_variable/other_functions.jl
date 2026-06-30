@@ -31,7 +31,7 @@ function dot_Ca_i(Ca_i, ICa_i, pn)
     return tmp - ((Ca_i-pn.Ca_0)/pn.tau_Ca)
 end
 
-function ghk_LeFranc( V, ci, co) #v(mV), ci(mM), co(mM), z) 
+function ghk_LeFranc(V, ci, co) #v(mV), ci(mM), co(mM), z) 
     FARADAY = 96520 #default value ( https://www.neuron.yale.edu/neuron/static/docs/units/units.html)
     R       = 8.3134
     celsius = 36

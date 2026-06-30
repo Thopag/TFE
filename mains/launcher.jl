@@ -1,5 +1,4 @@
 
-
 function main()
 
     analyse_r = nothing
@@ -35,19 +34,21 @@ function main()
 
     duration = 1700.0                               # ms
     stim_on = 500.0                                 # ms
-    stim_length = duration - stim_on - 200.0        # ms
+    stim_length = 1000.0        # ms
 
-    if make_single_simulation
-        amp = 51.0
-    else
+    amp = 51.0
+    if !make_single_simulation
         # Put amp = 0.0 for bifurcation
         amp = 0.0
     end
-    p_stim = stimulation_parameter(amp; on=stim_on, length=stim_length, Ihold=Ihold)
+
+    is_activated = nothing
+    #is_activated = multiple_pulse(;T=(duration-stim_on)/6, n_pulse=6, start=500.0, length=300.0)
+    p_stim = stimulation_parameter(amp; on=stim_on, length=stim_length, Ihold=Ihold, is_act=is_activated)
 
     # -------- Inter Parameter -------- #
 
-    inhibs = 0:0.5:1.0
+    inhibs = 0:0.5:0.0
 
     VEC_inter_parameter = inhibs
     VEC_label = ["$k" for k in VEC_inter_parameter]
@@ -101,9 +102,9 @@ function main()
         println("")
         # -------- Analyses -------- #
 
-        analyse_r     = run_parameter_analyses(u0, VEC_p_model, VEC_label, parameter_label, duration)
-        bifurcation_r = run_bifurcation_analyses(u0, VEC_p_model, VEC_label)
-        DIC_r         = run_DIC_analyses(VEC_p_model, VEC_label)
+        # analyse_r     = run_parameter_analyses(u0, VEC_p_model, VEC_label, parameter_label, duration)
+        # bifurcation_r = run_bifurcation_analyses(u0, VEC_p_model, VEC_label)
+        # DIC_r         = run_DIC_analyses(VEC_p_model, VEC_label)
         SS_current_r  = run_SS_current_analyses(VEC_p_model, VEC_label)                                                                                                                                                             
 
         # -------- Saving -------- #
@@ -118,7 +119,8 @@ function main()
 
         println("")
         println("----------- Start Ploting -----------")
-        plot_parameter_analyses(analyse_r; file_prefix = "default")
+        #plot_parameter_analyses(analyse_r; file_prefix = "default")
+        plot_SS_current_analyses(SS_current_r; file_prefix = "default")
         println("----------- End Ploting -----------")
     end
 

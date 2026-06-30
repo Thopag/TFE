@@ -21,17 +21,24 @@ function plot_test(sol_n, sol_pn, sol_s, p_model; xlimits=(400, 1700))
     ylabel!(plt[voltage_pn], "Voltage (mV)", ylims=(-100,50))
     plot!(plt[voltage_pn], t, sol_pn.V, color= :black, label="")
 
-    syn_curr = 3
-    s_current = retrieve_synapse_currents(sol_s, p_model)
-    plot!(plt[syn_curr], t, .-s_current.INMDA, label="-INMDA")
-    plot!(plt[syn_curr], t, .-s_current.IAMPA, label="-IAMPA")
+    # syn_curr = 3
+    # s_current = retrieve_synapse_currents(sol_s, p_model)
+    # plot!(plt[syn_curr], t, .-s_current.INMDA, label="-INMDA")
+    # plot!(plt[syn_curr], t, .-s_current.IAMPA, label="-IAMPA")
 
-    syn_variables = 4
-    plot!(plt[syn_variables], t, sol_s.A_NMDA,  label="A_NMDA", color= :purple)
-    plot!(plt[syn_variables], t, sol_s.B_NMDA,  label="B_NMDA", color= :blue)
-    plot!(plt[syn_variables], t, sol_s.Use_NMDA,  label="Use_NMDA", color= :green)
-    plot!(plt[syn_variables], t, sol_s.P_NMDA,  label="P_NMDA ", color= :orange)
-    plot!(plt[syn_variables], t, sol_s.B_NMDA .- sol_s.A_NMDA,  label="B_NMDA - A_NMDA", color= :red)
+    # syn_variables = 4
+    # plot!(plt[syn_variables], t, sol_s.A_NMDA,  label="A_NMDA", color= :purple)
+    # plot!(plt[syn_variables], t, sol_s.B_NMDA,  label="B_NMDA", color= :blue)
+    # plot!(plt[syn_variables], t, sol_s.Use_NMDA,  label="Use_NMDA", color= :green)
+    # plot!(plt[syn_variables], t, sol_s.P_NMDA,  label="P_NMDA ", color= :orange)
+    # plot!(plt[syn_variables], t, sol_s.B_NMDA .- sol_s.A_NMDA,  label="B_NMDA - A_NMDA", color= :red)
+
+    syn_Ca = 3
+    s_current = retrieve_synapse_currents(sol_s, p_model)
+    plot!(plt[syn_Ca], t, s_current.ICa_from_syn, label="ICa_from_syn")
+
+    calcium = 4
+    plot!(plt[calcium], t, sol_pn.Ca_i,  label="Ca", color= :black)
 
     # response = 3
     # t_resp, resp = reponse_time(p_model.save.t_NMDA_response, unique(t))
@@ -51,7 +58,7 @@ function main(;extra=0.0)
 
     p_noci = DIV0_parameter()
     p_stim, tstops = test_n1_n2_stimulation_parameter(;scenario = scenario)
-    p_model = model_parameter(;synapse=synapse_parameter(), stimulation=p_stim, nociceptor=p_noci, idx=indexes_parameter(;n = 1:5, pn=13:17))
+    p_model = model_parameter(;synapse=synapse_parameter(), stimulation=p_stim, nociceptor=p_noci, idx=indexes_parameter(;))
 
     u0 = get_test_u0()
     @time sol_n, sol_pn, sol_s = test_n1_n2_simulation(u0, (0.0, duration), p_model, tstops)

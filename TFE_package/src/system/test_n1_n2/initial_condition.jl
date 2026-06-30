@@ -6,13 +6,13 @@ function test_n1_u0(u0)
     u0[2] = mNa_inf(V0)   # mNa
     u0[3] = hNa_inf(V0)   # hNa
     u0[4] = mdr_inf(V0)   # mdr
-    u0[5] = 5.0e-5        # Ca_i
+    u0[11] = 5.0e-5       # Ca_i
 end
 
 function get_test_u0()
-    u0 = zeros(Float64, 25)
+    u0 = zeros(Float64, 31)
     test_n1_u0(view(u0, 1:11))
-    projection_neuron_u0(view(u0, 13:17))
-    synapse_u0(view(u0, 18:25))
+    projection_neuron_u0(view(u0, 13:23))
+    synapse_u0(view(u0, 24:31))
     return u0
 end

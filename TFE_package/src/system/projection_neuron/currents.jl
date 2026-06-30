@@ -64,9 +64,11 @@ function retrieve_projection_neuron_currents(pn_sol, p_model)
     return projection_neuron_current
 end
 
-function projection_neuron_SS_currents(V, p_model)
+function projection_neuron_SS_currents(V, p_model; Ca_i=nothing)
 
     pn = p_model.projection_neuron
+
+    tmp = something(Ca_i, pn.Ca_0)
 
     mNa = mNa_inf.(V)
     hNa = hNa_inf.(V)
@@ -84,8 +86,8 @@ function projection_neuron_SS_currents(V, p_model)
                                     IK_dr_pn.(V, mdr, pn.g_K_dr, pn.E_K),
                                     IK_ir.(V, mir, pn.g_K_ir, pn.E_K),
                                     IK_M_pn.(V, mM, pn.g_K_M, pn.E_K),
-                                    ICa_Lf.(V, pn.Ca_0, mLf, hLf, pn.pLf, pn.Ca_0), # Replace the the first Ca_0 used as Ca_i cst
-                                    ICa_Ls.(V, pn.Ca_0, mLs, hLs, pn.pLs, pn.Ca_0), # Replace the the first Ca_0 used as Ca_i cst
+                                    ICa_Lf.(V, tmp, mLf, hLf, pn.pLf, pn.Ca_0),
+                                    ICa_Ls.(V, tmp, mLs, hLs, pn.pLs, pn.Ca_0),
                                     ILeak_pn.(V, pn.g_Leak, pn.E_Leak), 
                                     V .* 0.0
                         )

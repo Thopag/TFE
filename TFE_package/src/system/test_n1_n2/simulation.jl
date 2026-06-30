@@ -61,20 +61,20 @@ function test_n1_n2_simulation(u0, tspan, p, tstops)
     t      = sol.t
 
     # -- n1 -- #
-    V      = sol[idx.n[1], :]
-    mNa    = sol[idx.n[2], :]
-    hNa    = sol[idx.n[3], :]
-    mdr    = sol[idx.n[4], :]
-    Ca_i   = sol[idx.n[5], :]
-    # m8     = sol[idx.n[6], :]
-    # h8     = sol[idx.n[7], :]
-    # ndr    = sol[idx.n[8], :]
-    # ldr    = sol[idx.n[9], :]
-    # nM     = sol[idx.n[10], :]
-    # zAHP   = sol[idx.n[11], :]
-    # Inoise = sol[idx.noise, :]
+    V      = sol[idx.pn[1], :]
+    mNa    = sol[idx.pn[2], :]
+    hNa    = sol[idx.pn[3], :]
+    mdr    = sol[idx.pn[4], :]
+    mir  = sol[idx.pn[5], :]
+    mM   = sol[idx.pn[6], :]
 
-    nociceptor_solution = ProjectionNeuronSolution(t,V,mNa,hNa,mdr,Ca_i,
+    mLs  = sol[idx.pn[7], :]
+    hLs  = sol[idx.pn[8], :]
+    mLf  = sol[idx.pn[9], :]
+    hLf  = sol[idx.pn[10], :]
+    Ca_i    = sol[idx.pn[11], :]
+
+    nociceptor_solution = ProjectionNeuronSolution(t,V,mNa,hNa,mdr,mir,mM,mLs,hLs,mLf,hLf,Ca_i,
                                                             p.save.n_t_spikes, p.save.n_V_spikes)
 
     # -- n2 -- #
@@ -82,9 +82,16 @@ function test_n1_n2_simulation(u0, tspan, p, tstops)
     mNa    = sol[idx.pn[2], :]
     hNa    = sol[idx.pn[3], :]
     mdr    = sol[idx.pn[4], :]
-    Ca_i   = sol[idx.pn[5], :]
+    mir  = sol[idx.pn[5], :]
+    mM   = sol[idx.pn[6], :]
 
-    projection_neuron_solution = ProjectionNeuronSolution(t,V,mNa,hNa,mdr,Ca_i,
+    mLs  = sol[idx.pn[7], :]
+    hLs  = sol[idx.pn[8], :]
+    mLf  = sol[idx.pn[9], :]
+    hLf  = sol[idx.pn[10], :]
+    Ca_i    = sol[idx.pn[11], :]
+
+    projection_neuron_solution = ProjectionNeuronSolution(t,V,mNa,hNa,mdr,mir,mM,mLs,hLs,mLf,hLf,Ca_i,
                                                             p.save.pn_t_spikes, p.save.pn_V_spikes)
 
     # -- Synapse -- #

@@ -30,7 +30,7 @@ function projection_neuron_state(du,u,p; Iext=0.0, Isyn=0.0, ICa_from_syn=0.0)
     hLs  = u[8]
     mLf  = u[9]
     hLf  = u[10]
-    Ca_i    = u[11]
+    Ca_i = u[11]
 
     # --- currents --- #
 

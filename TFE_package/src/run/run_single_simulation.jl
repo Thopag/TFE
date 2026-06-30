@@ -15,7 +15,7 @@ function single_simulation(p_model, u0, duration; file_prefix = "default")
     #@time sol_pn = projection_neuron_simulation(u0, (0.0, duration), p_model)
     @time sol_n, sol_pn, sol_s = with_synapse_simulation(u0, (0.0, duration), p_model)
 
-    sol = sol_n
+    sol = sol_pn
     t_spikes = sol.t_spikes
 
     freqs = instant_freqs(t_spikes)
@@ -29,7 +29,7 @@ end
 
 function plot_single_simulation(sol_n, sol_pn, sol_s, p_model, duration; file_prefix = "default")
 
-    n_fig = 4
+    n_fig = 6
 
     xlimits = (0.0, duration)
     xticks = :native #xlimits[1]:100:xlimits[end]
@@ -40,8 +40,8 @@ function plot_single_simulation(sol_n, sol_pn, sol_s, p_model, duration; file_pr
 
     plot!(plt[n_fig], xaxis = "Time (ms)", xticks=xticks)
 
-    t = sol_n.t
-    V = sol_n.V
+    sol = sol_pn
+    t = sol.t
     amp = p_model.stimulation.amp
 
     voltage = 1
@@ -49,7 +49,7 @@ function plot_single_simulation(sol_n, sol_pn, sol_s, p_model, duration; file_pr
     xlims = Plots.xlims(plt[voltage])
     ylims = Plots.ylims(plt[voltage])
 
-    plot!(plt[voltage], t, V, color= :black, label="")
+    plot!(plt[voltage], t, sol_n.V, color= :black, label="")
     #vline!(plt[voltage], sol_n.t_spikes, color=:red, label="")
     annotate!(plt[voltage],
         xlims[2] - 0.1*(xlims[2]-xlims[1]),
@@ -61,29 +61,30 @@ function plot_single_simulation(sol_n, sol_pn, sol_s, p_model, duration; file_pr
     ylabel!(plt[voltage_pn], "Voltage (mV)", ylims=(-100,50))
     plot!(plt[voltage_pn], t, sol_pn.V, color= :black, label="")
 
+    Ca = 3
+    ylabel!(plt[Ca], "Ca")
+    plot!(plt[Ca], t, sol_pn.Ca_i, color= :black, label="")
+
+    pn_current = retrieve_projection_neuron_currents(sol_pn, p_model)
+    pn_curr = 4
+    ylabel!(plt[pn_curr], "Current")
+    plot!(plt[pn_curr], t, pn_current.ICa_Lf, label="ICa_Lf")
+    plot!(plt[pn_curr], t, pn_current.ICa_Ls, label="ICa_Ls")
+    #plot!(plt[pn_curr], t, pn_current.ICa_Ls .+ pn_current.ICa_Lf, label="ICa_i")
+    #plot!(plt[pn_curr], t, pn_current.Iext, label="")
+
+    syn_Ca = 5
     s_current = retrieve_synapse_currents(sol_s, p_model)
-    syn_curr = 3
-    plot!(plt[syn_curr], t, .-s_current.INMDA, label="-INMDA")
-    plot!(plt[syn_curr], t, .-s_current.IAMPA, label="-IAMPA")
-    #vline!(plt[3], sol_s.t_NMDA_response, color=:red, label="")
+    plot!(plt[syn_Ca], t, s_current.ICa_from_syn, label="ICa_from_syn")
+    plot!(plt[syn_Ca], t, s_current.IAMPA .+ s_current.INMDA, label="Isyn") 
 
-    # syn_variables = 4
-    # plot!(plt[syn_variables], t, sol_s.A_NMDA,  label="A_NMDA", color= :purple)
-    # plot!(plt[syn_variables], t, sol_s.B_NMDA,  label="B_NMDA", color= :blue)
-    # plot!(plt[syn_variables], t, sol_s.Use_NMDA,  label="Use_NMDA", color= :green)
-    # plot!(plt[syn_variables], t, sol_s.P_NMDA,  label="P_NMDA ", color= :orange)
-    # plot!(plt[syn_variables], t, sol_s.B_NMDA .- sol_s.A_NMDA,  label="B_NMDA - A_NMDA", color= :red)
-
-    t_resp, resp = reponse_time(p_model.save.t_NMDA_response, t)
-    response = 4
-    plot!(plt[response], t_resp, resp,  label="response", color= :black)
-
-    # n_current = retrieve_projection_neuron_currents(sol_n, p_model)
-    # plot!(plt[4], t, n_current.Iext, label="Iext")
+    is_activated = p_model.stimulation.is_activated
+    stim = 6
+    ylabel!(plt[stim], "Stim")
+    plot!(plt[stim], t, is_activated.(t) .* amp, color= :black, label="")
 
     # --- plot frequencies --- #
 
-    sol = sol_n
     t_spikes = sol.t_spikes
     freqs = instant_freqs(t_spikes)
 
@@ -96,7 +97,7 @@ function plot_single_simulation(sol_n, sol_pn, sol_s, p_model, duration; file_pr
     # --- save --- #
 
     savefig(plt, "plots/simulation/$(file_prefix).png")
-    savefig(plt, "plots/simulation/$(file_prefix).pdf")
+    #savefig(plt, "plots/simulation/$(file_prefix).pdf")
     savefig(p_freq, "plots/simulation/$(file_prefix)_freqs.pdf")
 
     println("Save Plots in [plots/simulation/$(file_prefix)]")

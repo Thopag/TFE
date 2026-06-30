@@ -25,12 +25,12 @@ function projection_neuron_parameter(;
     # conductances
     g_Na = 30.0,         # [mS/cm^2]
     g_K_dr = 4.0,        # [mS/cm^2]
-    g_K_ir = 0.0,        # [mS/cm^2]
+    g_K_ir = 0.02,       # [mS/cm^2]
     g_K_M = 0.0,         # [mS/cm^2]
     g_Leak = 0.03268,    # [mS/cm^2]
 
-    pLf = 0.0, #3.0 * 10^(-5),           # [cm*s^-1]
-    pLs = 0.0, #3.0 * 10^(-5),           # [cm*s^-1]
+    pLf = 0.0 * 1.5 * 10^(-4),           # [cm*s^-1]
+    pLs = 1000 * 0.2 * 10^(-4),           # [cm*s^-1]
 
     # Ca
     k = 1.0e4,                     # [µm.cm^(-1)] 
@@ -41,11 +41,11 @@ function projection_neuron_parameter(;
     E_Na = 50.0,         # [mV]
     E_K = -70.0,         # [mV]
     E_Leak = -65.0,       # [mV]
-    
+
     C = 1.0,                # [µF/cm^2]
     d = 0.1,                # [µm]
     )
-    
+
     L = 20                 # [µm]
     D = 20                 # [µm]
     CellArea = 2.0*pi*(D/2)*L

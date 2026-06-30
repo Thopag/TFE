@@ -10,7 +10,7 @@ function old_projection_neuron_state(du,u,p; Iext=0.0, Isyn=0.0, ICa_from_syn=0.
     mNa     = u[2]
     hNa     = u[3]
     mdr     = u[4]
-    Ca_i    = u[5]
+    Ca_i    = u[11]
 
     # --- currents --- #
 
@@ -27,7 +27,7 @@ function old_projection_neuron_state(du,u,p; Iext=0.0, Isyn=0.0, ICa_from_syn=0.
     du[3] = dot_hNa(V, hNa)
     du[4] = dot_mdr(V, mdr)
 
-    du[5] = dot_Ca_i(Ca_i, 0.0+ICa_from_syn, pn)
+    du[11] = dot_Ca_i(Ca_i, 0.0+ICa_from_syn, pn)
 
     return
 end
