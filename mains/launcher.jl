@@ -22,7 +22,7 @@ function main()
         Ihold = 0.0
     end
 
-    make_single_simulation = true
+    make_single_simulation = false
     make_excitability_plan = false
 
     # -------- Initial Condition -------- #
@@ -102,9 +102,9 @@ function main()
         println("")
         # -------- Analyses -------- #
 
-        # analyse_r     = run_parameter_analyses(u0, VEC_p_model, VEC_label, parameter_label, duration)
-        # bifurcation_r = run_bifurcation_analyses(u0, VEC_p_model, VEC_label)
-        # DIC_r         = run_DIC_analyses(VEC_p_model, VEC_label)
+        analyse_r     = run_parameter_analyses(u0, VEC_p_model, VEC_label, parameter_label, duration)
+        #bifurcation_r = run_bifurcation_analyses(u0, VEC_p_model, VEC_label)
+        DIC_r         = run_DIC_analyses(VEC_p_model, VEC_label)
         SS_current_r  = run_SS_current_analyses(VEC_p_model, VEC_label)                                                                                                                                                             
 
         # -------- Saving -------- #
@@ -119,8 +119,10 @@ function main()
 
         println("")
         println("----------- Start Ploting -----------")
-        #plot_parameter_analyses(analyse_r; file_prefix = "default")
-        plot_SS_current_analyses(SS_current_r; file_prefix = "default")
+    
+        plot_parameter_analyses(analyse_r; file_prefix = "default")
+        #plot_SS_current_analyses(SS_current_r; file_prefix = "default")
+    
         println("----------- End Ploting -----------")
     end
 

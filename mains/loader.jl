@@ -2,9 +2,9 @@
 
 function main()
 
-    load_excitability_plan = true
+    load_excitability_plan = false
 
-    file = "DIV0_plan_test"
+    file = "DIV0_test_2"
     
     println("")
     println("----------- Start Loading -----------")
@@ -20,18 +20,17 @@ function main()
     println("")
     println("----------- Start Ploting -----------")
 
-    if load_excitability_plan
-        if !isnothing(plan_r)
-            plot_excitability_plan(plan_r; file_prefix = "default")
-        else
-            print("No plan_r")
-        end
+
+    if !isnothing(plan_r)
+        plot_excitability_plan(plan_r; file_prefix = "default")
     else
-        if !isnothing(analyse_r)
-            plot_parameter_analyses(analyse_r; file_prefix = "default")
-        else
-            print("No analyse_r")
-        end
+        println("No plan_r")
+    end
+
+    if !isnothing(analyse_r)
+        plot_parameter_analyses(analyse_r; file_prefix = "default")
+    else
+        println("No analyse_r")
     end
 
     println("----------- End Ploting -----------")

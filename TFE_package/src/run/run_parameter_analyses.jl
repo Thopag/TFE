@@ -4,27 +4,28 @@ function run_parameter_analyses(u0, VEC_p_model, VEC_label, parameter_label, dur
 
     # -------- amp vectors -------- #
 
-    VEC_amp = 0.0:100:300.0
+    VEC_amp = 0.0:20:300.0
+
+    with_nociceptor = false
+    with_projection_neuron = true
 
     println("")
     println("----------- Start Parameter Analyses -----------")
     println("With amps values : [$VEC_amp]")
+    println("Nociceptor is [$with_nociceptor] and projection neuron is [$with_projection_neuron]")
     println("")
 
-    @time results = parameter_analyses(VEC_amp, VEC_p_model, duration, u0, VEC_label, parameter_label)
+    @time results = parameter_analyses(VEC_amp, VEC_p_model, duration, u0, VEC_label, parameter_label
+                                                                    ; with_nociceptor=with_nociceptor, with_projection_neuron=with_projection_neuron)
     println("------------ End Parameter Analyses ------------")
 
     return results
 end
 
-function plot_parameter_analyses(results::AnalyseResults; file_prefix = "default")
+function plot_data_analyse(data::AnalyseData, VEC_label, VEC_amp, inter_axe_label, file_prefix)
 
     # ----- INIT PLOTS ----- #
 
-    VEC_label = results.VEC_label
-    inter_axe_label = results.parameter_label
-
-    VEC_amp = results.VEC_amp
     amp_label = "Amp (pA)"
     xticks = VEC_amp[1]:30:VEC_amp[end]
     
@@ -43,12 +44,12 @@ function plot_parameter_analyses(results::AnalyseResults; file_prefix = "default
     
     # ----- Fill plots ----- #
 
-    M_first_h = first.(results.M_first_peak_h_w)
-    M_first_w = last.(results.M_first_peak_h_w)
+    M_first_h = first.(data.M_first_peak_h_w)
+    M_first_w = last.(data.M_first_peak_h_w)
 
-    M_freq       = results.M_freq
-    M_peak_count = results.M_peak_count
-    M_pattern    = results.M_pattern
+    M_freq       = data.M_freq
+    M_peak_count = data.M_peak_count
+    M_pattern    = data.M_pattern
 
     for (i,(VEC_first_h, VEC_first_w, VEC_freq, VEC_peak_count, VEC_pattern, label)) in 
                         enumerate(zip(eachcol(M_first_h), eachcol(M_first_w), eachcol(M_freq), eachcol(M_peak_count), eachcol(M_pattern), VEC_label))
@@ -72,7 +73,7 @@ function plot_parameter_analyses(results::AnalyseResults; file_prefix = "default
     hline!(p_height, [0.0], color=:red, linestyle = :dash, label="")
 
     # --- rheobase barplot --- #
-    VEC_rheobase = results.VEC_rheobase
+    VEC_rheobase = data.VEC_rheobase
     not_nothing_idx = .!isnothing.(VEC_rheobase)
 
     labels_not_nothing = VEC_label[not_nothing_idx]
@@ -92,4 +93,28 @@ function plot_parameter_analyses(results::AnalyseResults; file_prefix = "default
     savefig(p_rheo, "plots/default/$(file_prefix)_rheobases.pdf")
 
     return p_peaks, p_freqs, p_height, p_width, p_rheo, p_pattern
+    
+end
+
+function plot_parameter_analyses(results::AnalyseResults; file_prefix = "default")
+
+    
+    VEC_label = results.VEC_label
+    inter_axe_label = results.parameter_label
+
+    VEC_amp = results.VEC_amp
+
+    if !isnothing(results.nociceptor)
+        plot_data_analyse(results.nociceptor, VEC_label, VEC_amp, inter_axe_label, "$(file_prefix)_nociceptor")
+    else
+        println("(plot_parameter_analyses) No nociceptor")
+    end
+
+    if !isnothing(results.projection_neuron)
+        plot_data_analyse(results.projection_neuron, VEC_label, VEC_amp, inter_axe_label, "$(file_prefix)_projection_neuron")
+    else
+        println("(plot_parameter_analyses) No projection neuron")
+    end
+
+    return
 end

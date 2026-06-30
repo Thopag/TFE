@@ -63,5 +63,5 @@ function nociceptor_simulation(u0, tspan, p)
     nociceptor_solution = NociceptorSolution(t,V,m3,h3,m7,h7,m8,h8,ndr,ldr,nM,zAHP,Inoise,
                                                     p.save.n_t_spikes, p.save.n_V_spikes)
 
-    return nociceptor_solution
+    return nociceptor_solution , nothing, nothing
 end

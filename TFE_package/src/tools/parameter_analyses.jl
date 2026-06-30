@@ -1,11 +1,16 @@
 
-struct AnalyseResults
+struct AnalyseData
     M_first_peak_h_w::Matrix{Tuple{Float32, Float32}}
     M_freq::Matrix{Float32}
     M_peak_count::Matrix{Int}
     M_pattern::Matrix{Int}
     M_limit_cycle_min_max::Matrix{Tuple{Float64, Float64}}
     VEC_rheobase::Vector{Union{Nothing,Float32}}
+end
+
+struct AnalyseResults
+    nociceptor::Union{Nothing,AnalyseData}
+    projection_neuron::Union{Nothing,AnalyseData}
     VEC_p_model::Vector{ModelParameters}
     VEC_amp::Vector{Float64}
     VEC_label::Vector{String}
@@ -14,9 +19,7 @@ end
 
 # --- init --- #
 
-function analyse_result(VEC_amp, VEC_p_model, VEC_label, parameter_label)
-    n_row = length(VEC_amp)
-    n_col = length(VEC_p_model)
+function analyse_data(n_row, n_col)
 
     M_first_peak_h_w = Matrix{Tuple{Float64, Float64}}(undef, n_row, n_col)
     M_freq = Matrix{Float32}(undef, n_row, n_col)
@@ -26,14 +29,28 @@ function analyse_result(VEC_amp, VEC_p_model, VEC_label, parameter_label)
 
     VEC_rheobase = Vector{Union{Nothing,Float32}}(undef, n_col)
 
-    return AnalyseResults(M_first_peak_h_w, M_freq, M_peak_count, M_pattern, M_limit_cycle_min_max, VEC_rheobase, 
-                                                    VEC_p_model, VEC_amp, VEC_label, parameter_label)
+    return AnalyseData(M_first_peak_h_w, M_freq, M_peak_count, M_pattern, M_limit_cycle_min_max, VEC_rheobase)
 end
 
-function analyse(p_model, u0; duration = 1700.0)
+function analyse_result(VEC_amp, VEC_p_model, VEC_label, parameter_label, with_nociceptor, with_projection_neuron)
+    n_row = length(VEC_amp)
+    n_col = length(VEC_p_model)
 
-    stim = p_model.stimulation
-    sol = nociceptor_simulation(u0, (0.0, duration), p_model)
+    n = nothing
+    if with_nociceptor
+        n = analyse_data(n_row, n_col)
+    end
+
+    pn = nothing
+    if with_projection_neuron
+        pn = analyse_data(n_row, n_col)
+    end
+
+    return AnalyseResults(n, pn, VEC_p_model, VEC_amp, VEC_label, parameter_label)
+end
+
+function analyse(sol, stim)
+
     t_spike = sol.t_spikes
 
     first_h, first_w = get_first_peak_height_and_width(sol.t, sol.V)
@@ -52,28 +69,75 @@ function analyse(p_model, u0; duration = 1700.0)
     return (first_h, first_w), freq, n_peak, pattern, (min, max)
 end
 
-function make_analyse(amps_p_model, u0; duration = 1700.0)
+function choose_simulation_function(results::AnalyseResults)
+
+    with_nociceptor = !isnothing(results.nociceptor)
+    with_projection_neuron = !isnothing(results.projection_neuron) 
+
+    if with_nociceptor && with_projection_neuron
+        simulation_function = with_synapse_simulation
+    elseif with_nociceptor
+        simulation_function = nociceptor_simulation
+    elseif with_projection_neuron
+        simulation_function = projection_neuron_simulation
+    else
+        prinln("(choose_simulation_function) I NEED AT LEAST A NEURON (nociceptor or projection neuron)")
+    end
+    return simulation_function
+end
+
+function make_analyse(amps_p_model, u0, i::Int, results::AnalyseResults; duration = 1700.0)
 
     L = length(amps_p_model)
-    VEC_first_peak_h_w      = Vector{Tuple{Float32, Float32}}(undef, L)
-    VEC_freq                = Vector{Float32}(undef, L)
-    VEC_peak_count          = Vector{Int}(undef, L)
-    VEC_pattern             = Vector{Int}(undef, L)
-    VEC_limit_cycle_min_max = Vector{Tuple{Float64, Float64}}(undef, L)
+    simulation = choose_simulation_function(results)
 
-    for (i,p_model) in enumerate(amps_p_model)
-        print("\rProgress: $(round(((i-1)/L*100), digits=2)) %")
-        first_h_w, freq, n_peak, pattern, min_max = analyse(p_model, u0; duration = duration)
+    for (j,p_model) in enumerate(amps_p_model)
+        print("\rProgress: $(round(((j-1)/L*100), digits=2)) %")
+        
+        # Simulation
+        stim = p_model.stimulation
+        sol_n, sol_pn, sol_s = simulation(u0, (0.0, duration), p_model)
 
-        VEC_first_peak_h_w[i]       = first_h_w
-        VEC_freq[i]                 = freq
-        VEC_peak_count[i]           = n_peak
-        VEC_pattern[i]              = pattern
-        VEC_limit_cycle_min_max[i]  = min_max
+        if !isnothing(sol_n)
+            # Compute wanted features for nociceptor
+            first_h_w, freq, n_peak, pattern, min_max = analyse(sol_n, stim)
+
+            results.nociceptor.M_first_peak_h_w[j, i]      = first_h_w
+            results.nociceptor.M_freq[j, i]                = freq
+            results.nociceptor.M_peak_count[j, i]          = n_peak
+            results.nociceptor.M_pattern[j, i]             = pattern
+            results.nociceptor.M_limit_cycle_min_max[j, i] = min_max
+        end
+
+        if !isnothing(sol_pn)
+            # Compute wanted features for projection neuron
+            first_h_w, freq, n_peak, pattern, min_max = analyse(sol_pn, stim)
+
+            results.projection_neuron.M_first_peak_h_w[j, i]      = first_h_w
+            results.projection_neuron.M_freq[j, i]                = freq
+            results.projection_neuron.M_peak_count[j, i]          = n_peak
+            results.projection_neuron.M_pattern[j, i]             = pattern
+            results.projection_neuron.M_limit_cycle_min_max[j, i] = min_max
+        end
+
+    end
+
+    if !isnothing(results.nociceptor)
+        # Search rheobase for nociceptor
+        VEC_pattern = results.nociceptor.M_pattern[:, i]
+        rheobase_idx = findfirst(x -> x >= 1, VEC_pattern)
+        results.nociceptor.VEC_rheobase[i] = results.VEC_amp[rheobase_idx]
+    end
+
+    if !isnothing(results.projection_neuron)
+        # Search rheobase for projection_neuron
+        VEC_pattern = results.projection_neuron.M_pattern[:, i]
+        rheobase_idx = findfirst(x -> x >= 1, VEC_pattern)
+        results.projection_neuron.VEC_rheobase[i] = results.VEC_amp[rheobase_idx]
     end
 
     print("\r")
-    return VEC_first_peak_h_w, VEC_freq, VEC_peak_count, VEC_pattern, VEC_limit_cycle_min_max
+    return
 end
 
 function fill_analyse_result(i::Int, results::AnalyseResults, u0; duration = 1700.0)
@@ -86,23 +150,14 @@ function fill_analyse_result(i::Int, results::AnalyseResults, u0; duration = 170
     VEC_stim = map( (amp) -> change_stimulation_amp(amp, p_model.stimulation), results.VEC_amp)
     amps_p_model = map( (stim) -> from_model_parameter(p_model; stimulation=stim), VEC_stim)
 
-    VEC_first_peak_h_w, VEC_freq, VEC_peak_count, VEC_pattern, VEC_limit_cycle_min_max = make_analyse(amps_p_model, u0; duration = duration)
-
-    rheobase_idx = findfirst(x -> x >= 1, VEC_pattern)
-    results.VEC_rheobase[i] = results.VEC_amp[rheobase_idx]
-
-    results.M_first_peak_h_w[:, i] = VEC_first_peak_h_w
-    results.M_freq[:, i] = VEC_freq
-    results.M_peak_count[:, i] = VEC_peak_count
-    results.M_pattern[:, i] = VEC_pattern
-    results.M_limit_cycle_min_max[:, i] = VEC_limit_cycle_min_max
+    make_analyse(amps_p_model, u0, i, results; duration = duration)
 
     return
 end
 
-function parameter_analyses(VEC_amp, VEC_p_model, duration, u0, VEC_label, parameter_label)
+function parameter_analyses(VEC_amp, VEC_p_model, duration, u0, VEC_label, parameter_label; with_nociceptor=true, with_projection_neuron=false)
 
-    results = analyse_result(VEC_amp, VEC_p_model, VEC_label, parameter_label)
+    results = analyse_result(VEC_amp, VEC_p_model, VEC_label, parameter_label, with_nociceptor, with_projection_neuron)
     for i in 1:length(VEC_p_model)
         fill_analyse_result(i, results, u0; duration = duration)
     end

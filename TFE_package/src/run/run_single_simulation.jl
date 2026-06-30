@@ -11,8 +11,8 @@ function single_simulation(p_model, u0, duration; file_prefix = "default")
     print("------------------------------\n")
     println("I_ext : $(stim.amp) pA")
 
-    #@time sol_n = nociceptor_simulation(u0, (0.0, duration), p_model)
-    #@time sol_pn = projection_neuron_simulation(u0, (0.0, duration), p_model)
+    #@time sol_n, sol_pn, sol_s = nociceptor_simulation(u0, (0.0, duration), p_model)
+    #@time sol_n, sol_pn, sol_s = projection_neuron_simulation(u0, (0.0, duration), p_model)
     @time sol_n, sol_pn, sol_s = with_synapse_simulation(u0, (0.0, duration), p_model)
 
     sol = sol_pn

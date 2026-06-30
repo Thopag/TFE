@@ -32,7 +32,7 @@ function find_rheobase(amps, p_model, u0; duration = 1700.0)
         # -- Make Simulation -- #
         i_stim = change_stimulation_amp(amp, stim)
         i_p_model = from_model_parameter(p_model; stimulation=i_stim)
-        sol = nociceptor_simulation(u0, (0.0, duration), i_p_model)
+        sol_n, _, _ = nociceptor_simulation(u0, (0.0, duration), i_p_model)
 
         # -- Get predicted pattern -- #
         _, pattern = get_excitability(sol.t_spikes, i_stim.off)

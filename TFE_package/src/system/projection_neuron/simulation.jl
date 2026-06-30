@@ -54,5 +54,5 @@ function projection_neuron_simulation(u0, tspan, p)
     projection_neuron_solution = ProjectionNeuronSolution(t,V,mNa,hNa,mdr,mir,mM,mLs,hLs,mLf,hLf,Ca_i,
                                                             p.save.pn_t_spikes, p.save.pn_V_spikes)
 
-    return projection_neuron_solution
+    return nothing, projection_neuron_solution, nothing
 end
