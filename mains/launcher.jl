@@ -35,11 +35,11 @@ function main()
     in_one_micro_A = 50.0 / 4.0
 
     #Ihold = -0.8 * in_one_micro_A # to change
-    duration = 7000.0                               # ms
+    duration = 2000.0                               # ms
     stim_on = 500.0                                 # ms
     stim_length = 4000.0        # ms
 
-    amp = 65.0 #* in_one_micro_A
+    amp = 51.0 #* in_one_micro_A
     if !make_single_simulation
         # Put amp = 0.0 for bifurcation
         amp = 0.0
@@ -47,7 +47,7 @@ function main()
 
     n_pulse = 10
     is_activated = nothing
-    is_activated = multiple_pulse(;T=(duration-stim_on)/n_pulse, n_pulse=n_pulse, start=500.0, length=200.0)
+    #is_activated = multiple_pulse(;T=(duration-stim_on)/n_pulse, n_pulse=n_pulse, start=500.0, length=200.0)
     p_stim = stimulation_parameter(amp; on=stim_on, length=stim_length, Ihold=Ihold, is_act=is_activated)
 
     # -------- Inter Parameter -------- #
