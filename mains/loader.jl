@@ -2,9 +2,8 @@
 
 function main()
 
-    load_excitability_plan = false
 
-    file = "DIV0_test_2"
+    file = "DIV0_plan_test"
     
     println("")
     println("----------- Start Loading -----------")

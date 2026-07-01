@@ -6,8 +6,8 @@ function run_parameter_analyses(u0, VEC_p_model, VEC_label, parameter_label, dur
 
     VEC_amp = 0.0:20:300.0
 
-    with_nociceptor = false
-    with_projection_neuron = true
+    with_nociceptor = true
+    with_projection_neuron = false
 
     println("")
     println("----------- Start Parameter Analyses -----------")

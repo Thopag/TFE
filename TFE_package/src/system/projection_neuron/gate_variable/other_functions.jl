@@ -22,13 +22,13 @@ end
 function dot_Ca_i(Ca_i, ICa_i, pn)
 
     ICa_i = ICa_i/1000.0  # [mA/cm^2] instead of [µA/cm^2]
-    drive_channel = - ICa_i * pn.k /(2.0*pn.F*pn.d)
-    if drive_channel <= 0.0
-        tmp = 0.0
-    else
-        tmp = - ICa_i * pn.k /(2.0*pn.F*pn.d) 
-    end
-    return tmp - ((Ca_i-pn.Ca_0)/pn.tau_Ca)
+    # drive_channel = - ICa_i * pn.k /(2.0*pn.F*pn.d)
+    # if drive_channel <= 0.0
+    #     tmp = 0.0
+    # else
+    #     tmp = - ICa_i * pn.k /(2.0*pn.F*pn.d) 
+    # end
+    return - ICa_i * pn.k /(2.0*pn.F*pn.d)  - ((Ca_i-pn.Ca_i_0)/pn.tau_Ca)
 end
 
 function ghk_LeFranc(V, ci, co) #v(mV), ci(mM), co(mM), z) 
@@ -43,6 +43,7 @@ function ghk_LeFranc(V, ci, co) #v(mV), ci(mM), co(mM), z)
 
     return ghk
 end
+
 function geq_ghk_LeFranc(ci, co) #v(mV), ci(mM), co(mM), z) 
     FARADAY = 96520 #default value ( https://www.neuron.yale.edu/neuron/static/docs/units/units.html)
     R       = 8.3134

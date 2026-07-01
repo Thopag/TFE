@@ -69,7 +69,7 @@ function analyse(sol, stim)
     return (first_h, first_w), freq, n_peak, pattern, (min, max)
 end
 
-function choose_simulation_function(results::AnalyseResults)
+function choose_analyse_simulation_function(results::AnalyseResults)
 
     with_nociceptor = !isnothing(results.nociceptor)
     with_projection_neuron = !isnothing(results.projection_neuron) 
@@ -89,7 +89,7 @@ end
 function make_analyse(amps_p_model, u0, i::Int, results::AnalyseResults; duration = 1700.0)
 
     L = length(amps_p_model)
-    simulation = choose_simulation_function(results)
+    simulation = choose_analyse_simulation_function(results)
 
     for (j,p_model) in enumerate(amps_p_model)
         print("\rProgress: $(round(((j-1)/L*100), digits=2)) %")

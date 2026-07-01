@@ -34,7 +34,7 @@ function projection_neuron_state(du,u,p; Iext=0.0, Isyn=0.0, ICa_from_syn=0.0)
 
     # --- currents --- #
 
-    I_Ca_i = ICa_Lf(V, Ca_i, mLf, hLf, pn.pLf, pn.Ca_0) + ICa_Ls(V, Ca_i, mLs, hLs, pn.pLs, pn.Ca_0)
+    I_Ca_i = ICa_Lf(V, Ca_i, mLf, hLf, pn.pLf, pn.Ca_o) + ICa_Ls(V, Ca_i, mLs, hLs, pn.pLs, pn.Ca_o)
 
     Iion = 0.0
     Iion += INa(V, mNa, hNa, pn.g_Na, pn.E_Na)
@@ -58,6 +58,13 @@ function projection_neuron_state(du,u,p; Iext=0.0, Isyn=0.0, ICa_from_syn=0.0)
     du[8] = dot_hLs(V, hLs)
     du[9] = dot_mLf(V, mLf)
     du[10] = dot_hLf(V, hLf)
+
+    # To remove was for testing
+    # if Ca_i >= 0.0
+    #     du[11] = 0.0
+    # else
+    #     du[11] = dot_Ca_i(Ca_i, I_Ca_i+ICa_from_syn, pn)
+    # end
 
     du[11] = dot_Ca_i(Ca_i, I_Ca_i+ICa_from_syn, pn)
 

@@ -2,6 +2,9 @@ export run_excitability_plan, plot_excitability_plan
 
 function run_excitability_plan(u0, nociceptor_parameter, p_stim, duration)
 
+    with_nociceptor = true
+    with_projection_neuron = false
+
     # -------- amp vectors -------- #
 
     VEC_amp = [0.0:1:49.0; 50.0:5:95.0; 100.0:25:300.0]
@@ -34,18 +37,17 @@ function run_excitability_plan(u0, nociceptor_parameter, p_stim, duration)
     println("With col values : [$VEC_col_param]")
     println("")
 
-    @time results = excitability_plan(VEC_amp, M_p_model, VEC_row_param, VEC_col_param, row_label, col_label, duration, u0)
+    @time results = excitability_plan(VEC_amp, M_p_model, VEC_row_param, VEC_col_param, row_label, col_label, duration, u0
+                                                                                        ; with_nociceptor=with_nociceptor, with_projection_neuron=with_projection_neuron)
     println("------------ End Excitability Plan ------------")
 
     return results
 end
 
-function plot_excitability_plan(results::ExcitabilityPlanResults; file_prefix = "default")
-
+function plot_data_excitability_plan(results::ExcitabilityPlanResults, data::ExcitabilityPlanData, file_prefix; with_lido_traj=false)
+    
     cs = get(colorschemes[:nipy_spectral], range(0.15, 0.97, length=256))
     cmap = cgrad(cs, 25, categorical = true, rev = true, scale = :exp)
-
-    with_lido_traj = false
 
     # ---------- get matrices ---------- #
 
@@ -57,8 +59,8 @@ function plot_excitability_plan(results::ExcitabilityPlanResults; file_prefix = 
 
     VEC_amp = results.VEC_amp
 
-    M_rheobase = results.M_rheobase
-    M_spiking = results.M_spiking
+    M_rheobase = data.M_rheobase
+    M_spiking = data.M_spiking
 
     # ---------- make heatmap ---------- #
 
@@ -87,5 +89,23 @@ function plot_excitability_plan(results::ExcitabilityPlanResults; file_prefix = 
 
     savefig(plt_rheobase, "plots/default/$(file_prefix)_rheobase_plan.pdf")
     savefig(plt_spiking, "plots/default/$(file_prefix)_spiking_plan.pdf")
+end
+
+function plot_excitability_plan(results::ExcitabilityPlanResults; file_prefix = "default")
+
+    with_lido_traj = false
+
+    if !isnothing(results.nociceptor)
+        plot_data_excitability_plan(results, results.nociceptor, "$(file_prefix)_nociceptor"; with_lido_traj=with_lido_traj)
+    else
+        println("(plot_parameter_analyses) No nociceptor")
+    end
+
+    if !isnothing(results.projection_neuron)
+        plot_data_excitability_plan(results, results.projection_neuron, "$(file_prefix)_projection_neuron"; with_lido_traj=with_lido_traj)
+    else
+        println("(plot_parameter_analyses) No projection neuron")
+    end
+
     return
 end

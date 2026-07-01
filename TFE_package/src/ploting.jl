@@ -1,4 +1,4 @@
-export reponse_time, plot_SS_function
+export reponse_time, plot_SS_function, plot_tau_function
 
 const pattern_list   = ["No spike"    , "Single spike", "Two spikes", "Transient" , "Spiking" ]
 const markers_list   = [:circle       , :utriangle    , :dtriangle  , :diamond    , :square   ]
@@ -94,4 +94,64 @@ function plot_SS_function(; file_prefix = "default")
 
     savefig(p_n, "plots/default/$(file_prefix)_SS_gates_n.pdf")
     savefig(p_pn, "plots/default/$(file_prefix)_SS_gates_pn.pdf")
+end
+
+function plot_tau_function(; file_prefix = "default")
+
+    V = -120.0:0.5:60.0
+    xticks = [-120, -90, -60, -30, 0, 30, 60]
+    
+    # In the futur : add the adaptation with p_model
+
+    p_n = plot(xlabel=L"Voltage ($mV$)", ylabel= L"(-)", legendfontsize=7, legend=:bottomleft
+                                        , xticks = xticks, yscale=:log10)
+
+    p_pn = plot(xlabel=L"Voltage ($mV$)", ylabel= L"(-)", legendfontsize=7, legend=:bottomright
+                                        , xticks = xticks, yscale=:log10)
+
+    m3 = tau_m3.(V)
+    h3 = tau_h3.(V)
+    m7 = tau_m7.(V)
+    h7 = tau_h7.(V)
+    m8 = tau_m8.(V)
+    h8 = tau_h8.(V)
+    nM = tau_nM.(V)
+    ndr = tau_ndr.(V)
+    ldr = tau_ldr.(V)
+    zAHP = tau_zAHP.(V)
+
+    n_gates = [m3, h3, m7, h7, m8, h8, ldr, ndr, nM, zAHP]
+    n_gate_values = Dict(key => vec for (key, vec) in zip(n_gates_labels, n_gates))
+
+    for l in n_gates_labels
+        c     = gate_colors[l]
+        style = gate_styles[l]
+        vec   = n_gate_values[l]
+        plot!(p_n, V, vec, label=l, color=c, linestyle=style)
+    end
+
+    mNa = tau_mNa.(V)
+    hNa = tau_hNa.(V)
+    mdr = tau_mdr.(V)
+    mir = tau_mir.(V)
+    mM  = tau_mM.(V)
+
+    mLf = tau_mLf.(V)
+    hLf = tau_hLf.(V)
+    mLs = tau_mLs.(V)
+    hLs = tau_hLs.(V)
+
+    plot!(p_pn, V, mNa, label="mNa", linestyle=:solid)
+    plot!(p_pn, V, hNa, label="hNa", linestyle=:dash)
+    plot!(p_pn, V, mdr, label="mdr", linestyle=:solid)
+    plot!(p_pn, V, mir, label="mir", linestyle=:solid)
+    plot!(p_pn, V, mM, label="mM", linestyle=:solid)
+
+    plot!(p_pn, V, mLf, label="mLf", linestyle=:solid)
+    plot!(p_pn, V, hLf, label="hLf", linestyle=:dash)
+    plot!(p_pn, V, mLs, label="mLs", linestyle=:solid)
+    plot!(p_pn, V, hLs, label="hLs", linestyle=:dash)
+
+    savefig(p_n, "plots/default/$(file_prefix)_tau_gates_n.pdf")
+    savefig(p_pn, "plots/default/$(file_prefix)_tau_gates_pn.pdf")
 end

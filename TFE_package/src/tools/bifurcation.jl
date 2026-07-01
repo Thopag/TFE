@@ -17,6 +17,8 @@ end
 
 function make_bifurcation(p_model, u0, lens_param, p_min, p_max)
 
+    u0 = u0[p_model.idx.n]
+    
     prob = BifurcationProblem(bifurcation_system_nociceptor, u0, p_model, lens_param, 
         record_from_solution = (x, p; k...) -> x[:], inplace = true)
 
