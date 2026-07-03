@@ -1,16 +1,16 @@
 export run_SS_current_analyses, plot_SS_current_analyses
 
-function run_SS_current_analyses(VEC_p_model, VEC_label)
+function run_SS_current_analyses(fp::FileParameters)
 
     V = -120.0:0.5:60.0
 
     println("")
-    results = SS_current_analyses(V, VEC_p_model, VEC_label)
+    results = SS_current_analyses(V, fp)
     println("-------------- SS Currents Done --------------")
     return results
 end
 
-function plot_SS_current_analyses(results::SSCurrentResults; file_prefix = "default")
+function plot_SS_current_analyses(results::SSCurrentResults, fp::FileParameters; file_prefix = "default")
 
     xticks = [-120, -90, -60, -30, 0, 30, 60]
     n_ylimits =  :native
@@ -23,7 +23,7 @@ function plot_SS_current_analyses(results::SSCurrentResults; file_prefix = "defa
                                         , xticks = xticks, ylims=pn_ylimits)
 
     V = results.V
-    for (n_current, pn_current, label) in zip(results.VEC_nociceptor, results.VEC_projection_neuron, results.VEC_label)
+    for (n_current, pn_current, label) in zip(results.VEC_nociceptor, results.VEC_projection_neuron, fp.VEC_label)
 
         #plot!(p_pn, V, pn_current.INa, label="INa")
         #plot!(p_pn, V, pn_current.IK_dr, label="IK_dr")

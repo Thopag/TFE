@@ -27,8 +27,8 @@ end
 
 function synapse_parameter(;
 
-    g_NMDA = 1.0,         # [mS/cm²]
-    g_AMPA = 1.0,         # [mS/cm²]
+    g_NMDA = 2.0 * 1.0,           # [mS/cm²] # default = 1.0
+    g_AMPA = 4.0 * 1.0,           # [mS/cm²] # default = 1.0
     E_NMDA = 0.0,         # [mV]
     E_AMPA = 0.0,         # [mV]
 

@@ -1,6 +1,8 @@
+include("utils.jl")
 
 function main()
 
+    fp = nothing
     analyse_r = nothing
     bifurcation_r = nothing
     DIC_r = nothing
@@ -22,12 +24,11 @@ function main()
         Ihold = 0.0
     end
 
-    make_single_simulation = true
+    make_single_simulation = false
     make_excitability_plan = false
 
     # -------- Initial Condition -------- #
 
-    # The following analyses are on the nociceptor only but can carry the complete u0
     u0 = get_synapse_u0(set_u0_noci)
 
     # -------- Stimulation -------- #
@@ -37,17 +38,17 @@ function main()
     #Ihold = -0.8 * in_one_micro_A # to change
     duration = 2000.0                               # ms
     stim_on = 500.0                                 # ms
-    stim_length = 4000.0        # ms
+    stim_length = 1200.0        # ms
 
-    amp = 51.0 #* in_one_micro_A
+    amp = 70.0 #* in_one_micro_A
     if !make_single_simulation
         # Put amp = 0.0 for bifurcation
         amp = 0.0
     end
 
-    n_pulse = 10
+    n_pulse = 5
     is_activated = nothing
-    #is_activated = multiple_pulse(;T=(duration-stim_on)/n_pulse, n_pulse=n_pulse, start=500.0, length=200.0)
+    #is_activated = multiple_pulse(;T=(duration-stim_on)/n_pulse, n_pulse=n_pulse, start=500.0, length=150.0)
     p_stim = stimulation_parameter(amp; on=stim_on, length=stim_length, Ihold=Ihold, is_act=is_activated)
 
     # -------- Inter Parameter -------- #
@@ -58,76 +59,50 @@ function main()
     VEC_label = ["$k" for k in VEC_inter_parameter]
     parameter_label = "inhibition (-)"
 
-    # -------- INFO -------- #
-
-    println("")
-    println("%%%%%%%%%%%%%%%%%%%%%%% INFO %%%%%%%%%%%%%%%%%%%%%%%")
-    println("Parameter set type : [$DIV]")
-    println("Simulation of [$duration] ms")
+    file = "$(DIV)_default"
 
     # -------- Create the VEC_p_model -------- #
 
+    pn = projection_neuron_parameter(;)
+    s = synapse_parameter(;)
+
     VEC_p_noci = [nociceptor_parameter(; g_NaV1p8 = 30.0 * (1.0 - p)) for p in VEC_inter_parameter]
-    VEC_p_model = [model_parameter(;stimulation=p_stim, nociceptor=n) for n in VEC_p_noci]
+    VEC_p_model = [model_parameter(;stimulation=p_stim, nociceptor=n, projection_neuron=pn, synapse=s) for n in VEC_p_noci]
 
     if make_single_simulation
 
+        println("")
+        println("%%%%%%%%%%%%%%%%%%%%%%% INFO %%%%%%%%%%%%%%%%%%%%%%%")
+        println("Parameter set type : [$DIV]")
+        println("Simulation of [$duration] ms")
         println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
         println("")
+
         p_model = VEC_p_model[1]
         # -------- Single Simulation -------- #
-        sol_n, sol_pn, sol_s = single_simulation(p_model, u0, duration; file_prefix = "default")
-        plot_single_simulation(sol_n, sol_pn, sol_s, p_model, duration; file_prefix = "default")
+        sol_n, sol_pn, sol_s = single_simulation(p_model, u0, duration; file_prefix = file)
+        plot_single_simulation(sol_n, sol_pn, sol_s, p_model, duration; file_prefix = file)
 
     elseif make_excitability_plan
 
+        println("")
+        println("%%%%%%%%%%%%%%%%%%%%%%% INFO %%%%%%%%%%%%%%%%%%%%%%%")
+        println("Parameter set type : [$DIV]")
+        println("Simulation of [$duration] ms")
         println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
         println("")
+
         @time plan_r = run_excitability_plan(u0, nociceptor_parameter, p_stim, duration)
 
-        println("")
-        println("----------- Start Saving -----------")
-        # Mute the warning about function saving
-        with_logger(ConsoleLogger(stderr, Logging.Error)) do
-            @time jldsave("JLD2_save/$(DIV)_plan_test.jld2"; analyse_r, bifurcation_r, DIC_r, SS_current_r, plan_r)
-        end
-        println("----------- Finish Saving -----------")
-
-        println("")
-        println("----------- Start Ploting -----------")
-        plot_excitability_plan(plan_r; file_prefix = "default")
-        println("----------- End Ploting -----------")
+        save(file; plan_r=plan_r)
+        plot_plan(plan_r, file_prefix)
     else
-        println("")
-        println("Inter parameter is [$(parameter_label)]")
-        println("With vector : [$(VEC_inter_parameter)]")
-        println("And labels : [$(VEC_label)]")
-        println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-        println("")
-        # -------- Analyses -------- #
 
-        #analyse_r     = run_parameter_analyses(u0, VEC_p_model, VEC_label, parameter_label, duration)
-        bifurcation_r = run_bifurcation_analyses(u0, VEC_p_model, VEC_label)
-        DIC_r         = run_DIC_analyses(VEC_p_model, VEC_label)
-        SS_current_r  = run_SS_current_analyses(VEC_p_model, VEC_label)                                                                                                                                                             
+        fp = file_parameters(u0, duration, VEC_p_model, VEC_label, parameter_label, DIV)
+        analyse_r, bifurcation_r, DIC_r, SS_current_r = launch_analyses(fp, analyse_r, bifurcation_r, DIC_r, SS_current_r)
 
-        # -------- Saving -------- #
-
-        println("")
-        println("----------- Start Saving -----------")
-        # Mute the warning about function saving
-        with_logger(ConsoleLogger(stderr, Logging.Error)) do
-            @time jldsave("JLD2_save/$(DIV)_test.jld2"; analyse_r, bifurcation_r, DIC_r, SS_current_r, plan_r)
-        end
-        println("----------- Finish Saving -----------")
-
-        println("")
-        println("----------- Start Ploting -----------")
-    
-        #plot_parameter_analyses(analyse_r; file_prefix = "default")
-        #plot_SS_current_analyses(SS_current_r; file_prefix = "default")
-    
-        println("----------- End Ploting -----------")
+        save(file; fp=fp, analyse_r=analyse_r, bifurcation_r=bifurcation_r, DIC_r=DIC_r, SS_current_r=SS_current_r)
+        plot_analyses(fp, analyse_r, bifurcation_r, DIC_r, SS_current_r, file)
     end
 
 end

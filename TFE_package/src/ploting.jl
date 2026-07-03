@@ -6,18 +6,14 @@ const colors_list    = [:midnightblue , :darkgreen    , :yellowgreen, :orange   
 
 const pattern_palette = cgrad(colors_list, categorical = true)
 
-function NaV_palettes(L; dark=0.95, light=0.4)
+const label_bif_specialpoint = Dict{Symbol, String}(:hopf => "Hopf", :bp => "Branch Point", :endpoint => "End Point")
+
+function get_palette(L, colors, color; dark=0.95, light=0.4)
 
     if L == 1
-        return [:red], [:blue], [:green], [:grey]
+        return [color]
     end
-
-    reds   = [get(colorschemes[:Reds], i)   for i in range(light, stop=dark, length=L)]
-    blues  = [get(colorschemes[:Blues], i)  for i in range(light, stop=dark, length=L)]
-    greens = [get(colorschemes[:Greens], i) for i in range(light, stop=dark, length=L)]
-    greys  = [get(colorschemes[:Greys], i)  for i in range(light, stop=dark, length=L)]
-
-    return reds, blues, greens, greys
+    return [get(colorschemes[colors], i) for i in range(light, stop=dark, length=L)]
 end
 
 function reponse_time(t_resp, sol_t)

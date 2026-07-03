@@ -12,6 +12,7 @@ include("system/with_synapse/simulation.jl")
 include("system/test_n1_n2/simulation.jl")
 
 include("tools/excitability.jl")
+include("tools/file_saving_parameters.jl")
 
 include("tools/parameter_analyses.jl")
 include("tools/bifurcation.jl")

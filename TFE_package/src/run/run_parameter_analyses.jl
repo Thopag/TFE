@@ -1,13 +1,13 @@
 export run_parameter_analyses, plot_parameter_analyses
 
-function run_parameter_analyses(u0, VEC_p_model, VEC_label, parameter_label, duration)
+function run_parameter_analyses(fp::FileParameters)
 
     # -------- amp vectors -------- #
 
     VEC_amp = 0.0:20:300.0
 
     with_nociceptor = true
-    with_projection_neuron = false
+    with_projection_neuron = true
 
     println("")
     println("----------- Start Parameter Analyses -----------")
@@ -15,8 +15,7 @@ function run_parameter_analyses(u0, VEC_p_model, VEC_label, parameter_label, dur
     println("Nociceptor is [$with_nociceptor] and projection neuron is [$with_projection_neuron]")
     println("")
 
-    @time results = parameter_analyses(VEC_amp, VEC_p_model, duration, u0, VEC_label, parameter_label
-                                                                    ; with_nociceptor=with_nociceptor, with_projection_neuron=with_projection_neuron)
+    @time results = parameter_analyses(VEC_amp, fp; with_nociceptor=with_nociceptor, with_projection_neuron=with_projection_neuron)
     println("------------ End Parameter Analyses ------------")
 
     return results
@@ -96,11 +95,11 @@ function plot_data_analyse(data::AnalyseData, VEC_label, VEC_amp, inter_axe_labe
     
 end
 
-function plot_parameter_analyses(results::AnalyseResults; file_prefix = "default")
+function plot_parameter_analyses(results::AnalyseResults, fp::FileParameters; file_prefix = "default")
 
     
-    VEC_label = results.VEC_label
-    inter_axe_label = results.parameter_label
+    VEC_label = fp.VEC_label
+    inter_axe_label = fp.parameter_label
 
     VEC_amp = results.VEC_amp
 

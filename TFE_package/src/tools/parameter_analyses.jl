@@ -8,13 +8,11 @@ struct AnalyseData
     VEC_rheobase::Vector{Union{Nothing,Float32}}
 end
 
+
 struct AnalyseResults
     nociceptor::Union{Nothing,AnalyseData}
     projection_neuron::Union{Nothing,AnalyseData}
-    VEC_p_model::Vector{ModelParameters}
     VEC_amp::Vector{Float64}
-    VEC_label::Vector{String}
-    parameter_label::String
 end
 
 # --- init --- #
@@ -32,7 +30,7 @@ function analyse_data(n_row, n_col)
     return AnalyseData(M_first_peak_h_w, M_freq, M_peak_count, M_pattern, M_limit_cycle_min_max, VEC_rheobase)
 end
 
-function analyse_result(VEC_amp, VEC_p_model, VEC_label, parameter_label, with_nociceptor, with_projection_neuron)
+function analyse_result(VEC_amp, VEC_p_model, with_nociceptor, with_projection_neuron)
     n_row = length(VEC_amp)
     n_col = length(VEC_p_model)
 
@@ -46,7 +44,7 @@ function analyse_result(VEC_amp, VEC_p_model, VEC_label, parameter_label, with_n
         pn = analyse_data(n_row, n_col)
     end
 
-    return AnalyseResults(n, pn, VEC_p_model, VEC_amp, VEC_label, parameter_label)
+    return AnalyseResults(n, pn, VEC_amp)
 end
 
 function analyse(sol, stim)
@@ -140,12 +138,12 @@ function make_analyse(amps_p_model, u0, i::Int, results::AnalyseResults; duratio
     return
 end
 
-function fill_analyse_result(i::Int, results::AnalyseResults, u0; duration = 1700.0)
+function fill_analyse_result(i::Int, results::AnalyseResults, VEC_p_model, u0, VEC_label; duration = 1700.0)
 
-    L = length(results.VEC_label)
-    println("$(results.VEC_label[i]) -- $(round(((i-1)/L*100), digits=2)) % is done")
+    L = length(VEC_label)
+    println("$(VEC_label[i]) -- $(round(((i-1)/L*100), digits=2)) % is done")
 
-    p_model = results.VEC_p_model[i]
+    p_model = VEC_p_model[i]
 
     VEC_stim = map( (amp) -> change_stimulation_amp(amp, p_model.stimulation), results.VEC_amp)
     amps_p_model = map( (stim) -> from_model_parameter(p_model; stimulation=stim), VEC_stim)
@@ -155,11 +153,16 @@ function fill_analyse_result(i::Int, results::AnalyseResults, u0; duration = 170
     return
 end
 
-function parameter_analyses(VEC_amp, VEC_p_model, duration, u0, VEC_label, parameter_label; with_nociceptor=true, with_projection_neuron=false)
+function parameter_analyses(VEC_amp, fp::FileParameters; with_nociceptor=true, with_projection_neuron=false)
 
-    results = analyse_result(VEC_amp, VEC_p_model, VEC_label, parameter_label, with_nociceptor, with_projection_neuron)
+    u0 = fp.u0
+    duration = fp.duration
+    VEC_p_model = fp.VEC_p_model
+    VEC_label = fp.VEC_label
+    
+    results = analyse_result(VEC_amp, VEC_p_model, with_nociceptor, with_projection_neuron)
     for i in 1:length(VEC_p_model)
-        fill_analyse_result(i, results, u0; duration = duration)
+        fill_analyse_result(i, results, VEC_p_model, u0, VEC_label; duration = duration)
     end
     return results
 end

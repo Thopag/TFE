@@ -1,18 +1,16 @@
 
 struct BifurcationResults
     VEC_br::Vector{<:BifurcationKit.ContResult}
-    VEC_p_model::Vector{ModelParameters}
     param_min::Float64
     param_max::Float64
-    VEC_label::Vector{String}
 end
 
-function bifurcation_result(VEC_p_model, param_min, param_max, VEC_label)
+function bifurcation_result(VEC_p_model, param_min, param_max)
 
     L = length(VEC_p_model)
     VEC_br = Vector{BifurcationKit.ContResult}(undef, L)
 
-    return BifurcationResults(VEC_br, VEC_p_model, param_min, param_max, VEC_label)
+    return BifurcationResults(VEC_br, param_min, param_max)
 end
 
 function make_bifurcation(p_model, u0, lens_param, p_min, p_max)
@@ -21,6 +19,11 @@ function make_bifurcation(p_model, u0, lens_param, p_min, p_max)
     
     prob = BifurcationProblem(bifurcation_system_nociceptor, u0, p_model, lens_param, 
         record_from_solution = (x, p; k...) -> x[:], inplace = true)
+
+    # u0 = u0[p_model.idx.pn]
+    
+    # prob = BifurcationProblem(bifurcation_system_projection_neuron, u0, p_model, lens_param, 
+    #     record_from_solution = (x, p; k...) -> x[:], inplace = true)
 
     step_scaling = 100
     opts = ContinuationPar(
@@ -38,22 +41,26 @@ function make_bifurcation(p_model, u0, lens_param, p_min, p_max)
     return br
 end
 
-function fill_bifurcation_result(i::Int, results::BifurcationResults, u0, lens_param)
+function fill_bifurcation_result(i::Int, results::BifurcationResults, VEC_p_model, u0, lens_param, VEC_label)
 
-    L = length(results.VEC_label)
-    println("$(results.VEC_label[i]) -- $(round(((i-1)/L*100), digits=2)) % is done")
-    p_model = results.VEC_p_model[i]
+    L = length(VEC_label)
+    println("$(VEC_label[i]) -- $(round(((i-1)/L*100), digits=2)) % is done")
+    p_model = VEC_p_model[i]
 
     br = make_bifurcation(p_model, u0, lens_param, results.param_min, results.param_max)
     results.VEC_br[i] = br
     return
 end
 
-function bifurcation_analyses(VEC_p_model, u0, lens_param, param_min, param_max, VEC_label)
+function bifurcation_analyses(fp::FileParameters, lens_param, param_min, param_max)
 
-    results = bifurcation_result(VEC_p_model, param_min, param_max, VEC_label)
+    u0 = fp.u0
+    VEC_p_model = fp.VEC_p_model
+    VEC_label = fp.VEC_label
+    
+    results = bifurcation_result(VEC_p_model, param_min, param_max)
     for i in 1:length(VEC_p_model)
-        fill_bifurcation_result(i, results, u0, lens_param)
+        fill_bifurcation_result(i, results, VEC_p_model, u0, lens_param, VEC_label)
     end
     return results
 end

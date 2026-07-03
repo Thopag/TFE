@@ -68,27 +68,31 @@ function plot_single_simulation(sol_n, sol_pn, sol_s, p_model, duration; file_pr
     ylabel!(plt[voltage_pn], "Voltage (mV)", ylims=(-100,50))
     plot!(plt[voltage_pn], t, sol_pn.V, color= :black, label="")
 
-    Ca = 4
+    Ca = 3
     ylabel!(plt[Ca], "Ca")
     plot!(plt[Ca], t, sol_pn.Ca_i, color= :black, label="")
 
-    pn_curr = 5
-    ylabel!(plt[pn_curr], "Current")
-    #plot!(plt[pn_curr], t, pn_current.INa, label="INa")
-    #plot!(plt[pn_curr], t, pn_current.IK_M, label="IK_M")
-    plot!(plt[pn_curr], t, pn_current.ICa_Ls, label="ICa_Ls")
-    plot!(plt[pn_curr], t, pn_current.ICa_Lf, label="ICa_Lf")
-    #plot!(plt[pn_curr], t, pn_current.IK_ir, label="IK_ir")
-    #plot!(plt[pn_curr], t, s_current.IAMPA .+ s_current.INMDA, label="Isyn") 
-    #plot!(plt[pn_curr], t, pn_current.ICa_Ls .+ pn_current.ICa_Lf, label="ICa_i")
+    # pn_curr = 2
+    # ylabel!(plt[pn_curr], "Current")
+    # #plot!(plt[pn_curr], t, pn_current.INa, label="INa")
+    # plot!(plt[pn_curr], t, pn_current.IK_M, label="IK_M")
+    # plot!(plt[pn_curr], t, pn_current.ICa_Ls, label="ICa_Ls")
+    # #plot!(plt[pn_curr], t, pn_current.ICa_Lf, label="ICa_Lf")
+    # plot!(plt[pn_curr], t, pn_current.IK_ir, label="IK_ir")
+    # #plot!(plt[pn_curr], t, s_current.IAMPA .+ s_current.INMDA, label="Isyn") 
+    # #plot!(plt[pn_curr], t, pn_current.ICa_Ls .+ pn_current.ICa_Lf, label="ICa_i")
     
-    # syn_Ca = 3
-    # #plot!(plt[syn_Ca], t, s_current.ICa_from_syn, label="ICa_from_syn")
-    # plot!(plt[syn_Ca], t, s_current.IAMPA .+ s_current.INMDA, label="Isyn") 
+    syn_Ca = 4
+    #plot!(plt[syn_Ca], t, s_current.ICa_from_syn, label="ICa_from_syn")
+    #plot!(plt[syn_Ca], t, s_current.IAMPA .+ s_current.INMDA, label="Isyn") 
+    plot!(plt[syn_Ca], t, s_current.INMDA, label="INMDA") 
 
-    channel = 3
-    plot!(plt[channel], t, sol_pn.mir, label="mir") 
-    plot!(plt[channel], t, sol_pn.mM, label="mM") 
+    syn_var = 5
+    plot!(plt[syn_var], t, sol_s.Use_NMDA, label="Use_NMDA") 
+
+    # channel = 3
+    # plot!(plt[channel], t, sol_pn.mir, label="mir") 
+    # plot!(plt[channel], t, sol_pn.mM, label="mM") 
 
     # --- plot frequencies --- #
 

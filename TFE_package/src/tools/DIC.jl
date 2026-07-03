@@ -40,17 +40,15 @@ struct DICResults
     VEC_g_f::Vector{Vector{Float64}}
     VEC_g_s::Vector{Vector{Float64}}
     VEC_g_us::Vector{Vector{Float64}}
-    VEC_p_model::Vector{ModelParameters}
-    VEC_label::Vector{String}
 end
 
-function DIC_result(V, VEC_p_model, VEC_label)
+function DIC_result(V, VEC_p_model)
 
     L = length(VEC_p_model)
     VEC_g_f  = Vector{Vector{Float64}}(undef, L)
     VEC_g_s  = Vector{Vector{Float64}}(undef, L)
     VEC_g_us = Vector{Vector{Float64}}(undef, L)
-    return DICResults(V, VEC_g_f, VEC_g_s, VEC_g_us, VEC_p_model, VEC_label)
+    return DICResults(V, VEC_g_f, VEC_g_s, VEC_g_us)
 end
 
 function make_DIC(V, p)
@@ -144,9 +142,9 @@ function make_DIC(V, p)
     return g_f, g_s, g_us
 end
 
-function fill_DIC_result(i::Int, results::DICResults)
+function fill_DIC_result(i::Int, results::DICResults, VEC_p_model)
 
-    p_model = results.VEC_p_model[i]
+    p_model = VEC_p_model[i]
     g_f, g_s, g_us = make_DIC(results.V, p_model)
 
     results.VEC_g_f[i] = g_f
@@ -155,11 +153,12 @@ function fill_DIC_result(i::Int, results::DICResults)
     return
 end
 
-function DIC_analyses(V, VEC_p_model, VEC_label)
+function DIC_analyses(V, fp::FileParameters)
 
-    results = DIC_result(V, VEC_p_model, VEC_label)
+    VEC_p_model = fp.VEC_p_model
+    results = DIC_result(V, VEC_p_model)
     for i in 1:length(VEC_p_model)
-        fill_DIC_result(i, results)
+        fill_DIC_result(i, results, VEC_p_model)
     end
     return results
 end

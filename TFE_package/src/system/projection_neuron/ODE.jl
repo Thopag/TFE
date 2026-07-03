@@ -96,7 +96,7 @@ end
 
 function bifurcation_system_projection_neuron(du,u,p)
 
-    idx = p.idx
+    L = length(du)
     # -- Iext value -- #
     stim  = p.stimulation
     pn    = p.projection_neuron
@@ -105,6 +105,6 @@ function bifurcation_system_projection_neuron(du,u,p)
     Iext = Iext * (10^-6) / (pn.CellArea * (10^-8))      # [µA/cm^2]
 
     # -- update projection_neuron variables -- #
-    projection_neuron_state(view(du, idx.pn), view(u, idx.pn), p; Iext=Iext)
+    projection_neuron_state(view(du, 1:L), view(u, 1:L), p; Iext=Iext)
     return du
 end
