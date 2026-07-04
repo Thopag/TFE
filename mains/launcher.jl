@@ -24,7 +24,7 @@ function main()
         Ihold = 0.0
     end
 
-    make_single_simulation = false
+    with_simulations = true
     make_excitability_plan = false
 
     # -------- Initial Condition -------- #
@@ -41,7 +41,7 @@ function main()
     stim_length = 1200.0        # ms
 
     amp = 70.0 #* in_one_micro_A
-    if !make_single_simulation
+    if !with_simulations
         # Put amp = 0.0 for bifurcation
         amp = 0.0
     end
@@ -53,7 +53,7 @@ function main()
 
     # -------- Inter Parameter -------- #
 
-    inhibs = 0:0.5:0.0
+    inhibs = 0:0.5:1.0
 
     VEC_inter_parameter = inhibs
     VEC_label = ["$k" for k in VEC_inter_parameter]
@@ -69,19 +69,10 @@ function main()
     VEC_p_noci = [nociceptor_parameter(; g_NaV1p8 = 30.0 * (1.0 - p)) for p in VEC_inter_parameter]
     VEC_p_model = [model_parameter(;stimulation=p_stim, nociceptor=n, projection_neuron=pn, synapse=s) for n in VEC_p_noci]
 
-    if make_single_simulation
+    if with_simulations
 
-        println("")
-        println("%%%%%%%%%%%%%%%%%%%%%%% INFO %%%%%%%%%%%%%%%%%%%%%%%")
-        println("Parameter set type : [$DIV]")
-        println("Simulation of [$duration] ms")
-        println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-        println("")
-
-        p_model = VEC_p_model[1]
-        # -------- Single Simulation -------- #
-        sol_n, sol_pn, sol_s = single_simulation(p_model, u0, duration; file_prefix = file)
-        plot_single_simulation(sol_n, sol_pn, sol_s, p_model, duration; file_prefix = file)
+        VEC_p_model = [VEC_p_model[1]]
+        make_simulations(VEC_p_model, u0, duration, VEC_label, DIV; file_prefix = file)
 
     elseif make_excitability_plan
 

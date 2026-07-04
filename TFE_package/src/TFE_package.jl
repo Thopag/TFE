@@ -21,7 +21,7 @@ include("tools/SS_currents.jl")
 include("tools/excitability_plan.jl")
 
 # RUNS
-include("run/run_single_simulation.jl")
+include("run/run_simulations.jl")
 
 include("run/run_parameter_analyses.jl")
 include("run/run_bifurcation_analyses.jl")

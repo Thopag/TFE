@@ -21,6 +21,16 @@ function reponse_time(t_resp, sol_t)
     return sol_t, Int.(mask)
 end
 
+function annotate_amp(plt, amp)
+    xlims = Plots.xlims(plt)
+    ylims = Plots.ylims(plt)
+    annotate!(plt,
+        xlims[2] - 0.1*(xlims[2]-xlims[1]),
+        ylims[2] - 0.05*(ylims[2]-ylims[1]),
+        text( L"amp = %$amp pA", 11, :black))
+    return
+end
+
 const n_gates_labels = ["m3", "h3", "m7", "h7", "m8", "h8", "ldr", "ndr", "nM", "zAHP"]
 const n_gates_colors = [:blue, :blue, :red, :red, :green, :green, :orange, :orange, :purple, :brown]
 const n_gates_style  = [:solid, :dash, :solid, :dash, :solid, :dash, :dash, :solid, :solid, :solid]
