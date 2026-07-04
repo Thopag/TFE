@@ -153,14 +153,14 @@ function fill_analyse_result(i::Int, results::AnalyseResults, VEC_p_model, u0, V
     return
 end
 
-function parameter_analyses(VEC_amp, fp::FileParameters; with_nociceptor=true, with_projection_neuron=false)
+function parameter_analyses(VEC_amp, fp::FileParameters)
 
     u0 = fp.u0
     duration = fp.duration
     VEC_p_model = fp.VEC_p_model
     VEC_label = fp.VEC_label
     
-    results = analyse_result(VEC_amp, VEC_p_model, with_nociceptor, with_projection_neuron)
+    results = analyse_result(VEC_amp, VEC_p_model, fp.with_nociceptor, fp.with_projection_neuron)
     for i in 1:length(VEC_p_model)
         fill_analyse_result(i, results, VEC_p_model, u0, VEC_label; duration = duration)
     end

@@ -1,5 +1,6 @@
 export file_parameters, plan_parameters
 
+
 struct FileParameters
     u0::Vector{Float64}
     duration::Float64
@@ -7,10 +8,12 @@ struct FileParameters
     VEC_label::Vector{String}
     parameter_label::String
     DIV::String
+    with_nociceptor::Bool
+    with_projection_neuron::Bool
 end
 
-function file_parameters(u0, duration, VEC_p_model, VEC_label, parameter_label, DIV)
-    return FileParameters(u0, duration, VEC_p_model, VEC_label, parameter_label, DIV)
+function file_parameters(u0, duration, VEC_p_model, VEC_label, parameter_label, DIV, with_nociceptor, with_projection_neuron)
+    return FileParameters(u0, duration, VEC_p_model, VEC_label, parameter_label, DIV, with_nociceptor, with_projection_neuron)
 end
 
 #---------------------------------------------------------#
@@ -24,8 +27,10 @@ struct PlanParameters
     row_label::String
     col_label::String
     DIV::String
+    with_nociceptor::Bool
+    with_projection_neuron::Bool
 end
 
-function plan_parameters(u0, duration, M_p_model, VEC_row_param, VEC_col_param, row_label, col_label, DIV)
-    return PlanParameters(u0, duration, M_p_model, VEC_row_param, VEC_col_param, row_label, col_label, DIV)
+function plan_parameters(u0, duration, M_p_model, VEC_row_param, VEC_col_param, row_label, col_label, DIV, with_nociceptor, with_projection_neuron)
+    return PlanParameters(u0, duration, M_p_model, VEC_row_param, VEC_col_param, row_label, col_label, DIV, with_nociceptor, with_projection_neuron)
 end

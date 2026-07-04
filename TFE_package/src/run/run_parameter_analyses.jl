@@ -4,18 +4,14 @@ function run_parameter_analyses(fp::FileParameters)
 
     # -------- amp vectors -------- #
 
-    VEC_amp = 0.0:20:300.0
-
-    with_nociceptor = true
-    with_projection_neuron = true
+    VEC_amp = 0.0:100.0:300.0
 
     println("")
     println("----------- Start Parameter Analyses -----------")
     println("With amps values : [$VEC_amp]")
-    println("Nociceptor is [$with_nociceptor] and projection neuron is [$with_projection_neuron]")
     println("")
 
-    @time results = parameter_analyses(VEC_amp, fp; with_nociceptor=with_nociceptor, with_projection_neuron=with_projection_neuron)
+    @time results = parameter_analyses(VEC_amp, fp)
     println("------------ End Parameter Analyses ------------")
 
     return results

@@ -15,14 +15,17 @@ end
 
 function make_bifurcation(p_model, u0, lens_param, p_min, p_max)
 
+    stim = p_model.stimulation
+    new_stim = change_stimulation_amp(0.0, stim)
+    new_p_model = from_model_parameter(p_model; stimulation=new_stim)
+
     u0 = u0[p_model.idx.n]
-    
-    prob = BifurcationProblem(bifurcation_system_nociceptor, u0, p_model, lens_param, 
+
+    prob = BifurcationProblem(bifurcation_system_nociceptor, u0, new_p_model, lens_param, 
         record_from_solution = (x, p; k...) -> x[:], inplace = true)
 
     # u0 = u0[p_model.idx.pn]
-    
-    # prob = BifurcationProblem(bifurcation_system_projection_neuron, u0, p_model, lens_param, 
+    # prob = BifurcationProblem(bifurcation_system_projection_neuron, u0, new_p_model, lens_param, 
     #     record_from_solution = (x, p; k...) -> x[:], inplace = true)
 
     step_scaling = 100

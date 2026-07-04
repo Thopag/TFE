@@ -55,7 +55,7 @@ function choose_excitability_plan_simulation_function(results::ExcitabilityPlanR
     return simulation_function, n_is_finded, pn_is_finded
 end
 
-function find_rheobase(amps, p_model, u0, i::Int, j::Int, results::ExcitabilityPlanResults; duration = 1700.0)
+function find_rheobase(amps, p_model, u0, i::Int, j::Int, results::ExcitabilityPlanResults, duration)
 
     stim = p_model.stimulation
     simulation, n_is_finded, pn_is_finded = choose_excitability_plan_simulation_function(results)
@@ -109,7 +109,7 @@ function find_rheobase(amps, p_model, u0, i::Int, j::Int, results::ExcitabilityP
     return
 end
 
-function fill_excitability_plan_result(i::Int, j::Int, results::ExcitabilityPlanResults, M_p_model, u0; duration = 1700.0)
+function fill_excitability_plan_result(i::Int, j::Int, results::ExcitabilityPlanResults, M_p_model, u0, duration)
 
     p_model = M_p_model[i, j]
     VEC_amp = results.VEC_amp
@@ -117,21 +117,21 @@ function fill_excitability_plan_result(i::Int, j::Int, results::ExcitabilityPlan
     n_row, n_col = size(M_p_model)
     println("\r Row : $(round((((i)-1)/n_row*100), digits=2)) % ----- Col : $(round((((j)-1)/n_col*100), digits=2)) %")
 
-    find_rheobase(VEC_amp, p_model, u0, i, j, results; duration = duration)
+    find_rheobase(VEC_amp, p_model, u0, i, j, results, duration)
 
     print("\r")
     return
 end
 
-function excitability_plan(VEC_amp, pp::PlanParameters; with_nociceptor=true, with_projection_neuron=false)
+function excitability_plan(VEC_amp, pp::PlanParameters)
 
     u0 = pp.u0
     duration = pp.duration
     M_p_model = pp.M_p_model
-    results = excitability_plan_result(VEC_amp, M_p_model, with_nociceptor, with_projection_neuron)
+    results = excitability_plan_result(VEC_amp, M_p_model, pp.with_nociceptor, pp.with_projection_neuron)
     for j in axes(M_p_model, 2)
         for i in axes(M_p_model, 1)
-            fill_excitability_plan_result(i, j, results, M_p_model, u0; duration = duration)
+            fill_excitability_plan_result(i, j, results, M_p_model, u0, duration)
         end
     end
     return results

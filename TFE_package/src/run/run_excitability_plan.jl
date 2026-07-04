@@ -3,9 +3,6 @@ export run_excitability_plan, plot_excitability_plan
 
 function run_excitability_plan(pp::PlanParameters)
 
-    with_nociceptor = true
-    with_projection_neuron = false
-
     # -------- amp vectors -------- #
 
     VEC_amp = 0.0:10:50 #[0.0:1:49.0; 50.0:5:95.0; 100.0:25:300.0]
@@ -13,10 +10,9 @@ function run_excitability_plan(pp::PlanParameters)
     println("")
     println("----------- Start Excitability Plan -----------")
     println("With amps values : [$VEC_amp]")
-    println("Nociceptor is [$with_nociceptor] and projection neuron is [$with_projection_neuron]")
     println("")
 
-    @time results = excitability_plan(VEC_amp, pp; with_nociceptor=with_nociceptor, with_projection_neuron=with_projection_neuron)
+    @time results = excitability_plan(VEC_amp, pp)
     println("------------ End Excitability Plan ------------")
 
     return results

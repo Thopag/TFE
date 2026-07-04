@@ -19,6 +19,7 @@ include("tools/bifurcation.jl")
 include("tools/DIC.jl")
 include("tools/SS_currents.jl")
 include("tools/excitability_plan.jl")
+include("tools/frequency_plan.jl")
 
 # RUNS
 include("run/run_simulations.jl")
@@ -28,6 +29,7 @@ include("run/run_bifurcation_analyses.jl")
 include("run/run_DIC_analyses.jl")
 include("run/run_SS_current_analyses.jl")
 include("run/run_excitability_plan.jl")
+include("run/run_frequency_plan.jl")
 
 # precompile(simulation, (Vector{Float64}, Tuple{Float64, Float64}, ModelParameters))
 

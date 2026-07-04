@@ -5,7 +5,6 @@ function run_bifurcation_analyses(fp::FileParameters)
     # -------- bif Parameter -------- #
 
     lens_param = PropertyLens(:amp) ∘ PropertyLens(:stimulation)
-    #lens_param = @optic _.stimulation.amp
     amp_min = -1320.0
     amp_max = 300.0
 

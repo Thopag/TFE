@@ -1,16 +1,29 @@
 export make_simulations
 
-function used_simulation(p_model, u0, duration)
+function choose_simulation_function(with_nociceptor, with_projection_neuron)
 
-    sol_n  = nothing
-    sol_pn = nothing
-    sol_s  = nothing
+    if with_nociceptor && with_projection_neuron
+        simulation_function = with_synapse_simulation
+    elseif with_nociceptor
+        simulation_function = nociceptor_simulation
+    elseif with_projection_neuron
+        simulation_function = projection_neuron_simulation
+    else
+        prinln("(choose_simulation_function) I NEED AT LEAST A NEURON (nociceptor or projection neuron)")
+    end
+    return simulation_function
+end
 
-    #@time sol_n, sol_pn, sol_s = nociceptor_simulation(u0, (0.0, duration), p_model)
-    #@time sol_n, sol_pn, sol_s = projection_neuron_simulation(u0, (0.0, duration), p_model)
-    @time sol_n, sol_pn, sol_s = with_synapse_simulation(u0, (0.0, duration), p_model)
+function used_simulation(p_model, u0, duration, with_nociceptor, with_projection_neuron)
 
-    sol = sol_pn
+    simulation_function = choose_simulation_function(with_nociceptor, with_projection_neuron)
+    @time sol_n, sol_pn, sol_s = simulation_function(u0, (0.0, duration), p_model)
+
+    if !isnothing(sol_pn)
+        sol = sol_pn
+    else
+        sol = sol_n
+    end
 
     t_spikes = sol.t_spikes
     freqs = instant_freqs(t_spikes)
@@ -74,12 +87,13 @@ function plot_simulations(plt, p_model, sol_n, sol_pn, sol_s; color = nothing, l
 
 end
 
-function make_simulations(VEC_p_model, u0, duration, VEC_label, DIV; file_prefix = "default")
+function make_simulations(VEC_p_model, u0, duration, VEC_label, DIV, with_nociceptor, with_projection_neuron; file_prefix = "default")
 
     println("")
     println("%%%%%%%%%%%%%%%%%%%%%%% INFO %%%%%%%%%%%%%%%%%%%%%%%")
     println("Parameter set type : [$DIV]")
     println("Simulation of [$duration] ms")
+    println("Nociceptor is [$(with_nociceptor)] and projection neuron is [$(with_projection_neuron)]")
     println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
     println("")
 
@@ -100,7 +114,7 @@ function make_simulations(VEC_p_model, u0, duration, VEC_label, DIV; file_prefix
         for (i,(p_model, label, color)) in enumerate(zip(VEC_p_model, VEC_label, VEC_color))
 
             println("-------------- $(i)/$(L) ---------------")
-            sol_n, sol_pn, sol_s, t_spikes, freqs = used_simulation(p_model, u0, duration)
+            sol_n, sol_pn, sol_s, t_spikes, freqs = used_simulation(p_model, u0, duration, with_nociceptor, with_projection_neuron)
         
             println("---- plot ----")
             plot_simulations(plt, p_model, sol_n, sol_pn, sol_s; color = color, label = label)
@@ -115,7 +129,7 @@ function make_simulations(VEC_p_model, u0, duration, VEC_label, DIV; file_prefix
         p_model = VEC_p_model[1]
 
         println("-------------- Single ---------------")
-        sol_n, sol_pn, sol_s, t_spikes, freqs = used_simulation(p_model, u0, duration)
+        sol_n, sol_pn, sol_s, t_spikes, freqs = used_simulation(p_model, u0, duration, with_nociceptor, with_projection_neuron)
 
         println("---- plot ----")
         plot_simulations(plt, p_model, sol_n, sol_pn, sol_s)

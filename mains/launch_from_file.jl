@@ -2,7 +2,7 @@ include("utils.jl")
 
 function launch_from_file(file)
 
-    fp, pp, analyse_r, bifurcation_r, DIC_r, SS_current_r, plan_r = load_file(file)
+    fp, pp, analyse_r, bifurcation_r, DIC_r, SS_current_r, plan_exct, plan_freq = load_file(file)
 
     # results = nothing to force the remake
 
@@ -14,8 +14,8 @@ function launch_from_file(file)
     end
 
     if !isnothing(pp)
-        plan_r = launch_plan(pp, plan_r)
-        save(file; pp=pp, plan_r=plan_r)
+        plan_exct = launch_plan(pp, plan_exct, plan_freq)
+        save(file; pp=pp, plan_exct=plan_exct, plan_freq=plan_freq)
     else
         println("No pp")
     end  

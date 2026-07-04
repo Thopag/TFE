@@ -10,20 +10,21 @@ function load_file(file)
     bifurcation_r   = data["bifurcation_r"]
     DIC_r           = data["DIC_r"]
     SS_current_r    = data["SS_current_r"]
-    plan_r          = data["plan_r"]
+    plan_exct       = data["plan_exct"]
+    plan_freq       = data["plan_freq"]
 
     println("--- Loaded [$(file).jld2] ---")
     println("")
-    return fp, pp, analyse_r, bifurcation_r, DIC_r, SS_current_r, plan_r
+    return fp, pp, analyse_r, bifurcation_r, DIC_r, SS_current_r, plan_exct, plan_freq
 end
 
-function save(file; fp=nothing, pp=nothing, analyse_r=nothing, bifurcation_r=nothing, DIC_r=nothing, SS_current_r=nothing, plan_r=nothing)
+function save(file; fp=nothing, pp=nothing, analyse_r=nothing, bifurcation_r=nothing, DIC_r=nothing, SS_current_r=nothing, plan_exct=nothing, plan_freq=nothing)
 
     println("")
     println("----------- Start Saving -----------")
     # Mute the warning about function saving
     with_logger(ConsoleLogger(stderr, Logging.Error)) do
-        @time jldsave("JLD2_save/$(file).jld2"; fp, pp, analyse_r, bifurcation_r, DIC_r, SS_current_r, plan_r)
+        @time jldsave("JLD2_save/$(file).jld2"; fp, pp, analyse_r, bifurcation_r, DIC_r, SS_current_r, plan_exct, plan_freq)
     end
     println("----------- Finish Saving -----------")
 end
@@ -40,6 +41,7 @@ function launch_analyses(fp, analyse_r, bifurcation_r, DIC_r, SS_current_r)
     println("%%%%%%%%%%%%%%%%%%%%% LAUNCH %%%%%%%%%%%%%%%%%%%%%")
     println("Parameter set type : [$(fp.DIV)]")
     println("Simulation of [$(fp.duration)] ms")
+    println("Nociceptor is [$(fp.with_nociceptor)] and projection neuron is [$(fp.with_projection_neuron)]")
     println("")
     println("Inter parameter is [$(fp.parameter_label)]")
     println("And labels : [$(fp.VEC_label)]")
@@ -108,7 +110,7 @@ end
 
 # ------------------------- PLAN ------------------------ #
 
-function launch_plan(pp, plan_r)
+function launch_plan(pp, plan_exct, plan_freq)
 
     if isnothing(pp)
         println("(launch_plan) NO PP")
@@ -118,6 +120,7 @@ function launch_plan(pp, plan_r)
     println("%%%%%%%%%%%%%%%%%%%%% LAUNCH %%%%%%%%%%%%%%%%%%%%%")
     println("Parameter set type : [$(pp.DIV)]")
     println("Simulation of [$(pp.duration)] ms")
+    println("Nociceptor is [$(pp.with_nociceptor)] and projection neuron is [$(pp.with_projection_neuron)]")
     println("")
     println("With row [$(pp.row_label)] : [$(pp.VEC_row_param)]")
     println("With col [$(pp.col_label)] : [$(pp.VEC_col_param)]")
@@ -126,25 +129,39 @@ function launch_plan(pp, plan_r)
     
     # -------- Make Plans -------- #
 
-    if isnothing(plan_r)
-        plan_r = run_excitability_plan(pp)
+    if isnothing(plan_exct)
+        plan_exct = run_excitability_plan(pp)
     else
-        println("plan_r was already done")
+        println("plan_exct was already done")
     end
 
-    return plan_r
+    if isnothing(plan_freq)
+        plan_freq = run_frequency_plan(pp)
+    else
+        println("plan_freq was already done")
+    end
+
+    return plan_exct, plan_freq
 end
 
-function plot_plan(pp, plan_r, file_prefix)
+function plot_plan(pp, plan_exct, plan_freq, file_prefix)
 
     println("----------- Start Ploting Excitability Plan -----------")
 
     # excitability_plan
-    if !isnothing(plan_r)
-        plot_excitability_plan(pp, plan_r; file_prefix = file_prefix)
+    if !isnothing(plan_exct)
+        plot_excitability_plan(pp, plan_exct; file_prefix = file_prefix)
         println("excitability_plan done")
     else
-        println("No plan_r")
+        println("No plan_exct")
+    end
+
+    # freq_plan
+    if !isnothing(plan_freq)
+        plot_frequency_plan(pp, plan_freq; file_prefix = file_prefix)
+        println("frequency_plan done")
+    else
+        println("No plan_freq")
     end
 
     println("----------- End Ploting Excitability Plan -----------")
