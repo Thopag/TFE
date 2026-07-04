@@ -5,6 +5,7 @@ function load_file(file)
     
     @time data = load("JLD2_save/$(file).jld2")
     fp              = data["fp"]
+    pp              = data["pp"]
     analyse_r       = data["analyse_r"]
     bifurcation_r   = data["bifurcation_r"]
     DIC_r           = data["DIC_r"]
@@ -13,16 +14,16 @@ function load_file(file)
 
     println("--- Loaded [$(file).jld2] ---")
     println("")
-    return fp, analyse_r, bifurcation_r, DIC_r, SS_current_r, plan_r
+    return fp, pp, analyse_r, bifurcation_r, DIC_r, SS_current_r, plan_r
 end
 
-function save(file; fp=nothing, analyse_r=nothing, bifurcation_r=nothing, DIC_r=nothing, SS_current_r=nothing, plan_r=nothing)
+function save(file; fp=nothing, pp=nothing, analyse_r=nothing, bifurcation_r=nothing, DIC_r=nothing, SS_current_r=nothing, plan_r=nothing)
 
     println("")
     println("----------- Start Saving -----------")
     # Mute the warning about function saving
     with_logger(ConsoleLogger(stderr, Logging.Error)) do
-        @time jldsave("JLD2_save/$(file).jld2"; fp, analyse_r, bifurcation_r, DIC_r, SS_current_r, plan_r)
+        @time jldsave("JLD2_save/$(file).jld2"; fp, pp, analyse_r, bifurcation_r, DIC_r, SS_current_r, plan_r)
     end
     println("----------- Finish Saving -----------")
 end
@@ -32,7 +33,7 @@ end
 function launch_analyses(fp, analyse_r, bifurcation_r, DIC_r, SS_current_r)
 
     if isnothing(fp)
-        println("(launch) NO FP")
+        println("(launch_analyses) NO FP")
         return
     end
 
@@ -107,13 +108,40 @@ end
 
 # ------------------------- PLAN ------------------------ #
 
-function plot_plan(plan_r, file_prefix)
+function launch_plan(pp, plan_r)
+
+    if isnothing(pp)
+        println("(launch_plan) NO PP")
+        return
+    end
+
+    println("%%%%%%%%%%%%%%%%%%%%% LAUNCH %%%%%%%%%%%%%%%%%%%%%")
+    println("Parameter set type : [$(pp.DIV)]")
+    println("Simulation of [$(pp.duration)] ms")
+    println("")
+    println("With row [$(pp.row_label)] : [$(pp.VEC_row_param)]")
+    println("With col [$(pp.col_label)] : [$(pp.VEC_col_param)]")
+    println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+    println("")
+    
+    # -------- Make Plans -------- #
+
+    if isnothing(plan_r)
+        plan_r = run_excitability_plan(pp)
+    else
+        println("plan_r was already done")
+    end
+
+    return plan_r
+end
+
+function plot_plan(pp, plan_r, file_prefix)
 
     println("----------- Start Ploting Excitability Plan -----------")
 
     # excitability_plan
     if !isnothing(plan_r)
-        plot_excitability_plan(plan_r; file_prefix = file_prefix)
+        plot_excitability_plan(pp, plan_r; file_prefix = file_prefix)
         println("excitability_plan done")
     else
         println("No plan_r")

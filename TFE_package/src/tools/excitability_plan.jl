@@ -8,11 +8,6 @@ struct ExcitabilityPlanResults
     nociceptor::Union{Nothing,ExcitabilityPlanData}
     projection_neuron::Union{Nothing,ExcitabilityPlanData}
     VEC_amp::Vector{Float64}
-    M_p_model::Matrix{ModelParameters}
-    VEC_row_param::Vector{Float64}
-    VEC_col_param::Vector{Float64}
-    row_label::String
-    col_label::String
 end
 
 function excitability_plan_data(n_row, n_col)
@@ -22,7 +17,7 @@ function excitability_plan_data(n_row, n_col)
     return ExcitabilityPlanData(M_rheobase, M_spiking)
 end
 
-function excitability_plan_result(VEC_amp, M_p_model, VEC_row_param, VEC_col_param, row_label, col_label, with_nociceptor, with_projection_neuron)
+function excitability_plan_result(VEC_amp, M_p_model, with_nociceptor, with_projection_neuron)
 
     n_row, n_col = size(M_p_model)
     n = nothing
@@ -35,7 +30,7 @@ function excitability_plan_result(VEC_amp, M_p_model, VEC_row_param, VEC_col_par
         pn = excitability_plan_data(n_row, n_col)
     end
 
-    return ExcitabilityPlanResults(n, pn, VEC_amp, M_p_model, VEC_row_param, VEC_col_param, row_label, col_label)
+    return ExcitabilityPlanResults(n, pn, VEC_amp)
 end
 
 function choose_excitability_plan_simulation_function(results::ExcitabilityPlanResults)
@@ -109,18 +104,17 @@ function find_rheobase(amps, p_model, u0, i::Int, j::Int, results::ExcitabilityP
         if (n_is_finded > 1) && (pn_is_finded > 1)
             return
         end
-
     end
     print("\r")
     return
 end
 
-function fill_excitability_plan_result(i::Int, j::Int, results::ExcitabilityPlanResults, u0; duration = 1700.0)
+function fill_excitability_plan_result(i::Int, j::Int, results::ExcitabilityPlanResults, M_p_model, u0; duration = 1700.0)
 
-    p_model = results.M_p_model[i, j]
+    p_model = M_p_model[i, j]
     VEC_amp = results.VEC_amp
 
-    n_row, n_col = size(results.M_p_model)
+    n_row, n_col = size(M_p_model)
     println("\r Row : $(round((((i)-1)/n_row*100), digits=2)) % ----- Col : $(round((((j)-1)/n_col*100), digits=2)) %")
 
     find_rheobase(VEC_amp, p_model, u0, i, j, results; duration = duration)
@@ -129,12 +123,15 @@ function fill_excitability_plan_result(i::Int, j::Int, results::ExcitabilityPlan
     return
 end
 
-function excitability_plan(VEC_amp, M_p_model, VEC_row_param, VEC_col_param, row_label, col_label, duration, u0; with_nociceptor=true, with_projection_neuron=false)
+function excitability_plan(VEC_amp, pp::PlanParameters; with_nociceptor=true, with_projection_neuron=false)
 
-    results = excitability_plan_result(VEC_amp, M_p_model, VEC_row_param, VEC_col_param, row_label, col_label, with_nociceptor, with_projection_neuron)
+    u0 = pp.u0
+    duration = pp.duration
+    M_p_model = pp.M_p_model
+    results = excitability_plan_result(VEC_amp, M_p_model, with_nociceptor, with_projection_neuron)
     for j in axes(M_p_model, 2)
         for i in axes(M_p_model, 1)
-            fill_excitability_plan_result(i, j, results, u0; duration = duration)
+            fill_excitability_plan_result(i, j, results, M_p_model, u0; duration = duration)
         end
     end
     return results

@@ -1,61 +1,39 @@
 export run_excitability_plan, plot_excitability_plan
+# max_val = maximum(x for x in vec if !isnan(x))
 
-function run_excitability_plan(u0, nociceptor_parameter, p_stim, duration)
+function run_excitability_plan(pp::PlanParameters)
 
     with_nociceptor = true
     with_projection_neuron = false
 
     # -------- amp vectors -------- #
 
-    VEC_amp = [0.0:1:49.0; 50.0:5:95.0; 100.0:25:300.0]
-
-    # -------- Row Parameter -------- #
-
-    inhibs = 0:0.5:1.0
-
-    VEC_row_param = inhibs
-    row_label = "inhibition NaV1.8 (-)"
-
-    # -------- Col Parameter -------- #
-
-    inhibs = 0:0.5:1.0
-
-    VEC_col_param = inhibs
-    col_label = "inhibition NaV1.7 (-)"
-
-    # -------- Create matrix -------- #
-
-    M_p_noci = [nociceptor_parameter(; g_NaV1p8 = 30.0 * (1.0 - r),
-                                        g_NaV1p7 = 3.0 * (1.0 - c) ) for r in VEC_row_param, c in VEC_col_param]
-
-    M_p_model = [model_parameter(;stimulation=p_stim, nociceptor=n) for n in M_p_noci]
+    VEC_amp = 0.0:10:50 #[0.0:1:49.0; 50.0:5:95.0; 100.0:25:300.0]
 
     println("")
     println("----------- Start Excitability Plan -----------")
     println("With amps values : [$VEC_amp]")
-    println("With row values : [$VEC_row_param]")
-    println("With col values : [$VEC_col_param]")
+    println("Nociceptor is [$with_nociceptor] and projection neuron is [$with_projection_neuron]")
     println("")
 
-    @time results = excitability_plan(VEC_amp, M_p_model, VEC_row_param, VEC_col_param, row_label, col_label, duration, u0
-                                                                                        ; with_nociceptor=with_nociceptor, with_projection_neuron=with_projection_neuron)
+    @time results = excitability_plan(VEC_amp, pp; with_nociceptor=with_nociceptor, with_projection_neuron=with_projection_neuron)
     println("------------ End Excitability Plan ------------")
 
     return results
 end
 
-function plot_data_excitability_plan(results::ExcitabilityPlanResults, data::ExcitabilityPlanData, file_prefix; with_lido_traj=false)
+function plot_data_excitability_plan(pp::PlanParameters, results::ExcitabilityPlanResults, data::ExcitabilityPlanData, file_prefix; with_lido_traj=false)
     
     cs = get(colorschemes[:nipy_spectral], range(0.15, 0.97, length=256))
     cmap = cgrad(cs, 25, categorical = true, rev = true, scale = :exp)
 
     # ---------- get matrices ---------- #
 
-    VEC_row_param = results.VEC_row_param
-    VEC_col_param = results.VEC_col_param
+    VEC_row_param = pp.VEC_row_param
+    VEC_col_param = pp.VEC_col_param
 
-    row_label = results.row_label
-    col_label = results.col_label
+    row_label = pp.row_label
+    col_label = pp.col_label
 
     VEC_amp = results.VEC_amp
 
@@ -91,20 +69,20 @@ function plot_data_excitability_plan(results::ExcitabilityPlanResults, data::Exc
     savefig(plt_spiking, "plots/default/$(file_prefix)_spiking_plan.pdf")
 end
 
-function plot_excitability_plan(results::ExcitabilityPlanResults; file_prefix = "default")
+function plot_excitability_plan(pp::PlanParameters, results::ExcitabilityPlanResults; file_prefix = "default")
 
     with_lido_traj = false
 
     if !isnothing(results.nociceptor)
-        plot_data_excitability_plan(results, results.nociceptor, "$(file_prefix)_nociceptor"; with_lido_traj=with_lido_traj)
+        plot_data_excitability_plan(pp, results, results.nociceptor, "$(file_prefix)_nociceptor"; with_lido_traj=with_lido_traj)
     else
-        println("(plot_parameter_analyses) No nociceptor")
+        println("(plot_excitability_plan) No nociceptor")
     end
 
     if !isnothing(results.projection_neuron)
-        plot_data_excitability_plan(results, results.projection_neuron, "$(file_prefix)_projection_neuron"; with_lido_traj=with_lido_traj)
+        plot_data_excitability_plan(pp, results, results.projection_neuron, "$(file_prefix)_projection_neuron"; with_lido_traj=with_lido_traj)
     else
-        println("(plot_parameter_analyses) No projection neuron")
+        println("(plot_excitability_plan) No projection neuron")
     end
 
     return
