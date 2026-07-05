@@ -129,11 +129,11 @@ function launch_plan(pp, plan_exct, plan_freq)
     
     # -------- Make Plans -------- #
 
-    if isnothing(plan_exct)
-        plan_exct = run_excitability_plan(pp)
-    else
-        println("plan_exct was already done")
-    end
+    # if isnothing(plan_exct)
+    #     plan_exct = run_excitability_plan(pp)
+    # else
+    #     println("plan_exct was already done")
+    # end
 
     if isnothing(plan_freq)
         plan_freq = run_frequency_plan(pp)

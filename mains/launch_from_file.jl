@@ -14,7 +14,7 @@ function launch_from_file(file)
     end
 
     if !isnothing(pp)
-        plan_exct = launch_plan(pp, plan_exct, plan_freq)
+        plan_exct, plan_freq = launch_plan(pp, plan_exct, plan_freq)
         save(file; pp=pp, plan_exct=plan_exct, plan_freq=plan_freq)
     else
         println("No pp")
@@ -23,9 +23,17 @@ end
 
 function main()
 
-    file = "DIV0_default"
+    files = ["DIV0_inhib_NMDA", "DIV0_inhib_NaV1.8", "DIV0_inhib_AMPA", "DIV0_plan_inhib_NaV1.8_NMDA"]
 
-    launch_from_file(file)
+    for file in files
+        println("-------------------------------------")
+        println()
+        println("FILE IS $file")
+        println()
+        println("-------------------------------------")
+        #launch_from_file(file)
+    end
+    launch_from_file(files[4])
 end
 
 main()

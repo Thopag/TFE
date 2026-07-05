@@ -63,9 +63,9 @@ function plot_simulations(plt, p_model, sol_n, sol_pn, sol_s; color = nothing, l
         ylabel!(plt[voltage], "Voltage (mV)")
         plot!(plt[voltage], t, sol_pn.V, color = something(color, :black), label=something(empty_label, ""))
 
-        Ca = 3
-        ylabel!(plt[Ca], "Intracellular calcium [mM]")
-        plot!(plt[Ca], t, sol_pn.Ca_i, color = something(color, :black), label=something(empty_label, ""))
+        # Ca = 3
+        # ylabel!(plt[Ca], "Intracellular calcium [mM]")
+        # plot!(plt[Ca], t, sol_pn.Ca_i, color = something(color, :black), label=something(empty_label, ""))
     
     end
 
@@ -74,12 +74,12 @@ function plot_simulations(plt, p_model, sol_n, sol_pn, sol_s; color = nothing, l
         t = sol_s.t
         s_current = retrieve_synapse_currents(sol_s, p_model)
 
-        current = 4
-        plot!(plt[current], t, s_current.INMDA, color = something(color, :blue), label=something(empty_label, "INMDA")) 
+        # current = 4
+        # plot!(plt[current], t, s_current.INMDA, color = something(color, :blue), label=something(empty_label, "INMDA")) 
     end
 
     # --------------------- STIMULATION --------------------- #
-    stim = 5
+    stim = 3
     amp = p_model.stimulation.amp
     is_activated = p_model.stimulation.is_activated
     ylabel!(plt[stim], "Stimulation (pA)")
@@ -97,7 +97,7 @@ function make_simulations(VEC_p_model, u0, duration, VEC_label, DIV, with_nocice
     println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
     println("")
 
-    n_fig = 5
+    n_fig = 3
 
     # Simulation plot
     xlimits = (0.0, duration)
@@ -120,7 +120,7 @@ function make_simulations(VEC_p_model, u0, duration, VEC_label, DIV, with_nocice
             plot_simulations(plt, p_model, sol_n, sol_pn, sol_s; color = color, label = label)
 
             if length(freqs) > 1
-                plot!(p_freq, t_spikes[1:end-1], freqs, color=color, label=label, marker=:circle, markersize=4, markerstrokecolor = :match, markerstrokewidth = 0.0)
+                plot!(p_freq, t_spikes[1:end-1], freqs, color=color, label=label, marker=:circle, markersize=2, markerstrokecolor = :match, markerstrokewidth = 0.0)
             end
             println("----------------------------------------") 
         end
@@ -138,7 +138,7 @@ function make_simulations(VEC_p_model, u0, duration, VEC_label, DIV, with_nocice
         annotate_amp(plt[1], amp)
 -
         if length(freqs) > 1
-            plot!(p_freq, t_spikes[1:end-1], freqs, color=:black, label="", marker=:circle, markersize=4, markerstrokecolor = :match, markerstrokewidth = 0.0)
+            plot!(p_freq, t_spikes[1:end-1], freqs, color=:black, label="", marker=:circle, markersize=2, markerstrokecolor = :match, markerstrokewidth = 0.0)
         end
         println("----------------------------------------") 
     end

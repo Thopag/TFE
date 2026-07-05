@@ -3,19 +3,23 @@ include("utils.jl")
 function get_file_parameter(u0, duration, DIV, p_stim, nociceptor_parameter, with_nociceptor, with_projection_neuron)
 
     # -------- Inter Parameter -------- #
-    inhibs = 0:0.5:1.0
+    inhibs = 0:0.1:1.0
 
     VEC_inter_parameter = inhibs
-    VEC_label = ["$k" for k in VEC_inter_parameter]
-    parameter_label = "inhibition (-)"
+    VEC_label = ["$k inhib" for k in VEC_inter_parameter]
+    parameter_label = "Inhibition NaV1.8 (-)"
 
     # -------- Create the VEC_p_model -------- #
 
+    n = nociceptor_parameter(;)
     pn = projection_neuron_parameter(;)
     s = synapse_parameter(;)
 
     VEC_p_noci = [nociceptor_parameter(; g_NaV1p8 = 30.0 * (1.0 - p)) for p in VEC_inter_parameter]
-    VEC_p_model = [model_parameter(;stimulation=p_stim, nociceptor=n, projection_neuron=pn, synapse=s) for n in VEC_p_noci]
+    VEC_p_proj = [projection_neuron_parameter(;) for p in VEC_inter_parameter]
+    VEC_p_syn = [synapse_parameter(;g_AMPA = 4.0 * (1.0 - p)) for p in VEC_inter_parameter]
+
+    VEC_p_model = [model_parameter(;stimulation=p_stim, nociceptor=i, projection_neuron=pn, synapse=s) for i in VEC_p_noci]
 
     fp = file_parameters(u0, duration, VEC_p_model, VEC_label, parameter_label
                                                             , DIV, with_nociceptor, with_projection_neuron)
@@ -29,19 +33,19 @@ function get_plan_parameter(u0, duration, DIV, p_stim, nociceptor_parameter, wit
     inhibs = 0:0.5:1.0
 
     VEC_row_param = inhibs
-    row_label = "inhibition NaV1.8 (-)"
-
+    row_label = "inhibition NMDA (-)"
     # -------- Col Parameter -------- #
     inhibs = 0:0.5:1.0
 
     VEC_col_param = inhibs
-    col_label = "inhibition NaV1.7 (-)"
+    col_label = "inhibition NaV1.8 (-)"
     # -------- Create matrix -------- #
 
-    M_p_noci = [nociceptor_parameter(; g_NaV1p8 = 30.0 * (1.0 - r),
-                                        g_NaV1p7 = 3.0 * (1.0 - c) ) for r in VEC_row_param, c in VEC_col_param]
+    M_p_noci = [nociceptor_parameter(; g_NaV1p8 = 30.0 * (1.0 - c)) for r in VEC_row_param, c in VEC_col_param]
+    M_p_proj = [projection_neuron_parameter(;) for r in VEC_row_param, c in VEC_col_param]
+    M_p_syn = [synapse_parameter(;g_NMDA = 2.0 * (1.0 - r)) for r in VEC_row_param, c in VEC_col_param]
 
-    M_p_model = [model_parameter(;stimulation=p_stim, nociceptor=n) for n in M_p_noci]
+    M_p_model = [model_parameter(;stimulation=p_stim, nociceptor=n, projection_neuron=pn, synapse=s) for (n,pn,s) in zip(M_p_noci,M_p_proj,M_p_syn)]
 
     pp = plan_parameters(u0, duration, M_p_model, VEC_row_param, VEC_col_param, row_label, col_label
                                                             , DIV, with_nociceptor, with_projection_neuron)
@@ -51,18 +55,16 @@ end
 
 function main()
 
-    fp = nothing
-    analyse_r = nothing
-    bifurcation_r = nothing
-    DIC_r = nothing
-    SS_current_r = nothing
-    plan_exct = nothing
-    plan_freq = nothing
+    DIV = "DIV0"
+
+    # -------- File name -------- #
+
+    file = "$(DIV)_default"
 
     # -------- Launching options -------- #
 
-    with_simulations = true
-    make_plan = false
+    with_simulations = false
+    make_plan = true
     make_analyses = false
 
     with_nociceptor = true
@@ -70,7 +72,6 @@ function main()
 
     # -------- PARAMETER SET TYPE -------- #
 
-    DIV = "DIV0"
     if DIV == "DIV0"
         nociceptor_parameter = DIV0_parameter
         set_u0_noci = DIV0_u0
@@ -83,9 +84,13 @@ function main()
         Ihold = 0.0
     end
 
-    # -------- File name -------- #
-
-    file = "$(DIV)_default"
+    fp = nothing
+    analyse_r = nothing
+    bifurcation_r = nothing
+    DIC_r = nothing
+    SS_current_r = nothing
+    plan_exct = nothing
+    plan_freq = nothing
 
     # -------- Initial Condition -------- #
 
@@ -97,8 +102,8 @@ function main()
 
     #Ihold = -0.8 * in_one_micro_A # to change
     duration = 2000.0                               # ms
-    stim_on = 500.0                                 # ms
-    stim_length = 1200.0        # ms
+    stim_on = 300.0                                 # ms
+    stim_length = 1300.0                            # ms
 
     amp = 70.0 #* in_one_micro_A
 
@@ -115,7 +120,7 @@ function main()
     if with_simulations
         VEC_p_model = fp.VEC_p_model
 
-        VEC_p_model = [VEC_p_model[1]]
+        #VEC_p_model = [VEC_p_model[1]]
         make_simulations(VEC_p_model, u0, duration, fp.VEC_label, DIV, with_nociceptor, with_projection_neuron; file_prefix = file)
     end
     if make_plan
@@ -124,9 +129,9 @@ function main()
         plot_plan(pp, plan_exct, plan_freq, file)
     end
     if make_analyses
-        analyse_r, bifurcation_r, DIC_r, SS_current_r = launch_analyses(fp, analyse_r, bifurcation_r, DIC_r, SS_current_r)
+        #analyse_r, bifurcation_r, DIC_r, SS_current_r = launch_analyses(fp, analyse_r, bifurcation_r, DIC_r, SS_current_r)
         save(file; fp=fp, analyse_r=analyse_r, bifurcation_r=bifurcation_r, DIC_r=DIC_r, SS_current_r=SS_current_r)
-        plot_analyses(fp, analyse_r, bifurcation_r, DIC_r, SS_current_r, file)
+        #plot_analyses(fp, analyse_r, bifurcation_r, DIC_r, SS_current_r, file)
     end
 end
 
