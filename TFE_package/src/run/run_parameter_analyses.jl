@@ -4,7 +4,7 @@ function run_parameter_analyses(fp::FileParameters)
 
     # -------- amp vectors -------- #
 
-    VEC_amp = 0.0:5.0:300.0
+    VEC_amp = 0.0:3.0:300.0
 
     println("")
     println("----------- Start Parameter Analyses -----------")

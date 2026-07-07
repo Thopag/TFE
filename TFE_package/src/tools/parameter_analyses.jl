@@ -124,14 +124,24 @@ function make_analyse(amps_p_model, u0, i::Int, results::AnalyseResults; duratio
         # Search rheobase for nociceptor
         VEC_pattern = results.nociceptor.M_pattern[:, i]
         rheobase_idx = findfirst(x -> x >= 1, VEC_pattern)
-        results.nociceptor.VEC_rheobase[i] = results.VEC_amp[rheobase_idx]
+
+        if !isnothing(rheobase_idx)
+            results.nociceptor.VEC_rheobase[i] = results.VEC_amp[rheobase_idx]
+        else
+            results.nociceptor.VEC_rheobase[i] = nothing
+        end
     end
 
     if !isnothing(results.projection_neuron)
         # Search rheobase for projection_neuron
         VEC_pattern = results.projection_neuron.M_pattern[:, i]
         rheobase_idx = findfirst(x -> x >= 1, VEC_pattern)
-        results.projection_neuron.VEC_rheobase[i] = results.VEC_amp[rheobase_idx]
+
+        if !isnothing(rheobase_idx)
+            results.projection_neuron.VEC_rheobase[i] = results.VEC_amp[rheobase_idx]
+        else
+            results.projection_neuron.VEC_rheobase[i] = nothing
+        end
     end
 
     print("\r")

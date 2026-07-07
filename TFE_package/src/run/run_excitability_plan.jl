@@ -5,7 +5,7 @@ function run_excitability_plan(pp::PlanParameters)
 
     # -------- amp vectors -------- #
 
-    VEC_amp = 0.0:25:300 #[0.0:1:49.0; 50.0:5:95.0; 100.0:25:300.0]
+    VEC_amp = [0.0:1:14.0; 15.0:2.5:50.0; 50.0:5:95.0; 100.0:25:300.0]
 
     println("")
     println("----------- Start Excitability Plan -----------")
