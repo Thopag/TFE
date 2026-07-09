@@ -1,4 +1,4 @@
-export reponse_time, plot_SS_function, plot_tau_function
+export reponse_time, plot_SS_function, plot_tau_function, plot_availability
 
 const pattern_list   = ["No spike"    , "Single spike", "Two spikes", "Transient" , "Spiking" ]
 const markers_list   = [:circle       , :utriangle    , :dtriangle  , :diamond    , :square   ]
@@ -41,6 +41,9 @@ const pn_gates_style  = []
 
 const gate_colors = Dict(key => color for (key, color) in zip(vcat(n_gates_labels, pn_gates_labels), vcat(n_gates_colors, pn_gates_colors)))
 const gate_styles = Dict(key => style for (key, style) in zip(vcat(n_gates_labels, pn_gates_labels), vcat(n_gates_style, pn_gates_style)))
+
+
+#-------------------- Stand alone plot function --------------------#
 
 function plot_SS_function(; file_prefix = "default")
 
@@ -160,4 +163,30 @@ function plot_tau_function(; file_prefix = "default")
 
     savefig(p_n, "plots/default/$(file_prefix)_tau_gates_n.pdf")
     savefig(p_pn, "plots/default/$(file_prefix)_tau_gates_pn.pdf")
+end
+
+function plot_availability(; file_prefix = "default")
+
+    V = -100.0:0.5:45.0
+    xticks = [-120, -90, -60, -30, 0, 30, 60]
+
+    p_n = plot(xlabel="Voltage (mV)", ylabel= "Availability (-)", legendfontsize=9, legend=:topleft
+                                        , xticks = xticks, size = (600, 200), left_margin = 5mm,bottom_margin = 5mm, margin = 5mm)
+
+    m3 = m3_inf.(V)
+    h3 = h3_inf.(V)
+    m7 = m7_inf.(V)
+    h7 = h7_inf.(V)
+    m8 = m8_inf.(V)
+    h8 = h8_inf.(V)
+    nM = nM_inf.(V)
+    ndr = ndr_inf.(V)
+    ldr = ldr_inf.(V)
+    zAHP = zAHP_inf.(V)
+
+    plot!(p_n, V, m3.^3 .* h3 ./ maximum(m3.^3 .* h3), label="NaV1.3", color=gate_colors["m3"], linewidth = 3)
+    plot!(p_n, V, m7.^3 .* h7 ./ maximum(m7.^3 .* h7), label="NaV1.7", color=gate_colors["m7"], linewidth = 3)
+    plot!(p_n, V, m8.^3 .* h8 ./ maximum(m8.^3 .* h8), label="NaV1.8", color=gate_colors["m8"], linewidth = 3)
+
+    savefig(p_n, "plots/default/$(file_prefix)_availability.pdf")
 end
