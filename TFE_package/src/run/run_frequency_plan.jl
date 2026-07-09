@@ -46,7 +46,7 @@ function plot_data_frequency_plan(pp::PlanParameters, results::FrequencyPlanResu
         plt_freq = plot(xlabel=col_label, ylabel=row_label)
         title!(plt_freq, "$amp pA")
 
-        heatmap!(plt_freq, VEC_col_param, VEC_row_param, M_freq, background_color_inside = :black, c = cmap, clims=(0.0,200.0))
+        heatmap!(plt_freq, VEC_col_param, VEC_row_param, M_freq, background_color_inside = :black, c = cmap) #, clims=(0.0,200.0))
 
         plot!(plt_freq, xlims=x_limits, ylims=y_limits)
 

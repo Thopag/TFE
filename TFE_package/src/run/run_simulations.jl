@@ -63,9 +63,9 @@ function plot_simulations(plt, p_model, sol_n, sol_pn, sol_s; color = nothing, l
         ylabel!(plt[voltage], "Voltage (mV)")
         plot!(plt[voltage], t, sol_pn.V, color = something(color, :black), label=something(empty_label, ""))
 
-        # Ca = 3
-        # ylabel!(plt[Ca], "Intracellular calcium [mM]")
-        # plot!(plt[Ca], t, sol_pn.Ca_i, color = something(color, :black), label=something(empty_label, ""))
+        Ca = 3
+        ylabel!(plt[Ca], "Intracellular calcium [mM]")
+        plot!(plt[Ca], t, sol_pn.Ca_i, color = something(color, :black), label=something(empty_label, ""))
     
     end
 
@@ -79,7 +79,7 @@ function plot_simulations(plt, p_model, sol_n, sol_pn, sol_s; color = nothing, l
     end
 
     # --------------------- STIMULATION --------------------- #
-    stim = 3
+    stim = 4
     amp = p_model.stimulation.amp
     is_activated = p_model.stimulation.is_activated
     ylabel!(plt[stim], "Stimulation (pA)")
@@ -97,7 +97,7 @@ function make_simulations(VEC_p_model, u0, duration, VEC_label, DIV, with_nocice
     println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
     println("")
 
-    n_fig = 3
+    n_fig = 4
 
     # Simulation plot
     xlimits = (0.0, duration)

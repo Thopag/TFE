@@ -17,11 +17,11 @@ function get_file_parameter(u0, duration, DIV, p_stim, nociceptor_parameter, wit
     s = synapse_parameter(;)
     lido = lidocaine_parameter(;)
 
-    VEC_p_lido = [lidocaine_parameter(;shift_h3 = 0.0, shift_h7 = 0.0, shift_h8 = 0.4 * p, shift_m8 = 0.6 * p
+    VEC_p_lido = [lidocaine_parameter(;shift_h3 = 0.0, shift_h7 = 0.0, shift_h8 = 0.0 , shift_m8 = 0.0
                                                                 , with_shift = true, linear_shift_mode = true)
                                                                                      for p in VEC_inter_parameter]
 
-    VEC_p_noci = [nociceptor_parameter(; g_NaV1p3 = 0.35 * (1.0 - p)) for p in VEC_inter_parameter]
+    VEC_p_noci = [nociceptor_parameter(;) for p in VEC_inter_parameter]
     VEC_p_proj = [projection_neuron_parameter(;) for p in VEC_inter_parameter]
     VEC_p_syn = [synapse_parameter(;) for p in VEC_inter_parameter]
 
@@ -70,13 +70,14 @@ function main()
 
     # -------- File name -------- #
 
-    file = "noci/$(DIV)_NaV1.8_m0.6_h0.4_shift"
+    #file = "noci/$(DIV)_NaV1.8_m0.6_h0.4_shift"
+    file = "$(DIV)_default"
 
     # -------- Launching options -------- #
 
-    with_simulations = false
+    with_simulations = true
     make_plan = false
-    make_analyses = true
+    make_analyses = false
 
     with_nociceptor = true
     with_projection_neuron = true
@@ -116,11 +117,11 @@ function main()
     stim_on = 300.0                                 # ms
     stim_length = 1300.0                            # ms
 
-    amp = 70.0 #* in_one_micro_A
+    amp = 51.0 #* in_one_micro_A
 
     n_pulse = 5
     is_activated = nothing
-    #is_activated = multiple_pulse(;T=(duration-stim_on)/n_pulse, n_pulse=n_pulse, start=500.0, length=150.0)
+    #is_activated = multiple_pulse(;T=(duration-stim_on)/n_pulse, n_pulse=n_pulse, start=300.0, length=100.0)
     p_stim = stimulation_parameter(amp; on=stim_on, length=stim_length, Ihold=Ihold, is_act=is_activated)
 
     # --------------------------------------------------------------------- #
@@ -131,7 +132,7 @@ function main()
     if with_simulations
         VEC_p_model = fp.VEC_p_model
 
-        #VEC_p_model = [VEC_p_model[1]]
+        VEC_p_model = [VEC_p_model[1]]
         make_simulations(VEC_p_model, u0, duration, fp.VEC_label, DIV, with_nociceptor, with_projection_neuron; file_prefix = file)
     end
     if make_plan
