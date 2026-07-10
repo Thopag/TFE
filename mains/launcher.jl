@@ -113,11 +113,11 @@ function main()
     in_one_micro_A = 50.0 / 4.0
 
     #Ihold = -0.8 * in_one_micro_A # to change
-    duration = 2000.0                               # ms
+    duration = 2500.0                               # ms
     stim_on = 300.0                                 # ms
-    stim_length = 1300.0                            # ms
+    stim_length = 1800.0                            # ms
 
-    amp = 51.0 #* in_one_micro_A
+    amp = 60.0 #* in_one_micro_A
 
     n_pulse = 5
     is_activated = nothing

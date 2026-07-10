@@ -24,15 +24,15 @@ end
 function projection_neuron_parameter(;
 
     # conductances
-    g_Na = 50.0,            # [mS/cm^2]
-    g_K_dr = 10.0,          # [mS/cm^2]
-    g_K_ir = 0.03,          # [mS/cm^2]
-    g_K_M = 0.015,          # [mS/cm^2]
+    g_Na = 30.0,            # [mS/cm^2]
+    g_K_dr = 4.0,          # [mS/cm^2]
+    g_K_ir = 0.15,          # [mS/cm^2]
+    g_K_M = 0.0,          # [mS/cm^2]
     g_Leak = 0.03268,       # [mS/cm^2]
 
     # Ca
     pLf = 1.5e-5,       # [cm*s^-1]
-    pLs = 1.3e-5,       # [cm*s^-1]
+    pLs = 7.5e-6,       # [cm*s^-1]
 
     k = 1.0e7,          # [nm.cm^(-1)]
     Ca_i_0 = 5.0e-5,    # [mM]
