@@ -3,7 +3,10 @@ function load_file(file)
 
     println("Loading...")
     
-    @time data = load("JLD2_save/$(file).jld2")
+    # Mute the warning about function loading
+    data = with_logger(ConsoleLogger(stderr, Logging.Error)) do
+        @time data = load("JLD2_save/$(file).jld2")
+    end
     fp              = data["fp"]
     pp              = data["pp"]
     analyse_r       = data["analyse_r"]
