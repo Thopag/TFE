@@ -14,11 +14,20 @@ function main()
             "shift/DIV7_h7_shift"
             ]
 
-    # file = inhib_files[1]
-    # start = 11
+    plan_files = ["plan/DIV0_NaV1.8_shift_inhib",
+            "plan/DIV7_NaV1.7_shift_inhib",
+            "plan/DIV7_NaV1.3_shift_inhib",
+            "plan/DIV0_inhib_NaV1.8_NMDA"
+            ]
 
-    file = shift_files[1]
-    start = 6
+#     file = inhib_files[1]
+#     start = 11
+
+#     file = shift_files[3]
+#     start = 6
+
+    file = plan_files[1]
+    start = 5
 
     fp, pp, analyse_r, bifurcation_r, DIC_r, SS_current_r, plan_exct, plan_freq = load_file(file)
 

@@ -18,8 +18,9 @@ function run_parameter_analyses(fp::FileParameters)
 end
 
 function plot_data_analyse(data::AnalyseData, VEC_label, VEC_amp, inter_axe_label, file_prefix)
-
-    take_idx = 1:length(VEC_label)
+    #[1,5,9,12,14]
+    #[1,2,4,6,8,11]
+    take_idx = [1,5,9,12,14]#1:3:length(VEC_label)
     #take_idx = 1:2:14
     # ----- INIT PLOTS ----- #
 
