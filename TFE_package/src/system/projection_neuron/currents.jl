@@ -8,20 +8,20 @@ function IK_dr_pn(V, mdr, g_K_dr, E_K)
     I = g_K_dr*mdr^4*(V-E_K)                  # [µA/cm^2]
     return I
 end
-function ICa_Lf(V, Ca_i, mLf, hLf, pLf, Ca_o)
-    I = pLf*(mLf^2)*hLf*ghk_LeFranc(V, Ca_i, Ca_o) *1000  # [µA/cm^2] instead of [mA/cm^2]
-    return I
-end
-function ICa_Ls(V, Ca_i, mLs, hLs, pLs, Ca_o)
-    I = pLs*mLs*hLs*ghk_LeFranc(V, Ca_i, Ca_o) *1000    # [µA/cm^2] instead of [mA/cm^2]
-    return I
-end
 function IK_ir(V, mir, g_K_ir, E_K)
     I = g_K_ir*mir*(V-E_K)                    # [µA/cm^2]
     return I
 end
 function IK_M_pn(V, mM, g_K_M, E_K)
     I = g_K_M*mM*(V-E_K)                      # [µA/cm^2]
+    return I
+end
+function ICa_Lf(V, Ca_i, mLf, hLf, pLf, Ca_o)
+    I = pLf*(mLf^2)*hLf*ghk_LeFranc(V, Ca_i, Ca_o) *1000  # [µA/cm^2] instead of [mA/cm^2]
+    return I
+end
+function ICa_Ls(V, Ca_i, mLs, hLs, pLs, Ca_o)
+    I = pLs*mLs*hLs*ghk_LeFranc(V, Ca_i, Ca_o) *1000    # [µA/cm^2] instead of [mA/cm^2]
     return I
 end
 function ILeak_pn(V, g_Leak, E_Leak)

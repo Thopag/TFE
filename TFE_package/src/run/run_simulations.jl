@@ -49,24 +49,74 @@ function plot_simulations(plt, p_model, sol_n, sol_pn, sol_s; color = nothing, l
         n_current = retrieve_nociceptor_currents(sol_n, p_model)
 
         voltage = 1
-        ylabel!(plt[voltage], "Voltage (mV)", ylims=(-100,50))
-        plot!(plt[voltage], t, sol_n.V, color = something(color, :black), label=something(empty_label, ""))
-    
+        if voltage != 0
+            yticks= [-90, -65, -40, 0, 30]
+            ylabel!(plt[voltage], "Voltage (mV)", ylims=(-100,50), yticks=yticks)
+
+            plot!(plt[voltage], t, sol_n.V, color = something(color, :black), label=something(empty_label, ""), linewidth=1.5)
+            #ylims!(plt[voltage], (-75.0, -65.0) )
+        end
+
+        currents = 0
+        if currents != 0
+            ylabel!(plt[currents], "Current [µA/cm2]")
+
+            I_K = n_current.IK_M .+ n_current.IK_AHP .+ n_current.IK_dr
+            plot!(plt[currents], t, I_K, color = :cyan, label= L"I_{K}")
+
+            #plot!(plt[currents], t, n_current.INaV1p3, color = gate_colors["m3"], label= L"I_{NaV1.3}")
+            plot!(plt[currents], t, .- n_current.INaV1p7, color = gate_colors["m7"], label= L"-I_{NaV1.7}")
+            plot!(plt[currents], t, .- n_current.INaV1p8, color = gate_colors["m8"], label= L"-I_{NaV1.8}")
+
+            # plot!(plt[currents], t, n_current.IK_dr, color = gate_colors["ndr"], label= L"I_{K_{dr}}")
+            # plot!(plt[currents], t, n_current.IK_M, color = gate_colors["nM"], label= L"I_{K_M}")
+            # plot!(plt[currents], t, n_current.IK_AHP, color = gate_colors["zAHP"], label= L"I_{z_{AHP}}")
+            #plot!(plt[currents], t, n_current.ILeak, color = :black, label= L"I_{leak}")
+
+            plot!(plt[currents], t, n_current.Iext, color = :black, linestyle=:dash, label= L"I_{ext}")
+            #ylims!(plt[currents], ( - 0.05*maximum(n_current.Iext), 1.1*maximum(n_current.Iext)) )
+
+            plot!(plt[currents], legend=false)
+            ylims!(plt[currents], (-0.05, 5.0) )
+        end
+
     end
 
     # --------------------- PROJECTION NEURON --------------------- #
     if !isnothing(sol_pn)
         t = sol_pn.t
         pn_current = retrieve_projection_neuron_currents(sol_pn, p_model)
+        pn = p_model.projection_neuron
 
         voltage = 2
-        ylabel!(plt[voltage], "Voltage (mV)")
-        plot!(plt[voltage], t, sol_pn.V, color = something(color, :black), label=something(empty_label, ""))
+        if voltage != 0
+            yticks= [-90, -65, -40, 0, 30]
+            ylabel!(plt[voltage], "Voltage (mV)", ylims=(-100,50), yticks=yticks)
+            plot!(plt[voltage], t, sol_pn.V, color = something(color, :black), label=something(empty_label, ""))
+        end
 
-        Ca = 3
-        ylabel!(plt[Ca], "Intracellular calcium [mM]")
-        plot!(plt[Ca], t, sol_pn.Ca_i, color = something(color, :black), label=something(empty_label, ""))
-    
+        Ca = 4
+        if Ca != 0
+            ylabel!(plt[Ca], "Intracellular calcium [mM]")
+            plot!(plt[Ca], t, sol_pn.Ca_i, color = something(color, :black), label=something(empty_label, ""))
+        end
+
+        currents = 0
+        if currents != 0
+            ylabel!(plt[currents], "Current [µA/cm2]")
+
+            plot!(plt[currents], t, pn_current.Iext, color = :black, label=L"I_{ext}", linewidth=1.5, alpha=0.5)
+            plot!(plt[currents], t, pn_current.INa, color = :red, label=L"I_{Na}", alpha=0.7)
+            ylims!(plt[currents], (-15, 10))
+        end
+
+        r = 0
+        if r != 0
+            Ca_o = p_model.projection_neuron.Ca_o
+            y = ghk_LeFranc.(sol_pn.V, sol_pn.Ca_i, Ca_o)
+            plot!(plt[r], t, y, color = something(color, :black), label=something(empty_label, ""))
+        end
+
     end
 
     # --------------------- SYNAPSE --------------------- #
@@ -74,20 +124,58 @@ function plot_simulations(plt, p_model, sol_n, sol_pn, sol_s; color = nothing, l
         t = sol_s.t
         s_current = retrieve_synapse_currents(sol_s, p_model)
 
-        # current = 4
-        # plot!(plt[current], t, s_current.INMDA, color = something(color, :blue), label=something(empty_label, "INMDA")) 
+        # bin_centers, counts = compute_ccg(sol_n.t_spikes, sol_pn.t_spikes; bin_width=1.0, window=50.0)
+        # plt_corr = plot(bin_centers, counts)
+        # savefig(plt_corr, "plots/simulation/corr.pdf")
+
+        currents = 0
+        if currents != 0
+            ylabel!(plt[currents], "Current [µA/cm2]")
+            plot!(plt[currents], legend=:topright)
+
+            ICa_i = pn_current.ICa_Lf .+ pn_current.ICa_Ls
+            Isyn = s_current.INMDA .+ s_current.IAMPA
+
+            #plot!(plt[currents], t, ICa_i, color = something(color, :green), label=something(empty_label, "ICa_i"))
+            #plot!(plt[currents], t, s_current.IAMPA, color = :purple, label=L"I_{AMPA}", alpha=0.3) 
+            plot!(plt[currents], t, s_current.INMDA, color = :blue, label=L"I_{NMDA}", alpha=0.5) 
+            #plot!(plt[currents], t, Isyn, color = :black, label=L"I_{syn}", linewidth=1.5, alpha=0.8)
+            plot!(plt[currents], t, ICa_i, color = :green, label=L"I_{[Ca^{2+}]_i}", alpha=0.5) 
+
+            #plot!(plt[currents], t, pn_current.INa, color = :red, label=L"I_{Na}", alpha=0.7)
+            ylims!(plt[currents], (-3, 1))
+        end
+
+        channel = 3
+        if channel != 0
+            ylabel!(plt[channel], "Availability NMDA [-]")
+            plot!(plt[channel], legend=:topright)
+
+            availability_NMDA = sol_s.B_NMDA .- sol_s.A_NMDA
+            plot!(plt[channel], t, availability_NMDA, color = :blue, label="", alpha=1.0) 
+
+        end
+    
     end
 
     # --------------------- STIMULATION --------------------- #
-    stim = 4
-    amp = p_model.stimulation.amp
-    is_activated = p_model.stimulation.is_activated
-    ylabel!(plt[stim], "Stimulation (pA)")
-    plot!(plt[stim], t, is_activated.(t) .* amp, color= something(color, :black), label=something(empty_label, ""))
 
+    y_positions = [0, 1]
+    y_labels = ["off", "on"]
+
+    stim = 0
+    if stim != 0
+        amp = p_model.stimulation.amp
+        is_activated = p_model.stimulation.is_activated
+        ylabel!(plt[stim], "")
+        plot!(plt[stim], t, is_activated.(t) .* 1, color= something(color, :black), label=something(empty_label, "")
+                                    , xticks=[300.0, 1700.0], yticks = (y_positions, y_labels), ylims=(-0.2,1.2), ytickfontsize = 13, xtickfontsize = 13)
+    end
 end
 
 function make_simulations(VEC_p_model, u0, duration, VEC_label, DIV, with_nociceptor, with_projection_neuron; file_prefix = "default")
+
+    # size = (400, 175*n_fig)
 
     println("")
     println("%%%%%%%%%%%%%%%%%%%%%%% INFO %%%%%%%%%%%%%%%%%%%%%%%")
@@ -101,10 +189,16 @@ function make_simulations(VEC_p_model, u0, duration, VEC_label, DIV, with_nocice
 
     # Simulation plot
     xlimits = (0.0, duration)
-    xticks = :native #xlimits[1]:100:xlimits[end]
-    plt = plot(layout = (n_fig, 1), link = :x, xlims=xlimits, size = (750, 230*n_fig), xaxis = nothing, left_margin = 5mm,bottom_margin = 5mm, margin = 5mm)
-    plot!(plt[n_fig], xaxis = "Time (ms)", xticks=xticks)
+    xlimits = (250.0, duration)
+    xticks = :native #xlimits[1]:150:xlimits[end]
+    plt = plot(layout = (n_fig, 1), link = :x, xlims=xlimits, size = (600, 175*n_fig), xaxis = nothing, left_margin = 5mm,bottom_margin = 5mm, margin = 5mm)
+    plot!(plt[end], xaxis = "Time (ms)", xticks=xticks, xguidefontsize = 14)
 
+    for i in 1:(n_fig-1)
+        plot!(plt[i], xticks=xticks, xformatter = _ -> "")
+        plot!(plt[i], ytickfontsize = 9, yguidefontsize = 12,)
+    end
+    
     # Freq plot
     p_freq = plot(xaxis = "Time (ms)", yaxis = "Instant frequency (Hz)", xticks=xticks, xlims=xlimits)
 
@@ -136,15 +230,16 @@ function make_simulations(VEC_p_model, u0, duration, VEC_label, DIV, with_nocice
 
         amp = VEC_p_model[1].stimulation.amp
         annotate_amp(plt[1], amp)
--
+
         if length(freqs) > 1
             plot!(p_freq, t_spikes[1:end-1], freqs, color=:black, label="", marker=:circle, markersize=2, markerstrokecolor = :match, markerstrokewidth = 0.0)
         end
         println("----------------------------------------") 
+        #plot_spikes(p_model, sol_n, sol_pn, sol_s, file_prefix)
     end
 
-    savefig(plt, "plots/simulation/$(file_prefix).png")
-    #savefig(plt, "plots/simulation/$(file_prefix).pdf")
+    #savefig(plt, "plots/simulation/$(file_prefix).png")
+    savefig(plt, "plots/simulation/$(file_prefix).pdf")
     savefig(p_freq, "plots/simulation/$(file_prefix)_freqs.pdf")
 
     println("Save Plots in [plots/simulation/$(file_prefix)]")

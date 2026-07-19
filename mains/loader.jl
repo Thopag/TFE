@@ -2,29 +2,30 @@ include("utils.jl")
 
 function main()
 
-    files = ["DIV0_inhib_NMDA", "DIV0_inhib_NaV1.8", "DIV0_inhib_AMPA", "DIV0_plan_inhib_NaV1.8_NMDA", "DIV0_plan_inhib_AMPA_NMDA"]
+    inhib_files = ["inhibition/DIV0_NaV1.8_inhib",
+            "inhibition/DIV7_NaV1.7_inhib",
+            "inhibition/DIV7_NaV1.3_inhib"
+            ]
 
-    noci_files = ["noci/DIV0_NaV1.8_h8_shift", 
-                "noci/DIV0_NaV1.8_inhib",
-                "noci/DIV0_NaV1.8_m0.6_h0.4_shift",
-                "noci/DIV0_NaV1.8_m8_shift",
-                "noci/DIV0_NaV1.8_shift_h0.4_m0.6_inhib",
-                "noci/DIV7_NaV1.3_inhib",
-                "noci/DIV7_NaV1.3_shift_h_inhib",
-                "noci/DIV7_NaV1.3_shift",
-                "noci/DIV7_NaV1.7_inhib",
-                "noci/DIV7_NaV1.7_shift_h_inhib",
-                "noci/DIV7_NaV1.7_shift"]
+    shift_files = ["shift/DIV0_h8_shift",
+            "shift/DIV0_m8_h8_shift",
+            "shift/DIV0_m8_shift",
+            "shift/DIV7_h3_shift",
+            "shift/DIV7_h7_shift"
+            ]
 
-    #file = "DIV0_default"
-    #file = files[4]
+    # file = inhib_files[1]
+    # start = 11
 
-    file = noci_files[11]
+    file = shift_files[1]
+    start = 6
 
     fp, pp, analyse_r, bifurcation_r, DIC_r, SS_current_r, plan_exct, plan_freq = load_file(file)
 
-    plot_analyses(fp, analyse_r, bifurcation_r, DIC_r, SS_current_r, file[6:end])
-    plot_plan(pp, plan_exct, plan_freq, file[6:end])
+    file = file[start:end]
+
+    plot_analyses(fp, analyse_r, bifurcation_r, DIC_r, SS_current_r, file)
+    plot_plan(pp, plan_exct, plan_freq, file)
 end
 
 main()

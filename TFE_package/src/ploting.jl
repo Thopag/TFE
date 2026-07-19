@@ -1,4 +1,4 @@
-export reponse_time, plot_SS_function, plot_tau_function, plot_availability
+export reponse_time, plot_SS_function, plot_tau_function, plot_availability, random_plot
 
 const pattern_list   = ["No spike"    , "Single spike", "Two spikes", "Transient" , "Spiking" ]
 const markers_list   = [:circle       , :utriangle    , :dtriangle  , :diamond    , :square   ]
@@ -25,22 +25,29 @@ function annotate_amp(plt, amp)
     xlims = Plots.xlims(plt)
     ylims = Plots.ylims(plt)
     annotate!(plt,
-        xlims[2] - 0.1*(xlims[2]-xlims[1]),
-        ylims[2] - 0.05*(ylims[2]-ylims[1]),
-        text( L"amp = %$amp pA", 11, :black))
+        xlims[2] - 0.025*(xlims[2]-xlims[1]),
+        ylims[2] - 0.025*(ylims[2]-ylims[1]),
+        text("$amp pA", 11, :black))
     return
 end
 
 const n_gates_labels = ["m3", "h3", "m7", "h7", "m8", "h8", "ldr", "ndr", "nM", "zAHP"]
 const n_gates_colors = [:blue, :blue, :red, :red, :green, :green, :orange, :orange, :purple, :brown]
 const n_gates_style  = [:solid, :dash, :solid, :dash, :solid, :dash, :dash, :solid, :solid, :solid]
+const n_gates_SS_labels = [L"m_{3,\infty}", L"h_{3,\infty}", L"m_{7,\infty}", L"h_{7,\infty}", L"m_{8,\infty}", L"h_{8,\infty}", L"l_{dr,\infty}", L"n_{dr,\infty}", L"n_{M,\infty}", L"z_{AHP,\infty}"]
+const n_gates_tau_labels = [L"\tau_{m_3}", L"\tau_{h_3}", L"\tau_{m_7}", L"\tau_{h_7}", L"\tau_{m_8}", L"\tau_{h_8}", L"\tau_{l_{dr}}", L"\tau_{n_{dr}}", L"\tau_{n_M}", L"\tau_{z_{AHP}}"]
 
 const pn_gates_labels = []
 const pn_gates_colors = []
 const pn_gates_style  = []
+const pn_gates_SS_labels = []
+const pn_gates_tau_labels = []
+
 
 const gate_colors = Dict(key => color for (key, color) in zip(vcat(n_gates_labels, pn_gates_labels), vcat(n_gates_colors, pn_gates_colors)))
 const gate_styles = Dict(key => style for (key, style) in zip(vcat(n_gates_labels, pn_gates_labels), vcat(n_gates_style, pn_gates_style)))
+const gates_SS_labels = Dict(key => color for (key, color) in zip(vcat(n_gates_labels, pn_gates_labels), vcat(n_gates_SS_labels, pn_gates_SS_labels)))
+const gates_tau_labels = Dict(key => style for (key, style) in zip(vcat(n_gates_labels, pn_gates_labels), vcat(n_gates_tau_labels, pn_gates_tau_labels)))
 
 
 #-------------------- Stand alone plot function --------------------#
@@ -49,13 +56,13 @@ function plot_SS_function(; file_prefix = "default")
 
     V = -120.0:0.5:60.0
     xticks = [-120, -90, -60, -30, 0, 30, 60]
-    
+
     # In the futur : add the adaptation with p_model
 
-    p_n = plot(xlabel=L"Voltage ($mV$)", ylabel= L"(-)", legendfontsize=7, legend=:bottomleft
+    p_n = plot(xlabel="Voltage (mV)", ylabel= "(-)", legendfontsize=11, legend=:right
                                         , xticks = xticks)
 
-    p_pn = plot(xlabel=L"Voltage ($mV$)", ylabel= L"(-)", legendfontsize=7, legend=:bottomright
+    p_pn = plot(xlabel="Voltage (mV)", ylabel= "(-)", legendfontsize=7, legend=:bottomright
                                         , xticks = xticks)
 
     m3 = m3_inf.(V)
@@ -72,11 +79,12 @@ function plot_SS_function(; file_prefix = "default")
     n_gates = [m3, h3, m7, h7, m8, h8, ldr, ndr, nM, zAHP]
     n_gate_values = Dict(key => vec for (key, vec) in zip(n_gates_labels, n_gates))
 
-    for l in n_gates_labels
+    for l in n_gates_labels[1:6]
         c     = gate_colors[l]
         style = gate_styles[l]
+        lab = gates_SS_labels[l]
         vec   = n_gate_values[l]
-        plot!(p_n, V, vec, label=l, color=c, linestyle=style)
+        plot!(p_n, V, vec, label=lab, color=c, linestyle=style, linewidth=2)
     end
 
     mNa = mNa_inf.(V)
@@ -109,14 +117,17 @@ function plot_tau_function(; file_prefix = "default")
 
     V = -120.0:0.5:60.0
     xticks = [-120, -90, -60, -30, 0, 30, 60]
+    yticks = [0.01, 0.1, 1.0, 10.0, 100.0, 1000.0]
+
+    ylims = [0.001, 5000.0]
     
     # In the futur : add the adaptation with p_model
 
-    p_n = plot(xlabel=L"Voltage ($mV$)", ylabel= L"(-)", legendfontsize=7, legend=:bottomleft
-                                        , xticks = xticks, yscale=:log10)
+    p_n = plot(xlabel="Voltage (mV)", ylabel= "Time (ms)", legendfontsize=11, legend=:bottom
+                                        , xticks = xticks, yscale=:log10, yticks = yticks, ylims = ylims)
 
-    p_pn = plot(xlabel=L"Voltage ($mV$)", ylabel= L"(-)", legendfontsize=7, legend=:bottomright
-                                        , xticks = xticks, yscale=:log10)
+    p_pn = plot(xlabel="Voltage (mV)", ylabel= "Time (ms)", legendfontsize=7, legend=:bottomright
+                                        , xticks = xticks, yscale=:log10, yticks = yticks,ylims = ylims)
 
     m3 = tau_m3.(V)
     h3 = tau_h3.(V)
@@ -132,11 +143,12 @@ function plot_tau_function(; file_prefix = "default")
     n_gates = [m3, h3, m7, h7, m8, h8, ldr, ndr, nM, zAHP]
     n_gate_values = Dict(key => vec for (key, vec) in zip(n_gates_labels, n_gates))
 
-    for l in n_gates_labels
+    for l in n_gates_labels[7:end]
         c     = gate_colors[l]
         style = gate_styles[l]
         vec   = n_gate_values[l]
-        plot!(p_n, V, vec, label=l, color=c, linestyle=style)
+        lab   = gates_tau_labels[l]
+        plot!(p_n, V, vec, label=lab, color=c, linestyle=style, linewidth=2)
     end
 
     mNa = tau_mNa.(V)
@@ -189,4 +201,18 @@ function plot_availability(; file_prefix = "default")
     plot!(p_n, V, m8.^3 .* h8 ./ maximum(m8.^3 .* h8), label="NaV1.8", color=gate_colors["m8"], linewidth = 3)
 
     savefig(p_n, "plots/default/$(file_prefix)_availability.pdf")
+end
+
+function random_plot()
+
+    Ca_o = 2.0
+    V = -60:0.5:50
+    Ca_i = [5.0e-5, 5.0e-2, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0]
+
+    plt = plot(xticks= -60:20:40)
+    for c in Ca_i
+        GHK = ghk_LeFranc.(V, c, Ca_o)
+        plot!(plt, V, GHK, label="$c")
+    end
+    display(plt)
 end

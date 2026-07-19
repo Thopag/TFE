@@ -20,6 +20,8 @@ include("tools/DIC.jl")
 include("tools/SS_currents.jl")
 include("tools/excitability_plan.jl")
 include("tools/frequency_plan.jl")
+include("tools/correlogram.jl")
+include("tools/isolate_spikes.jl")
 
 # RUNS
 include("run/run_simulations.jl")

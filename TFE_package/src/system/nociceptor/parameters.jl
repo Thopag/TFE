@@ -61,7 +61,7 @@ end
 function DIV7_parameter(;
 
     # Na conductances
-    g_NaV1p3 = 0.35,                 # [mS/cm2]
+    g_NaV1p3 =  0.35,                 # [mS/cm2]
     g_NaV1p7 = 35.0,
     g_NaV1p8 = 0.2,
 

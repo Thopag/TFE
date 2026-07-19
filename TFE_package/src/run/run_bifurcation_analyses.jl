@@ -87,7 +87,7 @@ function plot_bifurcation_analyses(results::BifurcationResults, analyse_r::Union
         end
     end
 
-    savefig(plt, "plots/default/$(file_prefix)_bifurcation.pdf")
+    #savefig(plt, "plots/default/$(file_prefix)_bifurcation.pdf")
 
     return
 end
