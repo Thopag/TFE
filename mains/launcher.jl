@@ -118,7 +118,7 @@ function main()
     stim_on = 300.0                    # ms
     stim_length = 1400.0               # ms
 
-    amp = 70.0 #* in_one_micro_A
+    amp = 55.0 #* in_one_micro_A
 
     n_pulse = 5
     is_activated = nothing

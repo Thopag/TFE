@@ -95,7 +95,7 @@ function plot_simulations(plt, p_model, sol_n, sol_pn, sol_s; color = nothing, l
             plot!(plt[voltage], t, sol_pn.V, color = something(color, :black), label=something(empty_label, ""))
         end
 
-        Ca = 4
+        Ca = 0
         if Ca != 0
             ylabel!(plt[Ca], "Intracellular calcium [mM]")
             plot!(plt[Ca], t, sol_pn.Ca_i, color = something(color, :black), label=something(empty_label, ""))
@@ -148,11 +148,14 @@ function plot_simulations(plt, p_model, sol_n, sol_pn, sol_s; color = nothing, l
 
         channel = 3
         if channel != 0
-            ylabel!(plt[channel], "Availability NMDA [-]")
+            ylabel!(plt[channel], "Availability [-]")
             plot!(plt[channel], legend=:topright)
 
-            availability_NMDA = sol_s.B_NMDA .- sol_s.A_NMDA
-            plot!(plt[channel], t, availability_NMDA, color = :blue, label="", alpha=1.0) 
+            availability_NMDA = (sol_s.B_NMDA .- sol_s.A_NMDA) # .* NMDA_Mg_block.(sol_pn.V)
+            plot!(plt[channel], t, availability_NMDA, color = :blue, label="NMDA", alpha=1.0) 
+
+            availability_AMPA = sol_s.B_AMPA .- sol_s.A_AMPA
+            plot!(plt[channel], t, availability_AMPA, color = :purple, label="AMPA", alpha=1.0) 
 
         end
     
@@ -185,7 +188,7 @@ function make_simulations(VEC_p_model, u0, duration, VEC_label, DIV, with_nocice
     println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
     println("")
 
-    n_fig = 4
+    n_fig = 3
 
     # Simulation plot
     xlimits = (0.0, duration)

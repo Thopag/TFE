@@ -37,18 +37,16 @@ const n_gates_style  = [:solid, :dash, :solid, :dash, :solid, :dash, :dash, :sol
 const n_gates_SS_labels = [L"m_{3,\infty}", L"h_{3,\infty}", L"m_{7,\infty}", L"h_{7,\infty}", L"m_{8,\infty}", L"h_{8,\infty}", L"l_{dr,\infty}", L"n_{dr,\infty}", L"n_{M,\infty}", L"z_{AHP,\infty}"]
 const n_gates_tau_labels = [L"\tau_{m_3}", L"\tau_{h_3}", L"\tau_{m_7}", L"\tau_{h_7}", L"\tau_{m_8}", L"\tau_{h_8}", L"\tau_{l_{dr}}", L"\tau_{n_{dr}}", L"\tau_{n_M}", L"\tau_{z_{AHP}}"]
 
-const pn_gates_labels = []
-const pn_gates_colors = []
-const pn_gates_style  = []
-const pn_gates_SS_labels = []
-const pn_gates_tau_labels = []
-
+const pn_gates_labels = ["mNa", "hNa", "mdr", "mir", "mM", "mLf", "hLf", "mLs", "hLs"]
+const pn_gates_colors = [:firebrick, :firebrick, :orange, :yellow3, :orchid, :turquoise, :turquoise, :teal, :teal]
+const pn_gates_style  = [:solid, :dash, :solid, :solid, :solid, :solid, :dot, :solid, :dash]
+const pn_gates_SS_labels = [L"m_{Na,\infty}", L"h_{Na,\infty}", L"m_{dr,\infty}", L"m_{ir,\infty}", L"m_{M,\infty}", L"m_{Lf,\infty}", L"h_{Lf,\infty}", L"m_{Ls,\infty}", L"h_{Ls,\infty}"]
+const pn_gates_tau_labels = [L"\tau_{m_{Na}}", L"\tau_{h_{Na}}", L"\tau_{m_{dr}}", L"\tau_{m_{ir}}", L"\tau_{m_{M}}", L"\tau_{m_{Lf}}", L"\tau_{h_{Lf}}", L"\tau_{m_{Ls}}", L"\tau_{h_{Ls}}"]
 
 const gate_colors = Dict(key => color for (key, color) in zip(vcat(n_gates_labels, pn_gates_labels), vcat(n_gates_colors, pn_gates_colors)))
 const gate_styles = Dict(key => style for (key, style) in zip(vcat(n_gates_labels, pn_gates_labels), vcat(n_gates_style, pn_gates_style)))
 const gates_SS_labels = Dict(key => color for (key, color) in zip(vcat(n_gates_labels, pn_gates_labels), vcat(n_gates_SS_labels, pn_gates_SS_labels)))
 const gates_tau_labels = Dict(key => style for (key, style) in zip(vcat(n_gates_labels, pn_gates_labels), vcat(n_gates_tau_labels, pn_gates_tau_labels)))
-
 
 #-------------------- Stand alone plot function --------------------#
 
@@ -62,7 +60,7 @@ function plot_SS_function(; file_prefix = "default")
     p_n = plot(xlabel="Voltage (mV)", ylabel= "(-)", legendfontsize=11, legend=:right
                                         , xticks = xticks)
 
-    p_pn = plot(xlabel="Voltage (mV)", ylabel= "(-)", legendfontsize=7, legend=:bottomright
+    p_pn = plot(xlabel="Voltage (mV)", ylabel= "(-)", legendfontsize=11, legend=:right
                                         , xticks = xticks)
 
     m3 = m3_inf.(V)
@@ -98,18 +96,18 @@ function plot_SS_function(; file_prefix = "default")
     mLs = mLs_inf.(V)
     hLs = hLs_inf.(V)
 
-    plot!(p_pn, V, mNa, label="mNa", linestyle=:solid)
-    plot!(p_pn, V, hNa, label="hNa", linestyle=:dash)
-    plot!(p_pn, V, mdr, label="mdr", linestyle=:solid)
-    plot!(p_pn, V, mir, label="mir", linestyle=:solid)
-    plot!(p_pn, V, mM, label="mM", linestyle=:solid)
+    pn_gates = [mNa, hNa, mdr, mir, mM, mLf, hLf, mLs, hLs]
+    pn_gate_values = Dict(key => vec for (key, vec) in zip(pn_gates_labels, pn_gates))
 
-    plot!(p_pn, V, mLf, label="mLf", linestyle=:solid)
-    plot!(p_pn, V, hLf, label="hLf", linestyle=:dash)
-    plot!(p_pn, V, mLs, label="mLs", linestyle=:solid)
-    plot!(p_pn, V, hLs, label="hLs", linestyle=:dash)
+    for l in pn_gates_labels[6:end]
+        c     = gate_colors[l]
+        style = gate_styles[l]
+        lab = gates_SS_labels[l]
+        vec   = pn_gate_values[l]
+        plot!(p_pn, V, vec, label=lab, color=c, linestyle=style, linewidth=2)
+    end
 
-    savefig(p_n, "plots/default/$(file_prefix)_SS_gates_n.pdf")
+    #savefig(p_n, "plots/default/$(file_prefix)_SS_gates_n.pdf")
     savefig(p_pn, "plots/default/$(file_prefix)_SS_gates_pn.pdf")
 end
 
@@ -117,16 +115,16 @@ function plot_tau_function(; file_prefix = "default")
 
     V = -120.0:0.5:60.0
     xticks = [-120, -90, -60, -30, 0, 30, 60]
-    yticks = [0.01, 0.1, 1.0, 10.0, 100.0, 1000.0]
+    yticks = [0.01, 0.1, 1.0, 10.0, 100.0, 1000.0, 10000.0]
 
-    ylims = [0.001, 5000.0]
+    ylims = [0.001, 50000.0]
     
     # In the futur : add the adaptation with p_model
 
     p_n = plot(xlabel="Voltage (mV)", ylabel= "Time (ms)", legendfontsize=11, legend=:bottom
                                         , xticks = xticks, yscale=:log10, yticks = yticks, ylims = ylims)
 
-    p_pn = plot(xlabel="Voltage (mV)", ylabel= "Time (ms)", legendfontsize=7, legend=:bottomright
+    p_pn = plot(xlabel="Voltage (mV)", ylabel= "Time (ms)", legendfontsize=11, legend=:topright
                                         , xticks = xticks, yscale=:log10, yticks = yticks,ylims = ylims)
 
     m3 = tau_m3.(V)
@@ -146,8 +144,8 @@ function plot_tau_function(; file_prefix = "default")
     for l in n_gates_labels[7:end]
         c     = gate_colors[l]
         style = gate_styles[l]
-        vec   = n_gate_values[l]
         lab   = gates_tau_labels[l]
+        vec   = n_gate_values[l]
         plot!(p_n, V, vec, label=lab, color=c, linestyle=style, linewidth=2)
     end
 
@@ -162,18 +160,17 @@ function plot_tau_function(; file_prefix = "default")
     mLs = tau_mLs.(V)
     hLs = tau_hLs.(V)
 
-    plot!(p_pn, V, mNa, label="mNa", linestyle=:solid)
-    plot!(p_pn, V, hNa, label="hNa", linestyle=:dash)
-    plot!(p_pn, V, mdr, label="mdr", linestyle=:solid)
-    plot!(p_pn, V, mir, label="mir", linestyle=:solid)
-    plot!(p_pn, V, mM, label="mM", linestyle=:solid)
+    pn_gates = [mNa, hNa, mdr, mir, mM, mLf, hLf, mLs, hLs]
+    pn_gate_values = Dict(key => vec for (key, vec) in zip(pn_gates_labels, pn_gates))
 
-    plot!(p_pn, V, mLf, label="mLf", linestyle=:solid)
-    plot!(p_pn, V, hLf, label="hLf", linestyle=:dash)
-    plot!(p_pn, V, mLs, label="mLs", linestyle=:solid)
-    plot!(p_pn, V, hLs, label="hLs", linestyle=:dash)
-
-    savefig(p_n, "plots/default/$(file_prefix)_tau_gates_n.pdf")
+    for l in pn_gates_labels[6:end]
+        c     = gate_colors[l]
+        style = gate_styles[l]
+        lab = gates_tau_labels[l]
+        vec   = pn_gate_values[l]
+        plot!(p_pn, V, vec, label=lab, color=c, linestyle=style, linewidth=2)
+    end
+    #savefig(p_n, "plots/default/$(file_prefix)_tau_gates_n.pdf")
     savefig(p_pn, "plots/default/$(file_prefix)_tau_gates_pn.pdf")
 end
 
