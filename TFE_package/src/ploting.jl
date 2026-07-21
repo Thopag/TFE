@@ -1,4 +1,4 @@
-export reponse_time, plot_SS_function, plot_tau_function, plot_availability, random_plot
+export reponse_time, plot_SS_function, plot_tau_function, plot_availability, GHK_plot
 
 const pattern_list   = ["No spike"    , "Single spike", "Two spikes", "Transient" , "Spiking" ]
 const markers_list   = [:circle       , :utriangle    , :dtriangle  , :diamond    , :square   ]
@@ -200,16 +200,23 @@ function plot_availability(; file_prefix = "default")
     savefig(p_n, "plots/default/$(file_prefix)_availability.pdf")
 end
 
-function random_plot()
+function GHK_plot()
 
     Ca_o = 2.0
     V = -60:0.5:50
-    Ca_i = [5.0e-5, 5.0e-2, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0]
+    VEC_Ca_i = [5.0e-5, 5.0e-2, 0.1, 0.5, 1.0, 1.5, 2.0]
+    VEC_color = palette(:rainbow, length(VEC_Ca_i))
 
     plt = plot(xticks= -60:20:40)
-    for c in Ca_i
-        GHK = ghk_LeFranc.(V, c, Ca_o)
-        plot!(plt, V, GHK, label="$c")
-    end
-    display(plt)
+
+    xlabel!(plt, "Voltage (mV)")
+    ylabel!(plt, "GHK (mC/cm3)")
+
+    hline!(plt, [0], color=:black, linestyle=:dot, linewidth=2, label="")
+    for (Ca_i, c) in zip(VEC_Ca_i, VEC_color)
+        GHK = ghk_LeFranc.(V, Ca_i, Ca_o)
+        plot!(plt, V, GHK, color=c, label="$Ca_i mM", linewidth=2)
+    end  
+
+    savefig(plt, "plots/default/GHK.pdf")
 end
