@@ -103,11 +103,14 @@ end
 @inline lidocain_1_3_inact_inib(D) = hill(D, 0.949, 284, 0.48, 0)
 @inline lidocain_1_3_resting_inib(D) = hill(D, 0.997, 1462, 1.35, 0)
 
+# From Sugimote et al. 2003
+@inline NMDA_inib(D) = hill(D, 1.0, 1821, 1.3, 0)
+
 function get_lidocaine_inhibition(C)
     if (C == 0.0)
         return 1.0, 1.0, 1.0
     end
-    remaining_1_3 = 1.0 - lidocain_1_3_resting_inib(C) # not sure about this curve context
+    remaining_1_3 = 1.0 - lidocain_1_3_resting_inib(C)
     remaining_1_7 = 1.0 - lidocain_1_7_channel(C)
     remaining_1_8 = 1.0 - lidocain_1_8_channel(C)
     return remaining_1_3, remaining_1_7, remaining_1_8
