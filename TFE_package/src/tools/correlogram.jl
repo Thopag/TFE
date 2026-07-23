@@ -28,3 +28,23 @@ function compute_ccg(spikes_A::Vector{Float64}, spikes_B::Vector{Float64}; bin_w
     bin_centers = collect(edges[1:end-1] .+ bin_width / 2)
     return bin_centers, counts
 end
+
+# Gemini to change
+function compute_cc_and_ci(spikes_A::Vector{Float64}, spikes_B::Vector{Float64}; bin_width=1.0, window=50.0)
+    # 1. Compute the CCG using your existing function
+    bin_centers, counts = compute_ccg(spikes_A, spikes_B; bin_width=bin_width, window=window)
+    
+    # 2. Extract the peak co-occurrence count
+    # (Note: depending on the noise level, you can use maximum(counts) or sum a small window around the peak)
+    peak_count = maximum(counts)
+    
+    # 3. Calculate CC and CI by normalizing with the total input/output spike counts
+    n_spikes_A = length(spikes_A) # Afferent fiber spikes (Inputs)
+    n_spikes_B = length(spikes_B) # DHN spikes (Outputs)
+    
+    # Avoid division by zero if an array is empty
+    cc = n_spikes_A > 0 ? peak_count / n_spikes_A : 0.0
+    ci = n_spikes_B > 0 ? peak_count / n_spikes_B : 0.0
+    
+    return cc, ci
+end
