@@ -20,11 +20,11 @@ end
 function plot_data_analyse(data::AnalyseData, VEC_label, VEC_amp, inter_axe_label, file_prefix)
     #[1,5,9,12,14]
     #[1,2,4,6,8,11]
-    take_idx = [1,5,9,12,14]#1:3:length(VEC_label)
-    #take_idx = 1:2:14
+    take_idx = 1:length(VEC_label)
+
     # ----- INIT PLOTS ----- #
 
-    amp_label = "Amp (pA)"
+    amp_label = "Stimulation (pA)"
     xticks = VEC_amp[1]:30:VEC_amp[end]
     
     p_peaks   = plot(xlabel=amp_label, ylabel= "Peaks count (-)", xticks=xticks)
@@ -32,13 +32,18 @@ function plot_data_analyse(data::AnalyseData, VEC_label, VEC_amp, inter_axe_labe
     p_height  = plot(xlabel=amp_label, ylabel= "Height (mV)"    , xticks=xticks)
     p_width   = plot(xlabel=amp_label, ylabel= "Width (ms)"     , xticks=xticks)
 
-    p_rheo    = plot(xlabel=inter_axe_label, ylabel="rheobase (pA)")
-    p_pattern = plot(xlabel=amp_label, ylabel=inter_axe_label, yticks = (1:length(take_idx), VEC_label[take_idx]), xticks=xticks, legend=:topright, legendfontsize=7)
+    p_rheo    = plot(xlabel=inter_axe_label, ylabel="rheobase (pA)", left_margin = 5mm, bottom_margin = 5mm, margin = 5mm
+                                                                                                )#, size = (400, 200))
+
+    p_pattern = plot(left_margin = 5mm,bottom_margin = 5mm, margin = 5mm)
+    plot!(p_pattern, xticks=xticks, xtickfontsize = 8, xguidefontsize = 11) #, size = (400, 130))
+    plot!(p_pattern, xlabel=amp_label, ylabel=inter_axe_label, yticks = (1:length(take_idx), VEC_label[take_idx]))
 
     # Add color legend
-    for (c, l) in zip(colors_list, pattern_list)
-        scatter!(p_pattern, [], [], marker=:square, color = c, label = l, markersize = 4)
-    end
+    # plot!(p_pattern, legend=:topright, legendfontsize=7)
+    # for (c, l) in zip(colors_list, pattern_list)
+    #     scatter!(p_pattern, [], [], marker=:square, color = c, label = l, markersize = 4)
+    # end
     
     # ----- Fill plots ----- #
 
@@ -88,13 +93,13 @@ function plot_data_analyse(data::AnalyseData, VEC_label, VEC_amp, inter_axe_labe
 
     # --- save --- #
 
-    savefig(p_peaks, "plots/default/$(file_prefix)_peaks-curve.pdf")
-    savefig(p_freqs, "plots/default/$(file_prefix)_F-I-curve.pdf")
-    # savefig(p_height, "plots/default/$(file_prefix)_first_height.pdf")
-    # savefig(p_width, "plots/default/$(file_prefix)_first_width.pdf")
+    # savefig(p_peaks, "plots/default/$(file_prefix)_peaks-curve.pdf")
+    # savefig(p_freqs, "plots/default/$(file_prefix)_F-I-curve.pdf")
+    savefig(p_height, "plots/default/$(file_prefix)_first_height.pdf")
+    savefig(p_width, "plots/default/$(file_prefix)_first_width.pdf")
 
-    savefig(p_pattern, "plots/default/$(file_prefix)_pattern.pdf")
-    # savefig(p_rheo, "plots/default/$(file_prefix)_rheobases.pdf")
+    #savefig(p_pattern, "plots/default/$(file_prefix)_pattern.pdf")
+    savefig(p_rheo, "plots/default/$(file_prefix)_rheobases.pdf")
 
     return p_peaks, p_freqs, p_height, p_width, p_rheo, p_pattern
     

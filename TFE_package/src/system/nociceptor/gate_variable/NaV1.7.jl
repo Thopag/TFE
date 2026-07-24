@@ -23,9 +23,9 @@ end
 
 # ---- #
 
-function h7_inf(V; C_lido::Float64=0.0, shift::Float64=0.0, with_shift::Bool=false, linear_shift_mode::Bool=false)
+function h7_inf(V; shift::Float64=0.0, with_shift::Bool=false)
     # Lidocaine effect
-    lido_shift = h7_shift(C_lido, shift, with_shift, linear_shift_mode)
+    lido_shift = h7_shift(shift, with_shift)
     return alpha_h7(V; lido_shift=lido_shift) / (alpha_h7(V; lido_shift=lido_shift) + beta_h7(V; lido_shift=lido_shift))
 end
 
@@ -35,7 +35,7 @@ function tau_h7(V)
     return 1 / (alpha_h7(V; lido_shift=lido_shift) + beta_h7(V; lido_shift=lido_shift))
 end
 
-function m7_inf(V; C_lido::Float64=0.0, shift::Float64=0.0, with_shift::Bool=false, linear_shift_mode::Bool=false)
+function m7_inf(V; shift::Float64=0.0, with_shift::Bool=false)
     # Lidocaine effect
     lido_shift = m7_shift()
     return alpha_m7(V; lido_shift=lido_shift) / (alpha_m7(V; lido_shift=lido_shift) + beta_m7(V; lido_shift=lido_shift))
@@ -49,14 +49,14 @@ end
 
 # ---- #
 
-function dot_m7(V, m7; C_lido::Float64=0.0, shift::Float64=0.0, with_shift::Bool=false, linear_shift_mode::Bool=false)
-    x_inf = m7_inf(V; C_lido=C_lido, shift=shift, with_shift=with_shift, linear_shift_mode=linear_shift_mode)
+function dot_m7(V, m7; shift::Float64=0.0, with_shift::Bool=false)
+    x_inf = m7_inf(V; shift=shift, with_shift=with_shift)
     tau_x = tau_m7(V)
     return (x_inf-m7)/tau_x
 end
 
-function dot_h7(V, h7; C_lido::Float64=0.0, shift::Float64=0.0, with_shift::Bool=false, linear_shift_mode::Bool=false)
-    x_inf = h7_inf(V; C_lido=C_lido, shift=shift, with_shift=with_shift, linear_shift_mode=linear_shift_mode)
+function dot_h7(V, h7; shift::Float64=0.0, with_shift::Bool=false)
+    x_inf = h7_inf(V; shift=shift, with_shift=with_shift)
     tau_x = tau_h7(V)
     return (x_inf-h7)/tau_x
 end

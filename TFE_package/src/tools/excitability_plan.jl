@@ -55,7 +55,7 @@ function choose_excitability_plan_simulation_function(results::ExcitabilityPlanR
     return simulation_function, n_is_finded, pn_is_finded
 end
 
-function find_rheobase(amps, p_model, u0, i::Int, j::Int, results::ExcitabilityPlanResults, duration)
+function find_pattern(amps, p_model, u0, i::Int, j::Int, results::ExcitabilityPlanResults, duration)
 
     stim = p_model.stimulation
     simulation, n_is_finded, pn_is_finded = choose_excitability_plan_simulation_function(results)
@@ -117,7 +117,7 @@ function fill_excitability_plan_result(i::Int, j::Int, results::ExcitabilityPlan
     n_row, n_col = size(M_p_model)
     println("\r Row : $(round((((i)-1)/n_row*100), digits=2)) % ----- Col : $(round((((j)-1)/n_col*100), digits=2)) %")
 
-    find_rheobase(VEC_amp, p_model, u0, i, j, results, duration)
+    find_pattern(VEC_amp, p_model, u0, i, j, results, duration)
 
     print("\r")
     return

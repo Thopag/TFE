@@ -3,32 +3,22 @@ export lidocaine_parameter, get_lidocaine_inhibition, h3_shift, m3_shift, h7_shi
 # ----------------- Lidocaine Parameter struct ----------------- #
 
 struct LidocaineParameters
-    concentration::Float64          # [µM]
     shift_h3::Float64
     shift_h7::Float64
     shift_h8::Float64
     shift_m8::Float64
     with_shift::Bool
-    with_inhibition::Bool
-    linear_shift_mode::Bool
 end
 
 function lidocaine_parameter(;
-    concentration = 0.0,
     shift_h3 = 0.0,
     shift_h7 = 0.0,
     shift_h8 = 0.0,
     shift_m8 = 0.0,
     with_shift = false,
-    with_inhibition = false,
-    linear_shift_mode = false,
     )
 
-    lidocaine = LidocaineParameters(
-        concentration,
-        shift_h3, shift_h7, shift_h8, shift_m8,
-        with_shift, with_inhibition, linear_shift_mode
-        )
+    lidocaine = LidocaineParameters(shift_h3, shift_h7, shift_h8, shift_m8, with_shift)
 
     return lidocaine
 end
@@ -38,13 +28,15 @@ end
 # 1.3 inactivation
 # 20 mV shift at 1000 µM (Sheets et al. 2008)
 # 20.7 mV shift at 1000 µM (Lenkowski et al. 2003)
-@inline function h3_shift(C, shift, with_shift, linear_shift_mode)
+function lido_h3(C)
+    return - ((-21.4 / (1 + exp(3.17 * (log10(C) - log10(120))))) + 21.4)
+end
+
+@inline function h3_shift(shift, with_shift)
     if !with_shift
         return 0.0
-    elseif linear_shift_mode
-        return -shift
     end
-    return - ((-21.4 / (1 + exp(3.17 * (log10(C) - log10(120))))) + 21.4)
+    return -shift
 end
 
 # 1.3 activation
@@ -55,13 +47,15 @@ end
 # 1.7 inactivation
 # 23 mV shift at 1000 µM (Sheets et al. 2008)
 # 10.6 mV shift at 100 µM (Chevrier et al. 2004)
-@inline function h7_shift(C, shift, with_shift, linear_shift_mode)
+function lido_h7(C)
+    return - ( (-24.2 / (1 + exp(3.17 * (log10(C) - log10(120))))) + 24.2)
+end
+
+@inline function h7_shift(shift, with_shift)
     if !with_shift
         return 0.0
-    elseif linear_shift_mode
-        return -shift
     end
-    return - ( (-24.2 / (1 + exp(3.17 * (log10(C) - log10(120))))) + 24.2)
+    return -shift
 end
 
 # 1.7 activation
@@ -72,23 +66,27 @@ end
 # 1.8 inactivation
 # 4.8 mV shift at 1000 µM (Sheets et al. 2008)
 # 4 mV shift at 100 µM (Chevrier et al. 2004)
-@inline function h8_shift(C, shift, with_shift, linear_shift_mode)
-    if !with_shift
-        return 0.0
-    elseif linear_shift_mode
-        return -shift
-    end
+function lido_h8(C)
     return - ( (4.8 / (1 + exp(-14.16 * (log10(C) - log10(77))))) + 0)
 end
 
-# 1.8 activation
-@inline function m8_shift(C, shift, with_shift, linear_shift_mode)
+@inline function h8_shift(shift, with_shift)
     if !with_shift
         return 0.0
-    elseif linear_shift_mode
-        return shift
     end
+    return -shift
+end
+
+# 1.8 activation
+function lido_m8(C)
     return (-6.8 / (1 + exp(8.73 * (log10(C) - log10(56.5))))) + 6.8 
+end
+
+@inline function m8_shift(shift, with_shift)
+    if !with_shift
+        return 0.0
+    end
+    return shift
 end
 
 # ----------------- Lidocaine conductance inhibition ----------------- #
@@ -127,10 +125,10 @@ function add_lido_shift_inhib_traj(plt)
     remaining_1_7 = [r[2] for r in results]
     remaining_1_8 = [r[3] for r in results]
 
-    lido_shifts_inact_1_8 = .- h8_shift.(lido_concentrations, 0.0, true, false) 
-    lido_shifts_act_1_8 = m8_shift.(lido_concentrations, 0.0, true, false)
-    lido_shifts_1_7 = .- h7_shift.(lido_concentrations, 0.0, true, false)
-    lido_shifts_1_3 = .- h3_shift.(lido_concentrations, 0.0, true, false)
+    lido_shifts_inact_1_8 = .- lido_h8.(lido_concentrations) 
+    lido_shifts_act_1_8 = lido_m8.(lido_concentrations)
+    lido_shifts_1_7 = .- lido_h7.(lido_concentrations)
+    lido_shifts_1_3 = .- lido_h3.(lido_concentrations)
     lido_shifts_1_8 = lido_shifts_inact_1_8 .+ lido_shifts_act_1_8
 
     plot!(plt, 1.0 .- remaining_1_8, lido_shifts_1_8, color=:cyan, label="", linewidth = 3)
@@ -141,10 +139,10 @@ function add_lido_shift_inhib_traj(plt)
     remaining_1_7 = [r[2] for r in results]
     remaining_1_8 = [r[3] for r in results]
 
-    lido_shifts_inact_1_8 = .- h8_shift.(test_point, 0.0, true, false) 
-    lido_shifts_act_1_8 = m8_shift.(test_point, 0.0, true, false)
-    lido_shifts_1_7 = .- h7_shift.(test_point, 0.0, true, false)
-    lido_shifts_1_3 = .- h3_shift.(test_point, 0.0, true, false)
+    lido_shifts_inact_1_8 = .- lido_h8.(lido_concentrations) 
+    lido_shifts_act_1_8 = lido_m8.(lido_concentrations)
+    lido_shifts_1_7 = .- lido_h7.(lido_concentrations)
+    lido_shifts_1_3 = .- lido_h3.(lido_concentrations)
     lido_shifts_1_8 = lido_shifts_inact_1_8 .+ lido_shifts_act_1_8
 
     scatter!(plt, 1.0 .- remaining_1_8, lido_shifts_1_8, color=:cyan, markersize=4, label="", markerstrokewidth = 0.0)

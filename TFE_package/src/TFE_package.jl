@@ -32,6 +32,7 @@ include("run/run_DIC_analyses.jl")
 include("run/run_SS_current_analyses.jl")
 include("run/run_excitability_plan.jl")
 include("run/run_frequency_plan.jl")
+include("run/run_rheobase_bar.jl")
 
 # precompile(simulation, (Vector{Float64}, Tuple{Float64, Float64}, ModelParameters))
 

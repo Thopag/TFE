@@ -20,14 +20,17 @@ function main()
             "plan/DIV0_inhib_NaV1.8_NMDA"
             ]
 
-#     file = inhib_files[1]
-#     start = 11
+    # file = inhib_files[1]
+    # start = 11
 
-#     file = shift_files[3]
-#     start = 6
+    # file = shift_files[3]
+    # start = 6
 
-    file = plan_files[1]
-    start = 5
+    # file = plan_files[1]
+    # start = 5
+
+    file = "shift/DIV0_h8_shift"
+    start = 6
 
     fp, pp, analyse_r, bifurcation_r, DIC_r, SS_current_r, plan_exct, plan_freq = load_file(file)
 

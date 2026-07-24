@@ -16,10 +16,7 @@ function nociceptor_state(du,u,p;Iext= 0.0, Inoise=0.0)
 
     n       = p.nociceptor
     lido    = p.lidocaine
-
-    linear_shift_mode = lido.linear_shift_mode
     with_shift = lido.with_shift
-    C_lido = lido.concentration
 
     # --- variables --- #
 
@@ -51,13 +48,13 @@ function nociceptor_state(du,u,p;Iext= 0.0, Inoise=0.0)
     du[1] = (Iext+Inoise-Iion)/n.C
 
     du[2] = dot_m3(V, m3)
-    du[3] = dot_h3(V, h3; C_lido=C_lido, shift=lido.shift_h3, with_shift=with_shift, linear_shift_mode=linear_shift_mode)
+    du[3] = dot_h3(V, h3; shift=lido.shift_h3, with_shift=with_shift)
 
     du[4] = dot_m7(V, m7)
-    du[5] = dot_h7(V, h7; C_lido=C_lido, shift=lido.shift_h7, with_shift=with_shift, linear_shift_mode=linear_shift_mode)
+    du[5] = dot_h7(V, h7; shift=lido.shift_h7, with_shift=with_shift)
 
-    du[6] = dot_m8(V, m8; C_lido=C_lido, shift=lido.shift_m8, with_shift=with_shift, linear_shift_mode=linear_shift_mode)
-    du[7] = dot_h8(V, h8; C_lido=C_lido, shift=lido.shift_h8, with_shift=with_shift, linear_shift_mode=linear_shift_mode)
+    du[6] = dot_m8(V, m8; shift=lido.shift_m8, with_shift=with_shift)
+    du[7] = dot_h8(V, h8; shift=lido.shift_h8, with_shift=with_shift)
 
     du[8] = dot_ndr(V, ndr)
     du[9] = dot_ldr(V, ldr)

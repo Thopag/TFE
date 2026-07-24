@@ -70,3 +70,27 @@ function get_excitability(t_spikes, end_stim)
     end
     return f_mean, pattern
 end
+
+
+function find_rheobase(amps, p_model, u0, duration)
+
+    stim = p_model.stimulation
+
+    L = length(amps)
+    for (k,amp) in enumerate(amps)
+        print("\rProgress: $(round(((k-1)/L*100), digits=2)) %")
+
+        # -- Make Simulation -- #
+        i_stim = change_stimulation_amp(amp, stim)
+        i_p_model = from_model_parameter(p_model; stimulation=i_stim)
+        sol_n, _, _ = nociceptor_simulation(u0, (0.0, duration), i_p_model)
+
+        # -- Get predicted pattern -- #
+        _, pattern = get_excitability(sol_n.t_spikes, i_stim.off)
+        if (pattern >= 1)
+            return amp
+        end
+    end
+    print("\r")
+    return nothing
+end

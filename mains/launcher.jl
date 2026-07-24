@@ -7,9 +7,14 @@ function get_file_parameter(u0, duration, DIV, p_stim, nociceptor_parameter, wit
     shift = 0.0:1.5:15.0
     amps = 10.0:0.5:14.0
 
-    VEC_inter_parameter = inhibs
+    VEC_inter_parameter = [0.0, 3.0, 6.0, 9.0, 12.0, 15.0]
     VEC_label = ["$k" for k in VEC_inter_parameter]
-    parameter_label = "Inhibition NaV1.3 (-)"
+
+    # VEC_inter_parameter_2 = [40.0, 40.0, 40.0, 40.0]
+    # VEC_label = [L"Shift_{h_{8,\infty}} %$k - %$m pA" for (k,m) in zip(VEC_inter_parameter,VEC_inter_parameter_2)]
+    
+    var = L"m_{8,\infty}"
+    parameter_label = "Shift $var (mV)"
 
     # -------- Create the VEC_p_model -------- #
 
@@ -21,15 +26,16 @@ function get_file_parameter(u0, duration, DIV, p_stim, nociceptor_parameter, wit
 
     VEC_p_stim = [change_stimulation_amp(amp, stim) for amp in VEC_inter_parameter]
 
-    VEC_p_lido = [lidocaine_parameter(;shift_h3 = 0.0 * p, shift_h7 = 0.0 * p, shift_h8 = 0.4 * p, shift_m8 = 0.6 * p
-                                                                , with_shift = true, linear_shift_mode = true)
+    VEC_p_lido = [lidocaine_parameter(;shift_h3 = 0.0 * p, shift_h7 = 0.0 , shift_h8 = 0.0 * p, shift_m8 = 1.0 * p
+                                                                , with_shift = true)
                                                                                      for p in VEC_inter_parameter]
 
-    VEC_p_noci = [nociceptor_parameter(;g_NaV1p3 =  0.35 * (1 - p)) for p in VEC_inter_parameter]
+    VEC_p_noci = [nociceptor_parameter(;g_NaV1p8 = 30.0 * (1 - p)) for p in VEC_inter_parameter]
     VEC_p_proj = [projection_neuron_parameter(;) for p in VEC_inter_parameter]
     VEC_p_syn = [synapse_parameter(;g_NMDA = 1.0 * (1-p)) for p in VEC_inter_parameter]
 
-    VEC_p_model = [model_parameter(;stimulation=stim, nociceptor=n, projection_neuron=pn, synapse=s, lidocaine=lido) for i in VEC_p_noci]
+    VEC_p_model = [model_parameter(;stimulation=stim, nociceptor=n, projection_neuron=pn, synapse=s, lidocaine=i) for i in VEC_p_lido]
+    #VEC_p_model = [model_parameter(;stimulation=j, nociceptor=n, projection_neuron=pn, synapse=s, lidocaine=i) for (i,j) in zip(VEC_p_lido,VEC_p_stim) ]
 
     fp = file_parameters(u0, duration, VEC_p_model, VEC_label, parameter_label
                                                             , DIV, with_nociceptor, with_projection_neuron)
@@ -53,7 +59,7 @@ function get_plan_parameter(u0, duration, DIV, p_stim, nociceptor_parameter, wit
     # -------- Create matrix -------- #
 
     M_p_lido = [lidocaine_parameter(;shift_h3 = 0.0 * c, shift_h7 = 0.0 * c, shift_h8 = 0.0 * c, shift_m8 = 0.0 * c
-                                                                , with_shift = true, linear_shift_mode = true) 
+                                                                , with_shift = true) 
                                                                             for r in VEC_row_param, c in VEC_col_param]
 
     M_p_noci = [nociceptor_parameter(;g_NaV1p8 = 30.0 * (1-r)) for r in VEC_row_param, c in VEC_col_param]
@@ -74,17 +80,18 @@ function main()
 
     # -------- File name -------- #
 
-    #file = "inhibition/$(DIV)_NaV1.3_inhib"
-    file = "$(DIV)_default"
+    #file = "$(DIV)_default"
+    file = "m8_shift"
 
     # -------- Launching options -------- #
 
-    with_simulations = true
+    with_simulations = false
     make_plan = false
     make_analyses = false
+    rheobase = true
 
     with_nociceptor = true
-    with_projection_neuron = true
+    with_projection_neuron = false
 
     # -------- PARAMETER SET TYPE -------- #
 
@@ -114,11 +121,11 @@ function main()
 
     # -------- Stimulation -------- #
 
-    duration = 2000.0                   # ms
+    duration = 425.0                   # ms
     stim_on = 300.0                    # ms
     stim_length = 1400.0               # ms
 
-    amp = 55.0 #* in_one_micro_A
+    amp = 40.0
 
     n_pulse = 5
     is_activated = nothing
@@ -133,7 +140,7 @@ function main()
     if with_simulations
         VEC_p_model = fp.VEC_p_model
 
-        VEC_p_model = [VEC_p_model[1]]
+        #VEC_p_model = [VEC_p_model[1]]
         make_simulations(VEC_p_model, u0, duration, fp.VEC_label, DIV, with_nociceptor, with_projection_neuron; file_prefix = file)
     end
     if make_plan
@@ -145,6 +152,9 @@ function main()
         #analyse_r, bifurcation_r, DIC_r, SS_current_r = launch_analyses(fp, analyse_r, bifurcation_r, DIC_r, SS_current_r)
         save(file; fp=fp, analyse_r=analyse_r, bifurcation_r=bifurcation_r, DIC_r=DIC_r, SS_current_r=SS_current_r)
         #plot_analyses(fp, analyse_r, bifurcation_r, DIC_r, SS_current_r, file)
+    end
+    if rheobase
+        run_rheobase_bar(fp.VEC_p_model, u0, duration, fp.VEC_label, fp.parameter_label; file = file)
     end
 end
 
