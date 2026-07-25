@@ -18,26 +18,32 @@ function run_parameter_analyses(fp::FileParameters)
 end
 
 function plot_data_analyse(data::AnalyseData, VEC_label, VEC_amp, inter_axe_label, file_prefix)
-    #[1,5,9,12,14]
-    #[1,2,4,6,8,11]
+    # [1,4,6,8,10,12,14] inhib
+    # [1,3,5,7,9,11]
+    # 1:length(VEC_label)
     take_idx = 1:length(VEC_label)
+
+    L = length(take_idx)
+    VEC_color = palette(:rainbow, L)
 
     # ----- INIT PLOTS ----- #
 
     amp_label = "Stimulation (pA)"
-    xticks = VEC_amp[1]:30:VEC_amp[end]
+    xticks = VEC_amp[1]:50:VEC_amp[end]
     
-    p_peaks   = plot(xlabel=amp_label, ylabel= "Peaks count (-)", xticks=xticks)
-    p_freqs   = plot(xlabel=amp_label, ylabel= "Frequence (Hz)" , xticks=xticks) #, size = (400, 200))
+    p_peaks   = plot(xlabel=amp_label, ylabel= "Peak count (-)", xticks=xticks)
+    p_freqs   = plot(xlabel=amp_label, ylabel= "Frequency (Hz)" , xticks=xticks) #, size = (500, 250))
     p_height  = plot(xlabel=amp_label, ylabel= "Height (mV)"    , xticks=xticks)
     p_width   = plot(xlabel=amp_label, ylabel= "Width (ms)"     , xticks=xticks)
 
+    # v = L"m_{8,\infty}"
+    # inter_axe_label = "Shift $v (mV)"
     p_rheo    = plot(xlabel=inter_axe_label, ylabel="rheobase (pA)", left_margin = 5mm, bottom_margin = 5mm, margin = 5mm
                                                                                                 )#, size = (400, 200))
 
     p_pattern = plot(left_margin = 5mm,bottom_margin = 5mm, margin = 5mm)
-    plot!(p_pattern, xticks=xticks, xtickfontsize = 8, xguidefontsize = 11) #, size = (400, 130))
-    plot!(p_pattern, xlabel=amp_label, ylabel=inter_axe_label, yticks = (1:length(take_idx), VEC_label[take_idx]))
+    #plot!(p_pattern, xtickfontsize = 8, xguidefontsize = 11, yguidefontsize = 9, size = (350, 175))
+    plot!(p_pattern, xticks=xticks, xlabel=amp_label, ylabel=inter_axe_label, yticks = (1:length(take_idx), VEC_label[take_idx]))
 
     # Add color legend
     # plot!(p_pattern, legend=:topright, legendfontsize=7)
@@ -64,11 +70,17 @@ function plot_data_analyse(data::AnalyseData, VEC_label, VEC_amp, inter_axe_labe
 
         if i in take_idx
             j += 1
-            plot!(p_height, VEC_amp, VEC_first_h    , marker=:circle     , markersize=2, linealpha=0.6, markeralpha=0.9, label=label, markerstrokecolor = :match, markerstrokewidth = 0.0)
-            plot!(p_width , VEC_amp, VEC_first_w    , marker=:circle     , markersize=2, linealpha=0.6, markeralpha=0.9, label=label, markerstrokecolor = :match, markerstrokewidth = 0.0)
+            c = VEC_color[j]
+            m_size = 1.5
 
-            plot!(p_peaks , VEC_amp, VEC_peak_count , marker=binary_form, markersize=2, linealpha=1.0, markeralpha=0.9, label=label, markerstrokecolor = :match, markerstrokewidth = 0.0)
-            plot!(p_freqs , VEC_amp, VEC_freq       , marker=binary_form, markersize=2, linealpha=1.0, markeralpha=0.9, label=label, markerstrokecolor = :match, markerstrokewidth = 0.0)
+            #label = "$(label) mV"
+            plot!(p_freqs, [], [], color=c, label=label)
+        
+            plot!(p_height, VEC_amp, VEC_first_h    , marker=:circle     , markersize=m_size, linealpha=0.6, markeralpha=0.9, label=label, markerstrokecolor = :match, markerstrokewidth = 0.0, color = c)
+            plot!(p_width , VEC_amp, VEC_first_w    , marker=:circle     , markersize=m_size, linealpha=0.6, markeralpha=0.9, label=label, markerstrokecolor = :match, markerstrokewidth = 0.0, color = c)
+
+            plot!(p_peaks , VEC_amp, VEC_peak_count , marker=binary_form, markersize=m_size, linealpha=1.0, markeralpha=0.9, label=label, markerstrokecolor = :match, markerstrokewidth = 0.0, color = c)
+            plot!(p_freqs , VEC_amp, VEC_freq       , marker=binary_form, markersize=m_size, linealpha=1.0, markeralpha=0.9, label="", markerstrokecolor = :match, markerstrokewidth = 0.0, color = c)
 
             bar!(p_pattern, VEC_amp, fill(j+0.5, length(VEC_amp)), fillto=fill(j-0.45, length(VEC_amp)), 
                                                                             lw=0, linecolor=:match, bar_width=(VEC_amp[1]-VEC_amp[2])*1.05, label="", color=pattern_color)
@@ -93,13 +105,13 @@ function plot_data_analyse(data::AnalyseData, VEC_label, VEC_amp, inter_axe_labe
 
     # --- save --- #
 
-    # savefig(p_peaks, "plots/default/$(file_prefix)_peaks-curve.pdf")
-    # savefig(p_freqs, "plots/default/$(file_prefix)_F-I-curve.pdf")
-    savefig(p_height, "plots/default/$(file_prefix)_first_height.pdf")
-    savefig(p_width, "plots/default/$(file_prefix)_first_width.pdf")
+    savefig(p_peaks, "plots/default/$(file_prefix)_peaks-curve.pdf")
+    savefig(p_freqs, "plots/default/$(file_prefix)_F-I-curve.pdf")
+    # savefig(p_height, "plots/default/$(file_prefix)_first_height.pdf")
+    # savefig(p_width, "plots/default/$(file_prefix)_first_width.pdf")
 
-    #savefig(p_pattern, "plots/default/$(file_prefix)_pattern.pdf")
-    savefig(p_rheo, "plots/default/$(file_prefix)_rheobases.pdf")
+    savefig(p_pattern, "plots/default/$(file_prefix)_pattern.pdf")
+    # savefig(p_rheo, "plots/default/$(file_prefix)_rheobases.pdf")
 
     return p_peaks, p_freqs, p_height, p_width, p_rheo, p_pattern
     

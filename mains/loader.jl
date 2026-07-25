@@ -4,7 +4,8 @@ function main()
 
     inhib_files = ["inhibition/DIV0_NaV1.8_inhib",
             "inhibition/DIV7_NaV1.7_inhib",
-            "inhibition/DIV7_NaV1.3_inhib"
+            "inhibition/DIV7_NaV1.3_inhib",
+            "inhibition/DIV0_inhib_NMDA"
             ]
 
     shift_files = ["shift/DIV0_h8_shift",
@@ -29,12 +30,13 @@ function main()
     # file = plan_files[1]
     # start = 5
 
-    file = "shift/DIV0_h8_shift"
-    start = 6
+    file = "inhibition/DIV0_inhib_NMDA"
+    start = 11
 
     fp, pp, analyse_r, bifurcation_r, DIC_r, SS_current_r, plan_exct, plan_freq = load_file(file)
 
     file = file[start:end]
+    print(fp.VEC_label)
 
     plot_analyses(fp, analyse_r, bifurcation_r, DIC_r, SS_current_r, file)
     plot_plan(pp, plan_exct, plan_freq, file)

@@ -25,7 +25,8 @@ function main()
 
     inhib_files = ["inhibition/DIV0_NaV1.8_inhib",
             "inhibition/DIV7_NaV1.7_inhib",
-            "inhibition/DIV7_NaV1.3_inhib"
+            "inhibition/DIV7_NaV1.3_inhib",
+            "inhibition/DIV0_NMDA_inhib"
             ]
     
     files = inhib_files

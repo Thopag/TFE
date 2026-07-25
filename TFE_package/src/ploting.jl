@@ -1,4 +1,4 @@
-export reponse_time, plot_SS_function, plot_tau_function, plot_availability, GHK_plot
+export reponse_time, plot_SS_function, plot_tau_function, plot_availability, GHK_plot, SS_shift_plot, legend
 
 const pattern_list   = ["No spike"    , "Single spike", "Two spikes", "Transient" , "Spiking" ]
 const markers_list   = [:circle       , :utriangle    , :dtriangle  , :diamond    , :square   ]
@@ -219,4 +219,38 @@ function GHK_plot()
     end  
 
     savefig(plt, "plots/default/GHK.pdf")
+end
+
+function SS_shift_plot()
+
+    xticks = [-120, -90, -60, -30, 0, 30, 60]
+
+    V = -120.0:0.5:60.0
+    shift = 0.0:3.0:15.0
+    L = length(shift)
+    palette = get_palette(L, :Greens, :green; dark=0.95, light=0.4)
+    plt = plot(xlabel="Voltage (mV)", ylabel= "(-)", xticks = xticks, legend=false, size=(300,200))
+
+    plot!(plt, [], [], linestyle = :dash, label="$(shift[1]) mV", color=palette[1])
+    plot!(plt, [], [], linestyle = :dash, label="$(shift[end]) mV", color=palette[end])
+
+    vec = m8_inf.(V; shift=0.0, with_shift= true)
+    plot!(plt, V, vec, linestyle = :solid, label="", color=:green)
+
+    for (i,s) in enumerate(shift)
+        c = palette[i]
+        vec = h8_inf.(V; shift=s, with_shift= true)
+        plot!(plt, V, vec, linestyle = :dash, label="", color=c)
+    end
+    savefig(plt, "plots/default/SS_shift.pdf")
+end
+
+function legend()
+
+    plt = plot(legendfontsize=8, size=(400,400))
+    m_size = 10
+    plot!(plt , [], []  , marker=:circle, label="No spiking", markersize=m_size, markerstrokecolor = :match, markerstrokewidth = 0.0, color = :black)
+    plot!(plt , [], []  , marker=:square, label="Spiking", markersize=m_size, markerstrokecolor = :match, markerstrokewidth = 0.0, color = :black)
+
+    savefig(plt, "plots/default/legend.pdf")
 end

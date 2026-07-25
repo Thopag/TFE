@@ -202,11 +202,11 @@ function make_simulations(VEC_p_model, u0, duration, VEC_label, DIV, with_nocice
     #size = (250, 175*n_fig)
     #size = (300, 175*n_fig)
 
-    x_label_size = 12
-    y_label_size = 12
+    x_label_size = 10
+    y_label_size = 10
 
-    x_tick_size = 10
-    y_tick_size = 10
+    x_tick_size = 8
+    y_tick_size = 8
 
     # Simulation plot
     xlimits = (0.0, duration)
@@ -219,8 +219,8 @@ function make_simulations(VEC_p_model, u0, duration, VEC_label, DIV, with_nocice
         plot!(plt[i], xticks=xticks, xtickfontsize = x_tick_size, xguidefontsize = x_label_size)
         plot!(plt[i], ytickfontsize = y_tick_size, yguidefontsize = y_label_size)
 
-        #plot!(plt[i], legend=false)
-        plot!(plt[i], legendfontsize=8)
+        plot!(plt[i], legend=false)
+        #plot!(plt[i], legendfontsize=8)
     end
 
     for i in 1:(n_fig-1)
@@ -229,6 +229,8 @@ function make_simulations(VEC_p_model, u0, duration, VEC_label, DIV, with_nocice
     
     # Freq plot
     p_freq = plot(xaxis = "Time (ms)", yaxis = "Instant frequency (Hz)", xticks=xticks, xlims=xlimits)
+    plot!(p_freq, yguidefontsize = 7, legendfontsize=7, size=(450, 150), left_margin = 5mm,bottom_margin = 5mm, margin = 5mm)
+    plot!(p_freq, xformatter = _ -> "", xaxis = "")
 
     L = length(VEC_p_model)
     if L > 1
@@ -269,6 +271,13 @@ function make_simulations(VEC_p_model, u0, duration, VEC_label, DIV, with_nocice
     #savefig(plt, "plots/simulation/$(file_prefix).png")
     savefig(plt, "plots/simulation/$(file_prefix).pdf")
     savefig(p_freq, "plots/simulation/$(file_prefix)_freqs.pdf")
+
+    l = @layout [
+        a{0.44h}
+        b{0.56h}
+    ]
+    merge = plot(p_freq, plt, layout = l, size = (size[1], 1.75*size[2]), link = :x)
+    savefig(merge, "plots/simulation/$(file_prefix)_merge.pdf")
 
     println("Save Plots in [plots/simulation/$(file_prefix)]")
     return
