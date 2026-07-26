@@ -67,16 +67,14 @@ function nociceptor_SS_currents(V, p_model)
     n = p_model.nociceptor
     lido = p_model.lidocaine
 
-    linear_shift_mode = lido.linear_shift_mode
     with_shift = lido.with_shift
-    C_lido = lido.concentration
 
     m3 = m3_inf.(V)
-    h3 = h3_inf.(V; C_lido=C_lido, shift=lido.shift_h3, with_shift=with_shift, linear_shift_mode=linear_shift_mode)
+    h3 = h3_inf.(V; shift=lido.shift_h3, with_shift=with_shift)
     m7 = m7_inf.(V)
-    h7 = h7_inf.(V; C_lido=C_lido, shift=lido.shift_h7, with_shift=with_shift, linear_shift_mode=linear_shift_mode)
-    m8 = m8_inf.(V; C_lido=C_lido, shift=lido.shift_m8, with_shift=with_shift, linear_shift_mode=linear_shift_mode)
-    h8 = h8_inf.(V; C_lido=C_lido, shift=lido.shift_h8, with_shift=with_shift, linear_shift_mode=linear_shift_mode)
+    h7 = h7_inf.(V; shift=lido.shift_h7, with_shift=with_shift)
+    m8 = m8_inf.(V; shift=lido.shift_m8, with_shift=with_shift)
+    h8 = h8_inf.(V; shift=lido.shift_h8, with_shift=with_shift)
     nM = nM_inf.(V)
     ndr = ndr_inf.(V)
     ldr = ldr_inf.(V)

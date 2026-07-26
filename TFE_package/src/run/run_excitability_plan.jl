@@ -5,7 +5,7 @@ function run_excitability_plan(pp::PlanParameters)
 
     # -------- amp vectors -------- #
 
-    VEC_amp = [0.0:1:14.0; 15.0:2.5:50.0; 50.0:5:95.0; 100.0:25:300.0]
+    VEC_amp = [0.0:1:14.0; 15.0:2.5:47.5; 50.0:5:95.0; 100.0:25:300.0]
 
     println("")
     println("----------- Start Excitability Plan -----------")
@@ -20,6 +20,8 @@ end
 
 function plot_data_excitability_plan(pp::PlanParameters, results::ExcitabilityPlanResults, data::ExcitabilityPlanData, file_prefix; with_lido_traj=false)
     
+    reverse = false
+
     cs = get(colorschemes[:nipy_spectral], range(0.15, 0.97, length=256))
     cmap = cgrad(cs, 25, categorical = true, rev = true, scale = :exp)
 
@@ -35,6 +37,19 @@ function plot_data_excitability_plan(pp::PlanParameters, results::ExcitabilityPl
 
     M_rheobase = data.M_rheobase
     M_spiking = data.M_spiking
+
+    if reverse
+        VEC_row_param = pp.VEC_col_param 
+        VEC_col_param = pp.VEC_row_param
+
+        row_label = pp.col_label 
+        col_label = pp.row_label
+
+        VEC_amp = results.VEC_amp
+
+        M_rheobase = transpose(data.M_rheobase)
+        M_spiking = transpose(data.M_spiking)
+    end
 
     # ---------- make heatmap ---------- #
 

@@ -60,20 +60,18 @@ function make_DIC(V, p)
     n = p.nociceptor
     lido = p.lidocaine
 
-    linear_shift_mode = lido.linear_shift_mode
     with_shift = lido.with_shift
-    C_lido = lido.concentration
 
     # ----------- #
 
-    h_1p3(V) = h3_inf(V; C_lido=C_lido, shift=lido.shift_h3, with_shift=with_shift, linear_shift_mode=linear_shift_mode)
+    h_1p3(V) = h3_inf(V; shift=lido.shift_h3, with_shift=with_shift)
     m_1p3(V) = m3_inf(V)
 
-    h_1p7(V) = h7_inf(V; C_lido=C_lido, shift=lido.shift_h7, with_shift=with_shift, linear_shift_mode=linear_shift_mode)
+    h_1p7(V) = h7_inf(V; shift=lido.shift_h7, with_shift=with_shift)
     m_1p7(V) = m7_inf(V)
 
-    h_1p8(V) = h8_inf(V; C_lido=C_lido, shift=lido.shift_h8, with_shift=with_shift, linear_shift_mode=linear_shift_mode)
-    m_1p8(V) = m8_inf(V; C_lido=C_lido, shift=lido.shift_m8, with_shift=with_shift, linear_shift_mode=linear_shift_mode)
+    h_1p8(V) = h8_inf(V; shift=lido.shift_h8, with_shift=with_shift)
+    m_1p8(V) = m8_inf(V; shift=lido.shift_m8, with_shift=with_shift)
 
     l_inf_K_dr = ldr_inf
     n_inf_K_dr = ndr_inf

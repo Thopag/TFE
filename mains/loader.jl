@@ -30,13 +30,12 @@ function main()
     # file = plan_files[1]
     # start = 5
 
-    file = "inhibition/DIV0_inhib_NMDA"
-    start = 11
+    file = "plan/DIV0_NaV1.8_shift_inhib"
+    start = 5
 
     fp, pp, analyse_r, bifurcation_r, DIC_r, SS_current_r, plan_exct, plan_freq = load_file(file)
 
     file = file[start:end]
-    print(fp.VEC_label)
 
     plot_analyses(fp, analyse_r, bifurcation_r, DIC_r, SS_current_r, file)
     plot_plan(pp, plan_exct, plan_freq, file)

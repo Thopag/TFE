@@ -9,7 +9,7 @@ function get_file_parameter(u0, duration, DIV, p_stim, nociceptor_parameter, wit
     shift = 0.0:1.5:15.0
     amps = 10.0:0.5:14.0
 
-    VEC_inter_parameter = inhibs
+    VEC_inter_parameter = [0.0]
     VEC_label = ["$k" for k in VEC_inter_parameter]
 
     # VEC_inter_parameter_2 = [40.0, 40.0, 40.0, 40.0]
@@ -49,14 +49,14 @@ function get_plan_parameter(u0, duration, DIV, p_stim, nociceptor_parameter, wit
     # -------- Row Parameter -------- #
     inhibs = 0:0.05:1.0
 
-    VEC_row_param = 0:0
-    row_label = "inhibition NaV1.8 (-)"
+    VEC_row_param = inhibs
+    row_label = "Inhibition NaV1.8 (-)"
     # -------- Col Parameter -------- #
     inhibs = 0:0.05:1.0
-    shift = 0.0:0.5:15.0
+    shift = 0.0:5:15.0
 
-    VEC_col_param = 0:0
-    col_label = ""
+    VEC_col_param = inhibs
+    col_label = "Inhibition NMDA (-)"
     # -------- Create matrix -------- #
 
     M_p_lido = [lidocaine_parameter(;shift_h3 = 0.0 * c, shift_h7 = 0.0 * c, shift_h8 = 0.0 * c, shift_m8 = 0.0 * c
@@ -82,13 +82,13 @@ function main()
     # -------- File name -------- #
 
     file = "$(DIV)_default"
-    file = "inhibition/$(DIV)_NMDA_inhib"
+    file = "plan/$(DIV)_inhib_NaV1.8_NMDA"
 
     # -------- Launching options -------- #
 
     with_simulations = false
-    make_plan = false
-    make_analyses = true
+    make_plan = true
+    make_analyses = false
     rheobase = false
 
     with_nociceptor = true
