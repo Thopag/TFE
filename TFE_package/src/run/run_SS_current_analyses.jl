@@ -17,7 +17,7 @@ function plot_SS_current_analyses(results::SSCurrentResults, fp::FileParameters;
     # [1,4,6,8,10,12,14] inhib
     # [1,3,5,7,9,11]
     # 1:length(VEC_label)
-    take_idx = [1,3,5,7,10]
+    take_idx = 1:length(VEC_label)
     L = length(take_idx)
 
     xticks = [-120, -90, -60, -30, 0, 30, 60]
