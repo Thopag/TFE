@@ -16,8 +16,9 @@ end
 function plot_rheobase_bar(VEC_rheobase, VEC_label, inter_axe_label)
 
     # 1:length(VEC_label)
+    # [1, 3, 5, 7, 9, 14]
     # [1,4,6,8,10,12,13,14]
-    take_idx = 1:length(VEC_label)
+    take_idx = [1, 2, 3, 4, 5, 6, 8, 10]
 
     VEC_label = VEC_label[take_idx]
     VEC_rheobase = VEC_rheobase[take_idx]

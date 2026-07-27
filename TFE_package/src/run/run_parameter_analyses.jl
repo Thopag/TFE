@@ -111,7 +111,7 @@ function plot_data_analyse(data::AnalyseData, VEC_label, VEC_amp, inter_axe_labe
     # savefig(p_width, "plots/default/$(file_prefix)_first_width.pdf")
 
     savefig(p_pattern, "plots/default/$(file_prefix)_pattern.pdf")
-    # savefig(p_rheo, "plots/default/$(file_prefix)_rheobases.pdf")
+    savefig(p_rheo, "plots/default/$(file_prefix)_rheobases.pdf")
 
     return p_peaks, p_freqs, p_height, p_width, p_rheo, p_pattern
     

@@ -30,8 +30,8 @@ function main()
     # file = plan_files[1]
     # start = 5
 
-    file = "plan/DIV0_NaV1.8_shift_inhib"
-    start = 5
+    file = "shift/DIV7_h7_shift"
+    start = 6
 
     fp, pp, analyse_r, bifurcation_r, DIC_r, SS_current_r, plan_exct, plan_freq = load_file(file)
 

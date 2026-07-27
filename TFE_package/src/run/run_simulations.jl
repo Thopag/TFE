@@ -59,24 +59,34 @@ function plot_simulations(plt, p_model, sol_n, sol_pn, sol_s; color = nothing, l
 
         currents = 0
         if currents != 0
-            ylabel!(plt[currents], "Current (µA/cm2)")
+            var = L"I_{NaV1.7}"
+            ylabel!(plt[currents], "$var (µA/cm2)")
 
             I_K = n_current.IK_M .+ n_current.IK_AHP .+ n_current.IK_dr
-            plot!(plt[currents], t, I_K, color = :cyan, label= L"I_{K}")
+            #plot!(plt[currents], t, I_K, color = :cyan, label= L"I_{K}")
 
-            #plot!(plt[currents], t, n_current.INaV1p3, color = gate_colors["m3"], label= L"I_{NaV1.3}")
-            plot!(plt[currents], t, .- n_current.INaV1p7, color = gate_colors["m7"], label= L"-I_{NaV1.7}")
-            plot!(plt[currents], t, .- n_current.INaV1p8, color = gate_colors["m8"], label= L"-I_{NaV1.8}")
+            # plot!(plt[currents], t, n_current.INaV1p3, color = something(color, gate_colors["m3"]), label= L"I_{NaV1.3}")
+            plot!(plt[currents], t, n_current.INaV1p7, color = something(color, gate_colors["m7"]), label= L"-I_{NaV1.7}")
+            # plot!(plt[currents], t, n_current.INaV1p8, color = gate_colors["m8"], label= L"-I_{NaV1.8}")
 
             # plot!(plt[currents], t, n_current.IK_dr, color = gate_colors["ndr"], label= L"I_{K_{dr}}")
             # plot!(plt[currents], t, n_current.IK_M, color = gate_colors["nM"], label= L"I_{K_M}")
             # plot!(plt[currents], t, n_current.IK_AHP, color = gate_colors["zAHP"], label= L"I_{z_{AHP}}")
             #plot!(plt[currents], t, n_current.ILeak, color = :black, label= L"I_{leak}")
 
-            plot!(plt[currents], t, n_current.Iext, color = :black, linestyle=:dash, label= L"I_{ext}")
+            #plot!(plt[currents], t, n_current.Iext, color = :black, linestyle=:dash, label= L"I_{ext}")
             #ylims!(plt[currents], ( - 0.05*maximum(n_current.Iext), 1.1*maximum(n_current.Iext)) )
 
-            ylims!(plt[currents], (-0.05, 5.0) )
+            #ylims!(plt[currents], (-0.05, 5.0) )
+        end
+
+        gates = 0
+        if gates != 0
+            var = L"h_7"
+            ylabel!(plt[gates], "$var (-)")
+
+            plot!(plt[gates], t, sol_n.h7, color = something(color, gate_colors["h7"]), linestyle=:dash, label="")
+
         end
 
     end
@@ -96,7 +106,7 @@ function plot_simulations(plt, p_model, sol_n, sol_pn, sol_s; color = nothing, l
 
         Ca = 0
         if Ca != 0
-            ylabel!(plt[Ca], "Intracellular calcium [mM]")
+            ylabel!(plt[Ca], "Intracellular calcium (mM)")
             plot!(plt[Ca], t, sol_pn.Ca_i, color = something(color, :black), label=something(empty_label, ""))
         end
 
@@ -196,11 +206,12 @@ function make_simulations(VEC_p_model, u0, duration, VEC_label, DIV, with_nocice
     println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
     println("")
 
-    n_fig = 1
-    size = (600, 175*n_fig)
+    n_fig = 3
+    #size = (750, 175*n_fig)
+    #size = (600, 175*n_fig)
     size = (450, 175*n_fig)
     #size = (250, 175*n_fig)
-    #size = (300, 175*n_fig)
+    #size = (300, 150*n_fig)
 
     x_label_size = 10
     y_label_size = 10
@@ -220,21 +231,23 @@ function make_simulations(VEC_p_model, u0, duration, VEC_label, DIV, with_nocice
         plot!(plt[i], ytickfontsize = y_tick_size, yguidefontsize = y_label_size)
 
         plot!(plt[i], legend=false)
-        #plot!(plt[i], legendfontsize=8)
+        #plot!(plt[i], legendfontsize=6)
     end
 
     for i in 1:(n_fig-1)
         plot!(plt[i], xformatter = _ -> "")
     end
     
+    # size=(450, 150)
     # Freq plot
     p_freq = plot(xaxis = "Time (ms)", yaxis = "Instant frequency (Hz)", xticks=xticks, xlims=xlimits)
-    plot!(p_freq, yguidefontsize = 7, legendfontsize=7, size=(450, 150), left_margin = 5mm,bottom_margin = 5mm, margin = 5mm)
+    plot!(p_freq, yguidefontsize = 7, legendfontsize=7, size=(size[1], 175), left_margin = 5mm,bottom_margin = 5mm, margin = 5mm)
     plot!(p_freq, xformatter = _ -> "", xaxis = "")
 
     L = length(VEC_p_model)
     if L > 1
         VEC_color = palette(:rainbow, L)
+        #VEC_color = get_palette(L, :Reds, :red; dark=0.95, light=0.4)
         for (i,(p_model, label, color)) in enumerate(zip(VEC_p_model, VEC_label, VEC_color))
 
             println("-------------- $(i)/$(L) ---------------")
@@ -270,14 +283,14 @@ function make_simulations(VEC_p_model, u0, duration, VEC_label, DIV, with_nocice
 
     #savefig(plt, "plots/simulation/$(file_prefix).png")
     savefig(plt, "plots/simulation/$(file_prefix).pdf")
-    savefig(p_freq, "plots/simulation/$(file_prefix)_freqs.pdf")
+    #savefig(p_freq, "plots/simulation/$(file_prefix)_freqs.pdf")
 
     l = @layout [
-        a{0.44h}
-        b{0.56h}
+        a{0.2h}
+        b{0.8h}
     ]
     merge = plot(p_freq, plt, layout = l, size = (size[1], 1.75*size[2]), link = :x)
-    savefig(merge, "plots/simulation/$(file_prefix)_merge.pdf")
+    #savefig(merge, "plots/simulation/$(file_prefix)_merge.pdf")
 
     println("Save Plots in [plots/simulation/$(file_prefix)]")
     return

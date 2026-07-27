@@ -1,7 +1,10 @@
 
 function main()
 
-    file = "h8_shift"
+    # m8_shift
+    # NaV1.3_inhib
+
+    file = "h3_shift"
 
     load_rheobase_bar(file)
     
