@@ -30,7 +30,7 @@ function main()
             "inhibition/DIV0_NMDA_inhib"
             ]
 
-    files = ["plan/DIV0_inhib_NaV1.8_NMDA"]
+    files = ["plan/DIV0_FREQ_inhib_NaV1.8_NMDA", "plan/DIV0_FREQ_inhib_NaV1.8_shift"]
 
     for file in files
         println("-------------------------------------")

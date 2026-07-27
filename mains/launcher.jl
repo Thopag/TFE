@@ -53,19 +53,19 @@ function get_plan_parameter(u0, duration, DIV, p_stim, nociceptor_parameter, wit
     row_label = "Inhibition NaV1.8 (-)"
     # -------- Col Parameter -------- #
     inhibs = 0:0.05:1.0
-    shift = 0.0:5:15.0
+    shift = 0.0:1:15.0
 
-    VEC_col_param = inhibs
-    col_label = "Inhibition NMDA (-)"
+    VEC_col_param = shift
+    col_label = "Shift 0.4 h8 - 0.6 m8 (mV)"
     # -------- Create matrix -------- #
 
-    M_p_lido = [lidocaine_parameter(;shift_h3 = 0.0 * c, shift_h7 = 0.0 * c, shift_h8 = 0.0 * c, shift_m8 = 0.0 * c
+    M_p_lido = [lidocaine_parameter(;shift_h3 = 0.0 * c, shift_h7 = 0.0 * c, shift_h8 = 0.4 * c, shift_m8 = 0.6 * c
                                                                 , with_shift = true) 
                                                                             for r in VEC_row_param, c in VEC_col_param]
 
     M_p_noci = [nociceptor_parameter(;g_NaV1p8 = 30.0 * (1-r)) for r in VEC_row_param, c in VEC_col_param]
     M_p_proj = [projection_neuron_parameter(;) for r in VEC_row_param, c in VEC_col_param]
-    M_p_syn = [synapse_parameter(;g_NMDA = 1.0 * (1-c)) for r in VEC_row_param, c in VEC_col_param]
+    M_p_syn = [synapse_parameter(;g_NMDA = 1.0) for r in VEC_row_param, c in VEC_col_param]
 
     M_p_model = [model_parameter(;stimulation=p_stim, nociceptor=n, projection_neuron=pn, synapse=s, lidocaine=lido) for (n,pn,s,lido) in zip(M_p_noci,M_p_proj,M_p_syn, M_p_lido)]
 
@@ -77,17 +77,17 @@ end
 
 function main()
 
-    DIV = "DIV7"
+    DIV = "DIV0"
 
     # -------- File name -------- #
 
     file = "$(DIV)_default"
-    #file = "h3_shift"
+    file = "plan/$(DIV)_FREQ_inhib_NaV1.8_shift"
 
     # -------- Launching options -------- #
 
-    with_simulations = true
-    make_plan = false
+    with_simulations = false
+    make_plan = true
     make_analyses = false
     rheobase = false
 
@@ -122,7 +122,7 @@ function main()
 
     # -------- Stimulation -------- #
 
-    duration = 425.0                   # ms
+    duration = 2000.0                   # ms
     stim_on = 300.0                    # ms
     stim_length = 1400.0               # ms
 

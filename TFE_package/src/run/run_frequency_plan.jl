@@ -4,8 +4,8 @@ function run_frequency_plan(pp::PlanParameters)
 
     # -------- amp vectors -------- #
 
-    VEC_amp = [75.0, 150.0]
-    
+    VEC_amp = [50.0:10.0:90.0; 100.0:25.0:300.0]
+
     println("")
     println("----------- Start frequency Plan -----------")
     println("With amps values : [$(VEC_amp)]")
