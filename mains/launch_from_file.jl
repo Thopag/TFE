@@ -4,8 +4,12 @@ function change_fp(file, fp)
 
     for i in eachindex(fp.VEC_p_model)
         p_model = fp.VEC_p_model[i]
+        l = p_model.lidocaine
+        stim = p_model.stimulation
         new_p_model = from_model_parameter(p_model; 
-                    projection_neuron=projection_neuron_parameter(;pLf = 0.0)
+                    projection_neuron = projection_neuron_parameter(;pLf = 0.0),
+                    stimulation = stimulation_parameter(0.0; Ihold = stim.Ihold, on = stim.on, length = stim.off - stim.on),
+                    lidocaine = lidocaine_parameter(;shift_h3 = l.shift_h3,shift_h7 = l.shift_h7,shift_h8 = l.shift_h8,shift_m8 = l.shift_m8, with_shift = l.with_shift),
                     )
         fp.VEC_p_model[i] = new_p_model
     end
@@ -17,8 +21,12 @@ function change_pp(file, pp)
 
     for i in eachindex(pp.M_p_model)
         p_model = pp.M_p_model[i]
+        l = p_model.lidocaine
+        stim = p_model.stimulation
         new_p_model = from_model_parameter(p_model; 
-                    projection_neuron=projection_neuron_parameter(;pLf = 0.0)
+                    projection_neuron = projection_neuron_parameter(;pLf = 0.0),
+                    stimulation = stimulation_parameter(0.0; Ihold = stim.Ihold, on = stim.on, length = stim.off - stim.on),
+                    lidocaine = lidocaine_parameter(;shift_h3 = l.shift_h3,shift_h7 = l.shift_h7,shift_h8 = l.shift_h8,shift_m8 = l.shift_m8,with_shift = l.with_shift),
                     )
         pp.M_p_model[i] = new_p_model
     end
@@ -41,7 +49,7 @@ function launch_from_file(file)
     end
 
     if !isnothing(pp)
-        #file, fp, plan_exct, plan_freq = change_pp(file, pp)
+        #file, pp, plan_exct, plan_freq = change_pp(file, pp)
         plan_exct, plan_freq = launch_plan(pp, plan_exct, plan_freq)
         save(file; pp=pp, plan_exct=plan_exct, plan_freq=plan_freq)
     else
@@ -51,14 +59,24 @@ end
 
 function main()
 
-    inhib_files = [
-            # "inhibition/DIV0_NaV1.8_inhib",
-            # "inhibition/DIV7_NaV1.7_inhib",
-            # "inhibition/DIV7_NaV1.3_inhib",
-            "inhibition/DIV0_NMDA_inhib"
+    not_now = []
+
+    files = [
+            # "DIV0_baseline_NO_pLf",
+            # "inhibition/DIV0_NaV1.8_inhib_NO_pLf",
+            # "inhibition/DIV0_NMDA_inhib_NO_pLf",
+            # "shift/DIV0_h8_shift_NO_pLf",
+            # "shift/DIV0_m8_shift_NO_pLf",
+            # "shift/DIV0_m8_h8_shift_NO_pLf",
+            "plan/DIV0_FREQ_inhib_NaV1.8_NMDA_NO_pLf",
+            "plan/DIV0_FREQ_inhib_NaV1.8_shift_NO_pLf",
+            "shift/DIV7_h3_shift_NO_pLf",
+            "shift/DIV7_h7_shift_NO_pLf",
+            "inhibition/DIV7_NaV1.7_inhib_NO_pLf",
+            "inhibition/DIV7_NaV1.3_inhib_NO_pLf",
             ]
 
-    files = ["plan/DIV0_FREQ_inhib_NaV1.8_NMDA", "plan/DIV0_FREQ_inhib_NaV1.8_shift"]
+    #files = ["plan/DIV0_FREQ_inhib_NaV1.8_NMDA", "plan/DIV0_FREQ_inhib_NaV1.8_shift"]
 
     for file in files
         println("-------------------------------------")
@@ -68,6 +86,8 @@ function main()
         println("-------------------------------------")
         launch_from_file(file)
     end
+
+    #launch_from_file("proj_baseline_NO_pLf")
 
 end
 

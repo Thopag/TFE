@@ -23,7 +23,7 @@ function lidocaine_parameter(;
     return lidocaine
 end
 
-# ----------------- Lidocaine Staidy state shift----------------- #
+# ----------------- Lidocaine Steady state shift----------------- #
 
 # 1.3 inactivation
 # 20 mV shift at 1000 µM (Sheets et al. 2008)

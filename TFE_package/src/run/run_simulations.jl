@@ -21,6 +21,7 @@ function used_simulation(p_model, u0, duration, with_nociceptor, with_projection
 
     if !isnothing(sol_pn)
         sol = sol_pn
+        sol = sol_n
     else
         sol = sol_n
     end
@@ -51,9 +52,9 @@ function plot_simulations(plt, p_model, sol_n, sol_pn, sol_s; color = nothing, l
         voltage = 1
         if voltage != 0
             yticks= [-90, -65, -40, 0, 30]
-            ylabel!(plt[voltage], "Voltage (mV)", ylims=(-100,50), yticks=yticks)
+            ylabel!(plt[voltage], "DRG Voltage (mV)", ylims=(-100,50), yticks=yticks)
 
-            plot!(plt[voltage], t, sol_n.V, color = something(color, :black), label=something(empty_label, ""), linewidth=1, alpha=0.7)
+            plot!(plt[voltage], t, sol_n.V, color = something(color, :black), label=something(empty_label, ""), linewidth=1)
             #ylims!(plt[voltage], (-75.0, -65.0) )
         end
 
@@ -97,16 +98,17 @@ function plot_simulations(plt, p_model, sol_n, sol_pn, sol_s; color = nothing, l
         pn_current = retrieve_projection_neuron_currents(sol_pn, p_model)
         pn = p_model.projection_neuron
 
-        voltage = 0
+        voltage = 2
         if voltage != 0
             yticks= [-90, -65, -40, 0, 30]
-            ylabel!(plt[voltage], "Voltage (mV)", ylims=(-100,50), yticks=yticks)
-            plot!(plt[voltage], t, sol_pn.V, color = something(color, :black), label=something(empty_label, ""), linewidth=1.5)
+            ylabel!(plt[voltage], "DH Voltage (mV)", ylims=(-100,50), yticks=yticks)
+            plot!(plt[voltage], t, sol_pn.V, color = something(color, :black), label=something(empty_label, ""), linewidth=1.0)
         end
 
-        Ca = 0
+        Ca = 4
         if Ca != 0
-            ylabel!(plt[Ca], "Intracellular calcium (mM)")
+            temp = L"[Ca^{2+}]_i"
+            ylabel!(plt[Ca], "$temp (mM)")
             plot!(plt[Ca], t, sol_pn.Ca_i, color = something(color, :black), label=something(empty_label, ""))
         end
 
@@ -148,18 +150,18 @@ function plot_simulations(plt, p_model, sol_n, sol_pn, sol_s; color = nothing, l
             plot!(plt[currents], t, Isyn, color = :black, label=L"I_{syn}", linestyle=:dot, linewidth=1.5, alpha=0.9)
 
             #plot!(plt[currents], t, ICa_i, color = something(color, :green), label=something(empty_label, "ICa_i"))
-            plot!(plt[currents], t, s_current.IAMPA, color = :purple, label=L"I_{AMPA}", alpha=0.6) 
-            plot!(plt[currents], t, s_current.INMDA, color = :blue, label=L"I_{NMDA}", alpha=0.6) 
+            plot!(plt[currents], t, s_current.IAMPA, color = :purple, label=L"I_{AMPA}", alpha=0.7) 
+            plot!(plt[currents], t, s_current.INMDA, color = :blue, label=L"I_{NMDA}", alpha=0.7) 
             
             #plot!(plt[currents], t, ICa_i, color = :green, label=L"I_{[Ca^{2+}]_i}", alpha=0.5) 
 
             #plot!(plt[currents], t, pn_current.INa, color = :red, label=L"I_{Na}", alpha=0.7)
-            ylims!(plt[currents], (-15, 10))
+            #ylims!(plt[currents], (-15, 10))
         end
 
-        channel = 0
+        channel = 3
         if channel != 0
-            ylabel!(plt[channel], "Availability [-]")
+            ylabel!(plt[channel], "Gates Availability (-)")
             plot!(plt[channel], legend=:topright)
 
             availability_NMDA = (sol_s.B_NMDA .- sol_s.A_NMDA) # .* NMDA_Mg_block.(sol_pn.V)
@@ -206,7 +208,7 @@ function make_simulations(VEC_p_model, u0, duration, VEC_label, DIV, with_nocice
     println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
     println("")
 
-    n_fig = 3
+    n_fig = 4
     #size = (750, 175*n_fig)
     #size = (600, 175*n_fig)
     size = (450, 175*n_fig)
@@ -230,8 +232,8 @@ function make_simulations(VEC_p_model, u0, duration, VEC_label, DIV, with_nocice
         plot!(plt[i], xticks=xticks, xtickfontsize = x_tick_size, xguidefontsize = x_label_size)
         plot!(plt[i], ytickfontsize = y_tick_size, yguidefontsize = y_label_size)
 
-        plot!(plt[i], legend=false)
-        #plot!(plt[i], legendfontsize=6)
+        #plot!(plt[i], legend=false)
+        plot!(plt[i], legendfontsize=6)
     end
 
     for i in 1:(n_fig-1)
@@ -240,7 +242,7 @@ function make_simulations(VEC_p_model, u0, duration, VEC_label, DIV, with_nocice
     
     # size=(450, 150)
     # Freq plot
-    p_freq = plot(xaxis = "Time (ms)", yaxis = "Instant frequency (Hz)", xticks=xticks, xlims=xlimits)
+    p_freq = plot(xaxis = "Time (ms)", yaxis = "DRG Instant frequency (Hz)", xticks=xticks, xlims=xlimits)
     plot!(p_freq, yguidefontsize = 7, legendfontsize=7, size=(size[1], 175), left_margin = 5mm,bottom_margin = 5mm, margin = 5mm)
     plot!(p_freq, xformatter = _ -> "", xaxis = "")
 
@@ -286,11 +288,11 @@ function make_simulations(VEC_p_model, u0, duration, VEC_label, DIV, with_nocice
     #savefig(p_freq, "plots/simulation/$(file_prefix)_freqs.pdf")
 
     l = @layout [
-        a{0.2h}
-        b{0.8h}
+        a{0.15h}
+        b{0.85h}
     ]
-    merge = plot(p_freq, plt, layout = l, size = (size[1], 1.75*size[2]), link = :x)
-    #savefig(merge, "plots/simulation/$(file_prefix)_merge.pdf")
+    merge = plot(p_freq, plt, layout = l, size = (size[1], size[2]), link = :x)
+    savefig(merge, "plots/simulation/$(file_prefix)_merge.pdf")
 
     println("Save Plots in [plots/simulation/$(file_prefix)]")
     return

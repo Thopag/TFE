@@ -27,8 +27,8 @@ end
 
 function stimulation_parameter(amp::Float64;
     Ihold::Float64 = 0.0,              # [pA]     # Note: In original model, Ihold = -3.0 for DIV0 and 0.0 for DIV7
-    on::Float64 = 500.0,               # [ms]
-    length::Float64 = 1000.0,           # [ms]
+    on::Float64 = 300.0,               # [ms]
+    length::Float64 = 1400.0,           # [ms]
     is_act = nothing
     )
 

@@ -20,7 +20,7 @@ function get_file_parameter(u0, duration, DIV, p_stim, nociceptor_parameter, wit
     # -------- Create the VEC_p_model -------- #
 
     n = nociceptor_parameter(;)
-    pn = projection_neuron_parameter(;)
+    pn = projection_neuron_parameter(;pLf = 1.5e-5 * 0.0)
     s = synapse_parameter(;g_NMDA = 1.0)
     lido = lidocaine_parameter(;)
     stim = p_stim
@@ -82,12 +82,12 @@ function main()
     # -------- File name -------- #
 
     file = "$(DIV)_default"
-    file = "plan/$(DIV)_FREQ_inhib_NaV1.8_shift"
+    #file = "plan/$(DIV)_FREQ_inhib_NaV1.8_shift"
 
     # -------- Launching options -------- #
 
-    with_simulations = false
-    make_plan = true
+    with_simulations = true
+    make_plan = false
     make_analyses = false
     rheobase = false
 
@@ -126,7 +126,7 @@ function main()
     stim_on = 300.0                    # ms
     stim_length = 1400.0               # ms
 
-    amp = 50.0
+    amp = 70.0
 
     n_pulse = 5
     is_activated = nothing

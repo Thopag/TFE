@@ -17,6 +17,60 @@ function run_parameter_analyses(fp::FileParameters)
     return results
 end
 
+function plot_frequency_response(n_data::AnalyseData, pn_data::AnalyseData, VEC_amp, VEC_label, file_prefix)
+    # [1,4,6,8,10,12,14] inhib
+    # [1,3,5,7,9,11]
+    # 1:length(VEC_label)
+    take_idx = 1:1:length(VEC_label)
+
+    L = length(take_idx)
+    VEC_color = palette(:rainbow, L)
+    size = (300, 200)
+
+    n_M_freq       = n_data.M_freq
+    n_M_pattern    = n_data.M_pattern
+    pn_M_freq       = pn_data.M_freq
+    pn_M_pattern    = pn_data.M_pattern
+
+    plt = plot(xlabel="DRG Frequency (Hz)", ylabel= "DH Frequency (Hz)", size=size)
+    plt_DRG = plot(xlabel="DRG stimulation (pA)", ylabel= "DRG Frequency (Hz)", size=size)
+    plt_DH = plot(xlabel="DRG stimulation (pA)", ylabel= "DH Frequency (Hz)", size=size)
+
+    j = 0
+    for (i,(n_VEC_freq, n_VEC_pattern, pn_VEC_freq, pn_VEC_pattern, label)) in 
+                        enumerate(zip(eachcol(n_M_freq), eachcol(n_M_pattern), eachcol(pn_M_freq), eachcol(pn_M_pattern), VEC_label))
+
+        binary_value  = ifelse.(n_VEC_pattern .< 4, 0, 1)
+        #binary_form  = markers_list[ ifelse.(n_VEC_pattern .< 4, 1, 5) ]
+
+        VEC_afferent = n_VEC_freq[binary_value .== 1]
+        VEC_response = pn_VEC_freq[binary_value .== 1 ]
+        # VEC_afferent = n_VEC_freq .* binary_value
+        # VEC_response = pn_VEC_freq .* binary_value
+
+        if i in take_idx
+            j += 1
+            c = VEC_color[j]
+            m_size = 1.5
+
+            #label = "$(label) mV"
+            plot!(plt, [], [], color=c, label=label)
+            plot!(plt_DRG, [], [], color=c, label=label)
+            plot!(plt_DH, [], [], color=c, label=label)
+
+            plot!(plt , VEC_afferent, VEC_response, marker=:circle, markersize=m_size, linealpha=1.0, markeralpha=0.9, label="", markerstrokecolor = :match, markerstrokewidth = 0.0, color = c)
+            plot!(plt_DRG , VEC_amp, n_VEC_freq .* binary_value, marker=:circle, markersize=m_size, linealpha=1.0, markeralpha=0.9, label="", markerstrokecolor = :match, markerstrokewidth = 0.0, color = c)
+            plot!(plt_DH , VEC_amp, pn_VEC_freq .* binary_value, marker=:circle, markersize=m_size, linealpha=1.0, markeralpha=0.9, label="", markerstrokecolor = :match, markerstrokewidth = 0.0, color = c)
+        end
+    end
+
+    # savefig(plt, "plots/default/$(file_prefix)_response.pdf")
+    savefig(plt_DRG, "plots/default/$(file_prefix)_DRG_freq.pdf")
+    savefig(plt_DH, "plots/default/$(file_prefix)_DH_freq.pdf")
+
+    return plt
+end
+
 function plot_data_analyse(data::AnalyseData, VEC_label, VEC_amp, inter_axe_label, file_prefix)
     # [1,4,6,8,10,12,14] inhib
     # [1,3,5,7,9,11]
@@ -80,7 +134,7 @@ function plot_data_analyse(data::AnalyseData, VEC_label, VEC_amp, inter_axe_labe
             plot!(p_width , VEC_amp, VEC_first_w    , marker=:circle     , markersize=m_size, linealpha=0.6, markeralpha=0.9, label=label, markerstrokecolor = :match, markerstrokewidth = 0.0, color = c)
 
             plot!(p_peaks , VEC_amp, VEC_peak_count , marker=binary_form, markersize=m_size, linealpha=1.0, markeralpha=0.9, label=label, markerstrokecolor = :match, markerstrokewidth = 0.0, color = c)
-            plot!(p_freqs , VEC_amp, VEC_freq       , marker=binary_form, markersize=m_size, linealpha=1.0, markeralpha=0.9, label="", markerstrokecolor = :match, markerstrokewidth = 0.0, color = c)
+            plot!(p_freqs , VEC_amp, VEC_freq , marker=binary_form, markersize=m_size, linealpha=1.0, markeralpha=0.9, label="", markerstrokecolor = :match, markerstrokewidth = 0.0, color = c)
 
             bar!(p_pattern, VEC_amp, fill(j+0.5, length(VEC_amp)), fillto=fill(j-0.45, length(VEC_amp)), 
                                                                             lw=0, linecolor=:match, bar_width=(VEC_amp[1]-VEC_amp[2])*1.05, label="", color=pattern_color)
@@ -99,27 +153,25 @@ function plot_data_analyse(data::AnalyseData, VEC_label, VEC_amp, inter_axe_labe
 
     labels_not_nothing = VEC_label[not_nothing_idx]
     bars_not_nothing = VEC_rheobase[not_nothing_idx]
-    
+
     bar!(p_rheo, labels_not_nothing, bars_not_nothing, label="")
     annotate!(labels_not_nothing, bars_not_nothing ./ 2, text.(string.(bars_not_nothing), :center, :center, :white, 7))
 
     # --- save --- #
 
-    savefig(p_peaks, "plots/default/$(file_prefix)_peaks-curve.pdf")
+    # savefig(p_peaks, "plots/default/$(file_prefix)_peaks-curve.pdf")
     savefig(p_freqs, "plots/default/$(file_prefix)_F-I-curve.pdf")
     # savefig(p_height, "plots/default/$(file_prefix)_first_height.pdf")
     # savefig(p_width, "plots/default/$(file_prefix)_first_width.pdf")
 
     savefig(p_pattern, "plots/default/$(file_prefix)_pattern.pdf")
-    savefig(p_rheo, "plots/default/$(file_prefix)_rheobases.pdf")
+    # savefig(p_rheo, "plots/default/$(file_prefix)_rheobases.pdf")
 
     return p_peaks, p_freqs, p_height, p_width, p_rheo, p_pattern
-    
 end
 
 function plot_parameter_analyses(results::AnalyseResults, fp::FileParameters; file_prefix = "default")
 
-    
     VEC_label = fp.VEC_label
     inter_axe_label = fp.parameter_label
 
@@ -135,6 +187,12 @@ function plot_parameter_analyses(results::AnalyseResults, fp::FileParameters; fi
         plot_data_analyse(results.projection_neuron, VEC_label, VEC_amp, inter_axe_label, "$(file_prefix)_projection_neuron")
     else
         println("(plot_parameter_analyses) No projection neuron")
+    end
+
+    if !isnothing(results.projection_neuron) && !isnothing(results.nociceptor)
+        plot_frequency_response(results.nociceptor, results.projection_neuron, VEC_amp, VEC_label, file_prefix)
+    else
+        println("(plot_parameter_analyses) No response")
     end
 
     return

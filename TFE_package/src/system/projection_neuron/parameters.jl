@@ -31,7 +31,7 @@ function projection_neuron_parameter(;
     g_Leak = 0.03268,       # [mS/cm^2]
 
     # Ca
-    pLf = 1.5e-5,       # [cm*s^-1]
+    pLf = 0.0, #1.5e-5,       # [cm*s^-1]
     pLs = 7.5e-6,       # [cm*s^-1]
 
     k = 1.0e7,          # [nm.cm^(-1)]

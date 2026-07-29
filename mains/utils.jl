@@ -99,13 +99,13 @@ function plot_analyses(fp, analyse_r, bifurcation_r, DIC_r, SS_current_r, file_p
         println("No analyse_r")
     end
 
-    # SS_current_analyses
-    if !isnothing(bifurcation_r)
-        plot_bifurcation_analyses(bifurcation_r, analyse_r, fp; file_prefix = file_prefix)
-        println("bifurcation_analyses done")
-    else
-        println("No bifurcation_analyses")
-    end
+    # bifurcation_current_analyses
+    # if !isnothing(bifurcation_r)
+    #     plot_bifurcation_analyses(bifurcation_r, analyse_r, fp; file_prefix = file_prefix)
+    #     println("bifurcation_analyses done")
+    # else
+    #     println("No bifurcation_analyses")
+    # end
 
     println("----------- End Ploting Analyses -----------")
     return
@@ -132,11 +132,11 @@ function launch_plan(pp, plan_exct, plan_freq)
     
     # -------- Make Plans -------- #
 
-    # if isnothing(plan_exct)
-    #     plan_exct = run_excitability_plan(pp)
-    # else
-    #     println("plan_exct was already done")
-    # end
+    if isnothing(plan_exct)
+        plan_exct = run_excitability_plan(pp)
+    else
+        println("plan_exct was already done")
+    end
 
     if isnothing(plan_freq)
         plan_freq = run_frequency_plan(pp)
