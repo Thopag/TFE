@@ -138,11 +138,11 @@ function launch_plan(pp, plan_exct, plan_freq)
         println("plan_exct was already done")
     end
 
-    if isnothing(plan_freq)
-        plan_freq = run_frequency_plan(pp)
-    else
-        println("plan_freq was already done")
-    end
+    # if isnothing(plan_freq)
+    #     plan_freq = run_frequency_plan(pp)
+    # else
+    #     println("plan_freq was already done")
+    # end
 
     return plan_exct, plan_freq
 end
@@ -161,7 +161,7 @@ function plot_plan(pp, plan_exct, plan_freq, file_prefix)
 
     # freq_plan
     if !isnothing(plan_freq)
-        plot_frequency_plan(pp, plan_freq; file_prefix = file_prefix)
+        plot_frequency_plan(pp, plan_freq, plan_exct; file_prefix = file_prefix)
         println("frequency_plan done")
     else
         println("No plan_freq")

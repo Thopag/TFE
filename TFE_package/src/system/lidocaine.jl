@@ -133,16 +133,16 @@ function add_lido_shift_inhib_traj(plt)
 
     plot!(plt, 1.0 .- remaining_1_8, lido_shifts_1_8, color=:cyan, label="", linewidth = 3)
 
-    test_point = [100.0, 1000.0]
+    test_point = [100.0, 1000.0, 10000.0]
     results = get_lidocaine_inhibition.(test_point)
     remaining_1_3 = [r[1] for r in results]
     remaining_1_7 = [r[2] for r in results]
     remaining_1_8 = [r[3] for r in results]
 
-    lido_shifts_inact_1_8 = .- lido_h8.(lido_concentrations) 
-    lido_shifts_act_1_8 = lido_m8.(lido_concentrations)
-    lido_shifts_1_7 = .- lido_h7.(lido_concentrations)
-    lido_shifts_1_3 = .- lido_h3.(lido_concentrations)
+    lido_shifts_inact_1_8 = .- lido_h8.(test_point) 
+    lido_shifts_act_1_8 = lido_m8.(test_point)
+    lido_shifts_1_7 = .- lido_h7.(test_point)
+    lido_shifts_1_3 = .- lido_h3.(test_point)
     lido_shifts_1_8 = lido_shifts_inact_1_8 .+ lido_shifts_act_1_8
 
     scatter!(plt, 1.0 .- remaining_1_8, lido_shifts_1_8, color=:cyan, markersize=4, label="", markerstrokewidth = 0.0)

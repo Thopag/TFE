@@ -21,11 +21,11 @@ function plot_frequency_response(n_data::AnalyseData, pn_data::AnalyseData, VEC_
     # [1,4,6,8,10,12,14] inhib
     # [1,3,5,7,9,11]
     # 1:length(VEC_label)
-    take_idx = 1:1:length(VEC_label)
+    take_idx = [1,4,6,8,10,12,14]
 
     L = length(take_idx)
     VEC_color = palette(:rainbow, L)
-    size = (300, 200)
+    size = (400, 300)
 
     n_M_freq       = n_data.M_freq
     n_M_pattern    = n_data.M_pattern
@@ -53,7 +53,7 @@ function plot_frequency_response(n_data::AnalyseData, pn_data::AnalyseData, VEC_
             c = VEC_color[j]
             m_size = 1.5
 
-            #label = "$(label) mV"
+            label = "$(label) inhib"
             plot!(plt, [], [], color=c, label=label)
             plot!(plt_DRG, [], [], color=c, label=label)
             plot!(plt_DH, [], [], color=c, label=label)

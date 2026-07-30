@@ -20,7 +20,7 @@ end
 
 function plot_data_excitability_plan(pp::PlanParameters, results::ExcitabilityPlanResults, data::ExcitabilityPlanData, file_prefix; with_lido_traj=false)
     
-    reverse = false
+    reverse = true
 
     cs = get(colorschemes[:nipy_spectral], range(0.15, 0.97, length=256))
     cmap = cgrad(cs, 25, categorical = true, rev = true, scale = :exp)

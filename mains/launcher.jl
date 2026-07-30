@@ -10,7 +10,7 @@ function get_file_parameter(u0, duration, DIV, p_stim, nociceptor_parameter, wit
     amps = 10.0:0.5:14.0
 
     VEC_inter_parameter = [0.0]
-    VEC_label = ["$k" for k in VEC_inter_parameter]
+    VEC_label = ["" for k in VEC_inter_parameter]
 
     # VEC_inter_parameter_2 = [0.0, 0.64]
     # VEC_label = ["" for (k,m) in zip(VEC_inter_parameter,VEC_inter_parameter_2)]
@@ -19,8 +19,8 @@ function get_file_parameter(u0, duration, DIV, p_stim, nociceptor_parameter, wit
 
     # -------- Create the VEC_p_model -------- #
 
-    n = nociceptor_parameter(;)
-    pn = projection_neuron_parameter(;pLf = 1.5e-5 * 0.0)
+    n = nociceptor_parameter(; g_NaV1p3 =  0.35, g_NaV1p7 = 35.0, g_NaV1p8 = 0.2)
+    pn = projection_neuron_parameter(;)
     s = synapse_parameter(;g_NMDA = 1.0)
     lido = lidocaine_parameter(;)
     stim = p_stim
@@ -47,13 +47,13 @@ end
 function get_plan_parameter(u0, duration, DIV, p_stim, nociceptor_parameter, with_nociceptor, with_projection_neuron)
 
     # -------- Row Parameter -------- #
-    inhibs = 0:0.05:1.0
+    inhibs = 0.0:1.0
 
     VEC_row_param = inhibs
     row_label = "Inhibition NaV1.8 (-)"
     # -------- Col Parameter -------- #
     inhibs = 0:0.05:1.0
-    shift = 0.0:1:15.0
+    shift = 0.0:15.0:15.0
 
     VEC_col_param = shift
     col_label = "Shift 0.4 h8 - 0.6 m8 (mV)"
@@ -82,7 +82,7 @@ function main()
     # -------- File name -------- #
 
     file = "$(DIV)_default"
-    #file = "plan/$(DIV)_FREQ_inhib_NaV1.8_shift"
+    #file = "$(DIV)_but_DIV7_Na_conductance"
 
     # -------- Launching options -------- #
 

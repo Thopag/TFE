@@ -13,7 +13,7 @@ function change_fp(file, fp)
                     )
         fp.VEC_p_model[i] = new_p_model
     end
-    file = "$(file)_NO_pLf"
+    file = "$(file)"
     return file, fp, nothing, nothing, nothing, nothing
 end
 
@@ -30,7 +30,7 @@ function change_pp(file, pp)
                     )
         pp.M_p_model[i] = new_p_model
     end
-    file = "$(file)_NO_pLf"
+    file = "$(file)"
     return file, pp, nothing, nothing
 end
 
@@ -54,7 +54,7 @@ function launch_from_file(file)
         save(file; pp=pp, plan_exct=plan_exct, plan_freq=plan_freq)
     else
         println("No pp")
-    end  
+    end
 end
 
 function main()
@@ -62,18 +62,23 @@ function main()
     not_now = []
 
     files = [
-            # "DIV0_baseline_NO_pLf",
-            # "inhibition/DIV0_NaV1.8_inhib_NO_pLf",
-            # "inhibition/DIV0_NMDA_inhib_NO_pLf",
-            # "shift/DIV0_h8_shift_NO_pLf",
-            # "shift/DIV0_m8_shift_NO_pLf",
-            # "shift/DIV0_m8_h8_shift_NO_pLf",
-            "plan/DIV0_FREQ_inhib_NaV1.8_NMDA_NO_pLf",
-            "plan/DIV0_FREQ_inhib_NaV1.8_shift_NO_pLf",
-            "shift/DIV7_h3_shift_NO_pLf",
-            "shift/DIV7_h7_shift_NO_pLf",
-            "inhibition/DIV7_NaV1.7_inhib_NO_pLf",
-            "inhibition/DIV7_NaV1.3_inhib_NO_pLf",
+            # "DIV0_baseline",
+            # "inhibition/DIV0_NaV1.8_inhib",
+            # "inhibition/DIV0_NMDA_inhib",
+            # "shift/DIV0_h8_shift",
+            # "shift/DIV0_m8_shift",
+            # "shift/DIV0_m8_h8_shift",
+
+            "shift/DIV7_h3_shift",
+            "shift/DIV7_h7_shift",
+            "inhibition/DIV7_NaV1.7_inhib",
+            "inhibition/DIV7_NaV1.3_inhib",
+
+            "plan/DIV0_FREQ_inhib_NaV1.8_NMDA",
+            "plan/DIV0_FREQ_inhib_NaV1.8_shift",
+
+            "plan/DIV7_NaV1.7_shift_inhib",
+            "plan/DIV7_NaV1.3_shift_inhib",
             ]
 
     #files = ["plan/DIV0_FREQ_inhib_NaV1.8_NMDA", "plan/DIV0_FREQ_inhib_NaV1.8_shift"]

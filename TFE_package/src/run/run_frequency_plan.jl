@@ -17,62 +17,161 @@ function run_frequency_plan(pp::PlanParameters)
     return results
 end
 
-function plot_data_frequency_plan(pp::PlanParameters, results::FrequencyPlanResults, data::FrequencyPlanData, file_prefix; with_lido_traj=false)
-    
+function plot_3D_plane(pp::PlanParameters, results::FrequencyPlanResults, data::FrequencyPlanData, file_prefix)
+
     cs = get(colorschemes[:rainbow], range(0.01, 0.99, length=256))
     cmap = cgrad(cs, 25, categorical = true)
+    clip = (0.0, 200.0)
 
     VEC_amp = results.VEC_amp
 
-    for (i,amp) in enumerate(VEC_amp)
-        # ---------- get matrices ---------- #
+    VEC_row_param = pp.VEC_row_param
+    VEC_col_param = pp.VEC_col_param
 
-        VEC_row_param = pp.VEC_row_param
-        VEC_col_param = pp.VEC_col_param
+    row_label = pp.row_label
+    col_label = pp.col_label
 
-        row_label = pp.row_label
-        col_label = pp.col_label
+    # Accumulators for flat 1D vectors
+    X_pts = Float64[]
+    Y_pts = Float64[]
+    Z_pts = Float64[]
+    I_pts = Float64[]
 
-        M_freq = data.VEC_M_freq[i]
+    for (k,amp) in enumerate(VEC_amp)
+        for (i,x_i) in enumerate(VEC_col_param)
+            for (j,y_j) in enumerate(VEC_row_param)
+                push!(X_pts, x_i)
+                push!(Y_pts, y_j)
+                push!(Z_pts, amp)
 
-        # ---------- make heatmap ---------- #
-
-        diff_x = VEC_col_param[2]-VEC_col_param[1]
-        diff_y = VEC_row_param[2]-VEC_row_param[1]
-
-        x_limits = (-diff_x/8, VEC_col_param[end] + diff_x/8)
-        y_limits = (-diff_y/8, VEC_row_param[end] + diff_y/8)
-
-        plt_freq = plot(xlabel=col_label, ylabel=row_label)
-        title!(plt_freq, "$amp pA")
-
-        heatmap!(plt_freq, VEC_col_param, VEC_row_param, M_freq, background_color_inside = :black, c = cmap) #, clims=(0.0,200.0))
-
-        plot!(plt_freq, xlims=x_limits, ylims=y_limits)
-
-        ################### Lido Traj ###################
-        if with_lido_traj
-            add_lido_shift_inhib_traj(plt_freq)
+                # Your 4th value (intensity) at (x_i, y_j, z_val)
+                val = data.VEC_M_freq[k][j,i]
+                push!(I_pts, val)
+            end
         end
+    end
 
-        # ---------- save figures ---------- #
+    # Single 3D scatter plot
+    plt = scatter(
+        X_pts, Y_pts, Z_pts,
+        marker_z = I_pts,       # Color by intensity
+        color = cmap,
+        markersize = 4,
+        markerstrokewidth = 1,
+        alpha = 0.5,
+        clim=clip,
+        xlabel=col_label, ylabel=row_label, zlabel="DRG stimulation (pA)",
+        label="",
+        camera=(30,30)
+    )
+    display(plt)
+end
 
-        savefig(plt_freq, "plots/default/$(file_prefix)_freq_plan_$(amp)pA.pdf")
+function plot_data_frequency_plan(pp::PlanParameters, results::FrequencyPlanResults, data::FrequencyPlanData, exct_data::Union{Nothing,ExcitabilityPlanData}, file_prefix; with_lido_traj=false)
+
+    reverse = true
+    spiking_filter = false
+
+    if spiking_filter
+        if !isnothing(exct_data)
+            M_spiking = exct_data.M_spiking
+        else
+            println("NO exct_data")
+        end
+    end
+
+    VEC_amp = results.VEC_amp
+
+    # [1,4,6,8,10,12,14] inhib
+    # [1,3,5,7,9,11]
+    # 1:length(VEC_amp)
+    take_idx = [2,6,8,12]
+    
+    cs = get(colorschemes[:rainbow], range(0.01, 0.99, length=256))
+    cmap = cgrad(cs, 25, categorical = false)
+    clip = (0.0, 300.0)
+
+    VEC_row_param = pp.VEC_row_param
+    VEC_col_param = pp.VEC_col_param
+
+    row_label = pp.row_label
+    col_label = pp.col_label
+
+    if reverse
+        VEC_row_param = pp.VEC_col_param 
+        VEC_col_param = pp.VEC_row_param
+
+        row_label = pp.col_label 
+        col_label = pp.row_label
+    end
+
+    for (i,amp) in enumerate(VEC_amp)
+
+        if i in take_idx
+            # ---------- get matrices ---------- #
+
+            M_freq = data.VEC_M_freq[i]
+
+            if !isnothing(exct_data) && spiking_filter
+                filter = Int.(M_spiking .<= amp)
+                M_freq = M_freq .* filter
+            end
+
+            if reverse
+                M_freq = transpose(M_freq)
+            end
+
+            # ---------- make heatmap ---------- #
+
+            diff_x = VEC_col_param[2]-VEC_col_param[1]
+            diff_y = VEC_row_param[2]-VEC_row_param[1]
+
+            x_limits = (-diff_x/8, VEC_col_param[end] + diff_x/8)
+            y_limits = (-diff_y/8, VEC_row_param[end] + diff_y/8)
+
+            plt_freq = plot(xlabel=col_label, ylabel=row_label)
+            title!(plt_freq, "$amp pA")
+
+            #println("$(VEC_col_param), $(VEC_row_param)")
+            heatmap!(plt_freq, VEC_col_param, VEC_row_param, M_freq, background_color_inside = :black, c = cmap, clims=clip)
+
+            plot!(plt_freq, xlims=x_limits, ylims=y_limits)
+
+            ################### Lido Traj ###################
+            if with_lido_traj
+                add_lido_shift_inhib_traj(plt_freq)
+            end
+
+            # ---------- save figures ---------- #
+
+            savefig(plt_freq, "plots/default/$(file_prefix)_freq_plan_$(amp)pA.pdf")
+        end
     end
 end
 
-function plot_frequency_plan(pp::PlanParameters, results::FrequencyPlanResults; file_prefix = "default")
+function plot_frequency_plan(pp::PlanParameters, results::FrequencyPlanResults, exct_result::Union{Nothing, ExcitabilityPlanResults}; file_prefix = "default")
 
-    with_lido_traj = false
+    with_lido_traj = true
 
     if !isnothing(results.nociceptor)
-        plot_data_frequency_plan(pp, results, results.nociceptor, "$(file_prefix)_nociceptor"; with_lido_traj=with_lido_traj)
+        if !isnothing(exct_result)
+            n_exct_result = exct_result.nociceptor
+        else
+            n_exct_result = nothing
+        end
+        plot_data_frequency_plan(pp, results, results.nociceptor, n_exct_result, "$(file_prefix)_nociceptor"; with_lido_traj=with_lido_traj)
     else
         println("(plot_frequency_plan) No nociceptor")
     end
 
     if !isnothing(results.projection_neuron)
-        plot_data_frequency_plan(pp, results, results.projection_neuron, "$(file_prefix)_projection_neuron"; with_lido_traj=with_lido_traj)
+        if !isnothing(exct_result)
+            pn_exct_result = exct_result.projection_neuron
+        else
+            pn_exct_result = nothing
+        end
+        plot_data_frequency_plan(pp, results, results.projection_neuron, pn_exct_result, "$(file_prefix)_projection_neuron"; with_lido_traj=with_lido_traj)
+        #plot_3D_plane(pp, results, results.projection_neuron, "$(file_prefix)_pn_3D_plane")
     else
         println("(plot_frequency_plan) No projection neuron")
     end
