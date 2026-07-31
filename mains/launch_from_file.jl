@@ -50,6 +50,7 @@ function launch_from_file(file)
 
     if !isnothing(pp)
         #file, pp, plan_exct, plan_freq = change_pp(file, pp)
+        plan_exct = nothing
         plan_exct, plan_freq = launch_plan(pp, plan_exct, plan_freq)
         save(file; pp=pp, plan_exct=plan_exct, plan_freq=plan_freq)
     else
@@ -79,6 +80,7 @@ function main()
 
             "plan/DIV7_NaV1.7_shift_inhib",
             "plan/DIV7_NaV1.3_shift_inhib",
+            "plan/DIV7_NaV1.3_NaV1.7_inhib",
             ]
 
     #files = ["plan/DIV0_FREQ_inhib_NaV1.8_NMDA", "plan/DIV0_FREQ_inhib_NaV1.8_shift"]

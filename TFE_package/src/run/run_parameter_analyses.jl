@@ -21,7 +21,9 @@ function plot_frequency_response(n_data::AnalyseData, pn_data::AnalyseData, VEC_
     # [1,4,6,8,10,12,14] inhib
     # [1,3,5,7,9,11]
     # 1:length(VEC_label)
-    take_idx = [1,4,6,8,10,12,14]
+    take_idx = [1,5,8,10,14]
+
+    spiking_filtering = true
 
     L = length(take_idx)
     VEC_color = palette(:rainbow, L)
@@ -40,20 +42,27 @@ function plot_frequency_response(n_data::AnalyseData, pn_data::AnalyseData, VEC_
     for (i,(n_VEC_freq, n_VEC_pattern, pn_VEC_freq, pn_VEC_pattern, label)) in 
                         enumerate(zip(eachcol(n_M_freq), eachcol(n_M_pattern), eachcol(pn_M_freq), eachcol(pn_M_pattern), VEC_label))
 
-        binary_value  = ifelse.(n_VEC_pattern .< 4, 0, 1)
-        #binary_form  = markers_list[ ifelse.(n_VEC_pattern .< 4, 1, 5) ]
 
-        VEC_afferent = n_VEC_freq[binary_value .== 1]
-        VEC_response = pn_VEC_freq[binary_value .== 1 ]
-        # VEC_afferent = n_VEC_freq .* binary_value
-        # VEC_response = pn_VEC_freq .* binary_value
+        if spiking_filtering
+            binary_value  = ifelse.(n_VEC_pattern .< 4, 0, 1)
+            #binary_form  = markers_list[ ifelse.(n_VEC_pattern .< 4, 1, 5) ]
+
+            VEC_afferent = n_VEC_freq[binary_value .== 1]
+            VEC_response = pn_VEC_freq[binary_value .== 1 ]
+            # VEC_afferent = n_VEC_freq .* binary_value
+            # VEC_response = pn_VEC_freq .* binary_value
+        else
+            VEC_afferent = n_VEC_freq
+            VEC_response = pn_VEC_freq
+            binary_value = ifelse.(false, 0, 1)
+        end
 
         if i in take_idx
             j += 1
             c = VEC_color[j]
             m_size = 1.5
 
-            label = "$(label) inhib"
+            #label = "$(label) inhib"
             plot!(plt, [], [], color=c, label=label)
             plot!(plt_DRG, [], [], color=c, label=label)
             plot!(plt_DH, [], [], color=c, label=label)
@@ -64,9 +73,9 @@ function plot_frequency_response(n_data::AnalyseData, pn_data::AnalyseData, VEC_
         end
     end
 
-    # savefig(plt, "plots/default/$(file_prefix)_response.pdf")
-    savefig(plt_DRG, "plots/default/$(file_prefix)_DRG_freq.pdf")
-    savefig(plt_DH, "plots/default/$(file_prefix)_DH_freq.pdf")
+    savefig(plt, "plots/default/$(file_prefix)_response.pdf")
+    # savefig(plt_DRG, "plots/default/$(file_prefix)_DRG_freq.pdf")
+    # savefig(plt_DH, "plots/default/$(file_prefix)_DH_freq.pdf")
 
     return plt
 end
@@ -75,7 +84,7 @@ function plot_data_analyse(data::AnalyseData, VEC_label, VEC_amp, inter_axe_labe
     # [1,4,6,8,10,12,14] inhib
     # [1,3,5,7,9,11]
     # 1:length(VEC_label)
-    take_idx = 1:length(VEC_label)
+    take_idx = [1,5,8,10,14]
 
     L = length(take_idx)
     VEC_color = palette(:rainbow, L)
@@ -86,7 +95,7 @@ function plot_data_analyse(data::AnalyseData, VEC_label, VEC_amp, inter_axe_labe
     xticks = VEC_amp[1]:50:VEC_amp[end]
     
     p_peaks   = plot(xlabel=amp_label, ylabel= "Peak count (-)", xticks=xticks)
-    p_freqs   = plot(xlabel=amp_label, ylabel= "Frequency (Hz)" , xticks=xticks) #, size = (500, 250))
+    p_freqs   = plot(xlabel=amp_label, ylabel= "Frequency (Hz)" , xticks=xticks, size = (400, 250))
     p_height  = plot(xlabel=amp_label, ylabel= "Height (mV)"    , xticks=xticks)
     p_width   = plot(xlabel=amp_label, ylabel= "Width (ms)"     , xticks=xticks)
 
@@ -164,7 +173,7 @@ function plot_data_analyse(data::AnalyseData, VEC_label, VEC_amp, inter_axe_labe
     # savefig(p_height, "plots/default/$(file_prefix)_first_height.pdf")
     # savefig(p_width, "plots/default/$(file_prefix)_first_width.pdf")
 
-    savefig(p_pattern, "plots/default/$(file_prefix)_pattern.pdf")
+    # savefig(p_pattern, "plots/default/$(file_prefix)_pattern.pdf")
     # savefig(p_rheo, "plots/default/$(file_prefix)_rheobases.pdf")
 
     return p_peaks, p_freqs, p_height, p_width, p_rheo, p_pattern

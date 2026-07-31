@@ -21,7 +21,7 @@ function used_simulation(p_model, u0, duration, with_nociceptor, with_projection
 
     if !isnothing(sol_pn)
         sol = sol_pn
-        sol = sol_n
+        #sol = sol_n
     else
         sol = sol_n
     end
@@ -34,7 +34,7 @@ function used_simulation(p_model, u0, duration, with_nociceptor, with_projection
     return sol_n, sol_pn, sol_s, t_spikes, freqs
 end
 
-function plot_simulations(plt, p_model, sol_n, sol_pn, sol_s; color = nothing, label = nothing)
+function plot_simulations(plt, p_model, sol_n, sol_pn, sol_s, i; color = nothing, label = nothing)
 
     # Check if multi or single simulation
     if !isnothing(color) && !isnothing(label)
@@ -49,7 +49,7 @@ function plot_simulations(plt, p_model, sol_n, sol_pn, sol_s; color = nothing, l
         t = sol_n.t
         n_current = retrieve_nociceptor_currents(sol_n, p_model)
 
-        voltage = 1
+        voltage = 0
         if voltage != 0
             yticks= [-90, -65, -40, 0, 30]
             ylabel!(plt[voltage], "DRG Voltage (mV)", ylims=(-100,50), yticks=yticks)
@@ -98,17 +98,25 @@ function plot_simulations(plt, p_model, sol_n, sol_pn, sol_s; color = nothing, l
         pn_current = retrieve_projection_neuron_currents(sol_pn, p_model)
         pn = p_model.projection_neuron
 
-        voltage = 2
+        voltage = 1
         if voltage != 0
             yticks= [-90, -65, -40, 0, 30]
             ylabel!(plt[voltage], "DH Voltage (mV)", ylims=(-100,50), yticks=yticks)
+
+            # if i == 1 
+            #     vline!(plt[voltage], sol_n.t_spikes, color=:red, alpha=0.6, label="")
+            # end
             plot!(plt[voltage], t, sol_pn.V, color = something(color, :black), label=something(empty_label, ""), linewidth=1.0)
         end
 
-        Ca = 4
+        Ca = 0
         if Ca != 0
             temp = L"[Ca^{2+}]_i"
             ylabel!(plt[Ca], "$temp (mM)")
+
+            # if i == 1 
+            #     vline!(plt[Ca], sol_n.t_spikes, color=:red, alpha=0.6, label="")
+            # end
             plot!(plt[Ca], t, sol_pn.Ca_i, color = something(color, :black), label=something(empty_label, ""))
         end
 
@@ -141,17 +149,21 @@ function plot_simulations(plt, p_model, sol_n, sol_pn, sol_s; color = nothing, l
 
         currents = 0
         if currents != 0
-            ylabel!(plt[currents], "Current (µA/cm2)")
+            var = L"I_{NMDA}"
+            ylabel!(plt[currents], "$var (µA/cm2)")
+            if i == 1 
+                vline!(plt[currents], sol_n.t_spikes, color=:red, alpha=0.6, label="")
+            end
             plot!(plt[currents], legend=:topright)
 
             ICa_i = pn_current.ICa_Lf .+ pn_current.ICa_Ls
             Isyn = s_current.INMDA .+ s_current.IAMPA
 
-            plot!(plt[currents], t, Isyn, color = :black, label=L"I_{syn}", linestyle=:dot, linewidth=1.5, alpha=0.9)
+            #plot!(plt[currents], t, Isyn, color = :black, label=L"I_{syn}", linestyle=:dot, linewidth=1.5, alpha=0.9)
 
             #plot!(plt[currents], t, ICa_i, color = something(color, :green), label=something(empty_label, "ICa_i"))
-            plot!(plt[currents], t, s_current.IAMPA, color = :purple, label=L"I_{AMPA}", alpha=0.7) 
-            plot!(plt[currents], t, s_current.INMDA, color = :blue, label=L"I_{NMDA}", alpha=0.7) 
+            #plot!(plt[currents], t, s_current.IAMPA, color = :purple, label=L"I_{AMPA}", alpha=0.7) 
+            plot!(plt[currents], t, s_current.INMDA, color = :blue, label="", alpha=0.7) 
             
             #plot!(plt[currents], t, ICa_i, color = :green, label=L"I_{[Ca^{2+}]_i}", alpha=0.5) 
 
@@ -159,7 +171,7 @@ function plot_simulations(plt, p_model, sol_n, sol_pn, sol_s; color = nothing, l
             #ylims!(plt[currents], (-15, 10))
         end
 
-        channel = 3
+        channel = 0
         if channel != 0
             ylabel!(plt[channel], "Gates Availability (-)")
             plot!(plt[channel], legend=:topright)
@@ -171,7 +183,6 @@ function plot_simulations(plt, p_model, sol_n, sol_pn, sol_s; color = nothing, l
             plot!(plt[channel], t, availability_AMPA, color = :purple, label="AMPA", alpha=1.0) 
 
         end
-    
     end
 
     # --------------------- STIMULATION --------------------- #
@@ -208,7 +219,7 @@ function make_simulations(VEC_p_model, u0, duration, VEC_label, DIV, with_nocice
     println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
     println("")
 
-    n_fig = 4
+    n_fig = 1
     #size = (750, 175*n_fig)
     #size = (600, 175*n_fig)
     size = (450, 175*n_fig)
@@ -256,11 +267,8 @@ function make_simulations(VEC_p_model, u0, duration, VEC_label, DIV, with_nocice
             sol_n, sol_pn, sol_s, t_spikes, freqs = used_simulation(p_model, u0, duration, with_nociceptor, with_projection_neuron)
         
             println("---- plot ----")
-            plot_simulations(plt, p_model, sol_n, sol_pn, sol_s; color = color, label = label)
+            plot_simulations(plt, p_model, sol_n, sol_pn, sol_s, i; color = color, label = label)
 
-            if length(freqs) > 1
-                plot!(p_freq, t_spikes[1:end-1], freqs, color=color, label=label, marker=:circle, markersize=2, markerstrokecolor = :match, markerstrokewidth = 0.0)
-            end
             println("----------------------------------------") 
         end
     else # if L == 1
@@ -271,7 +279,7 @@ function make_simulations(VEC_p_model, u0, duration, VEC_label, DIV, with_nocice
         sol_n, sol_pn, sol_s, t_spikes, freqs = used_simulation(p_model, u0, duration, with_nociceptor, with_projection_neuron)
 
         println("---- plot ----")
-        plot_simulations(plt, p_model, sol_n, sol_pn, sol_s)
+        plot_simulations(plt, p_model, sol_n, sol_pn, sol_s, 1)
 
         amp = VEC_p_model[1].stimulation.amp
         #annotate_amp(plt[1], amp)
@@ -292,7 +300,7 @@ function make_simulations(VEC_p_model, u0, duration, VEC_label, DIV, with_nocice
         b{0.85h}
     ]
     merge = plot(p_freq, plt, layout = l, size = (size[1], size[2]), link = :x)
-    savefig(merge, "plots/simulation/$(file_prefix)_merge.pdf")
+    #savefig(merge, "plots/simulation/$(file_prefix)_merge.pdf")
 
     println("Save Plots in [plots/simulation/$(file_prefix)]")
     return

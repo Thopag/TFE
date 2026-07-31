@@ -19,9 +19,9 @@ function get_file_parameter(u0, duration, DIV, p_stim, nociceptor_parameter, wit
 
     # -------- Create the VEC_p_model -------- #
 
-    n = nociceptor_parameter(; g_NaV1p3 =  0.35, g_NaV1p7 = 35.0, g_NaV1p8 = 0.2)
+    n = nociceptor_parameter(;)
     pn = projection_neuron_parameter(;)
-    s = synapse_parameter(;g_NMDA = 1.0)
+    s = synapse_parameter(;g_NMDA = 1.0 * (1-0.0))
     lido = lidocaine_parameter(;)
     stim = p_stim
 
@@ -47,23 +47,23 @@ end
 function get_plan_parameter(u0, duration, DIV, p_stim, nociceptor_parameter, with_nociceptor, with_projection_neuron)
 
     # -------- Row Parameter -------- #
-    inhibs = 0.0:1.0
+    inhibs = 0.0:0.05:1.0
 
     VEC_row_param = inhibs
-    row_label = "Inhibition NaV1.8 (-)"
+    row_label = "Inhibition NaV1.7 (-)"
     # -------- Col Parameter -------- #
     inhibs = 0:0.05:1.0
     shift = 0.0:15.0:15.0
 
-    VEC_col_param = shift
-    col_label = "Shift 0.4 h8 - 0.6 m8 (mV)"
+    VEC_col_param = inhibs
+    col_label = "Inhibition NaV1.3 (-)"
     # -------- Create matrix -------- #
 
-    M_p_lido = [lidocaine_parameter(;shift_h3 = 0.0 * c, shift_h7 = 0.0 * c, shift_h8 = 0.4 * c, shift_m8 = 0.6 * c
-                                                                , with_shift = true) 
+    M_p_lido = [lidocaine_parameter(;shift_h3 = 0.0 * c, shift_h7 = 0.0 * c, shift_h8 = 0.0 * c, shift_m8 = 0.0 * c
+                                                                , with_shift = false) 
                                                                             for r in VEC_row_param, c in VEC_col_param]
 
-    M_p_noci = [nociceptor_parameter(;g_NaV1p8 = 30.0 * (1-r)) for r in VEC_row_param, c in VEC_col_param]
+    M_p_noci = [nociceptor_parameter(;g_NaV1p7 = 35.0 * (1-r), g_NaV1p3 = 0.35 * (1-c)) for r in VEC_row_param, c in VEC_col_param]
     M_p_proj = [projection_neuron_parameter(;) for r in VEC_row_param, c in VEC_col_param]
     M_p_syn = [synapse_parameter(;g_NMDA = 1.0) for r in VEC_row_param, c in VEC_col_param]
 
@@ -82,7 +82,7 @@ function main()
     # -------- File name -------- #
 
     file = "$(DIV)_default"
-    #file = "$(DIV)_but_DIV7_Na_conductance"
+    #file = "plan/$(DIV)_NaV1.3_NaV1.7_inhib"
 
     # -------- Launching options -------- #
 
@@ -91,7 +91,7 @@ function main()
     make_analyses = false
     rheobase = false
 
-    with_nociceptor = true
+    with_nociceptor = false
     with_projection_neuron = true
 
     # -------- PARAMETER SET TYPE -------- #
@@ -126,7 +126,7 @@ function main()
     stim_on = 300.0                    # ms
     stim_length = 1400.0               # ms
 
-    amp = 70.0
+    amp = 50.0
 
     n_pulse = 5
     is_activated = nothing
@@ -141,7 +141,7 @@ function main()
     if with_simulations
         VEC_p_model = fp.VEC_p_model
 
-        #VEC_p_model = [VEC_p_model[1]]
+        VEC_p_model = [VEC_p_model[1]]
         make_simulations(VEC_p_model, u0, duration, fp.VEC_label, DIV, with_nociceptor, with_projection_neuron; file_prefix = file)
     end
     if make_plan

@@ -88,7 +88,7 @@ function find_pattern(amps, p_model, u0, i::Int, j::Int, results::ExcitabilityPl
 
         if (pn_is_finded <= 1) && !isnothing(sol_pn)
             # Same as above but with projection neuron
-            _, pattern = get_excitability(sol_n.t_spikes, i_stim.off)
+            _, pattern = get_excitability(sol_pn.t_spikes, i_stim.off)
             if (pattern >= 1) && (pn_is_finded == 0)
                 results.projection_neuron.M_rheobase[i, j] = amp
                 pn_is_finded += 1

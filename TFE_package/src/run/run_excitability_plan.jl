@@ -18,12 +18,13 @@ function run_excitability_plan(pp::PlanParameters)
     return results
 end
 
-function plot_data_excitability_plan(pp::PlanParameters, results::ExcitabilityPlanResults, data::ExcitabilityPlanData, file_prefix; with_lido_traj=false)
+function plot_data_excitability_plan(pp::PlanParameters, results::ExcitabilityPlanResults, data::ExcitabilityPlanData, file_prefix)
     
     reverse = true
+    with_lido_traj = true
 
     cs = get(colorschemes[:nipy_spectral], range(0.15, 0.97, length=256))
-    cmap = cgrad(cs, 25, categorical = true, rev = true, scale = :exp)
+    cmap = cgrad(cs, 25, categorical = false, rev = true) #, scale = :exp)
 
     # ---------- get matrices ---------- #
 
@@ -34,6 +35,10 @@ function plot_data_excitability_plan(pp::PlanParameters, results::ExcitabilityPl
     col_label = pp.col_label
 
     VEC_amp = results.VEC_amp
+    clip = (VEC_amp[1],VEC_amp[end])
+    clip = (0.0,100)
+    m = 400
+    size = ( 1.05 * m, m)
 
     M_rheobase = data.M_rheobase
     M_spiking = data.M_spiking
@@ -44,6 +49,10 @@ function plot_data_excitability_plan(pp::PlanParameters, results::ExcitabilityPl
 
         row_label = pp.col_label 
         col_label = pp.row_label
+
+        # var = L"h_{8, \infty}"
+        # var2 = L"m_{8, \infty}"
+        # row_label = "Shift 40% $(var) and 60% $(var2) (mV)"
 
         VEC_amp = results.VEC_amp
 
@@ -59,11 +68,11 @@ function plot_data_excitability_plan(pp::PlanParameters, results::ExcitabilityPl
     x_limits = (-diff_x/8, VEC_col_param[end] + diff_x/8)
     y_limits = (-diff_y/8, VEC_row_param[end] + diff_y/8)
 
-    plt_rheobase = plot(xlabel=col_label, ylabel=row_label)
-    plt_spiking = plot(xlabel=col_label, ylabel=row_label)
+    plt_rheobase = plot(title="rheobase", xlabel=col_label, ylabel=row_label, size=size)
+    plt_spiking = plot(title="spiking", xlabel=col_label, ylabel=row_label, size=size)
 
-    heatmap!(plt_rheobase, VEC_col_param, VEC_row_param, M_rheobase, background_color_inside = :black, c = cmap, clims=(VEC_amp[1],VEC_amp[end]))
-    heatmap!(plt_spiking , VEC_col_param, VEC_row_param, M_spiking , background_color_inside = :black, c = cmap, clims=(VEC_amp[1],VEC_amp[end]))
+    heatmap!(plt_rheobase, VEC_col_param, VEC_row_param, M_rheobase, background_color_inside = :black, c = cmap, clims=clip)
+    heatmap!(plt_spiking , VEC_col_param, VEC_row_param, M_spiking , background_color_inside = :black, c = cmap, clims=clip)
 
     plot!(plt_rheobase, xlims=x_limits, ylims=y_limits)
     plot!(plt_spiking , xlims=x_limits, ylims=y_limits)
@@ -82,16 +91,14 @@ end
 
 function plot_excitability_plan(pp::PlanParameters, results::ExcitabilityPlanResults; file_prefix = "default")
 
-    with_lido_traj = false
-
     if !isnothing(results.nociceptor)
-        plot_data_excitability_plan(pp, results, results.nociceptor, "$(file_prefix)_nociceptor"; with_lido_traj=with_lido_traj)
+        plot_data_excitability_plan(pp, results, results.nociceptor, "$(file_prefix)_nociceptor")
     else
         println("(plot_excitability_plan) No nociceptor")
     end
 
     if !isnothing(results.projection_neuron)
-        plot_data_excitability_plan(pp, results, results.projection_neuron, "$(file_prefix)_projection_neuron"; with_lido_traj=with_lido_traj)
+        plot_data_excitability_plan(pp, results, results.projection_neuron, "$(file_prefix)_projection_neuron")
     else
         println("(plot_excitability_plan) No projection neuron")
     end

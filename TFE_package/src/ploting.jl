@@ -1,4 +1,4 @@
-export reponse_time, plot_SS_function, plot_tau_function, plot_availability, GHK_plot, SS_shift_plot, legend
+export reponse_time, plot_SS_function, plot_tau_function, plot_availability, GHK_plot, SS_shift_plot, legend, plot_lido_inhib
 
 const pattern_list   = ["No spike"    , "Single spike", "Two spikes", "Transient" , "Spiking" ]
 const markers_list   = [:circle       , :utriangle    , :dtriangle  , :diamond    , :square   ]
@@ -243,6 +243,28 @@ function SS_shift_plot()
         plot!(plt, V, vec, linestyle = :dash, label="", color=c)
     end
     savefig(plt, "plots/default/SS_shift.pdf")
+end
+
+function plot_lido_inhib()
+
+    C = 10 .^ range(log10(0.1), log10(100000), length=1000)
+
+    results = get_lidocaine_inhibition.(C)
+
+    inhibition_1_3 = [r[1] for r in results]
+    inhibition_1_7 = [r[2] for r in results]
+    inhibition_1_8 = [r[3] for r in results]
+    inhibition_NMDA = [r[4] for r in results]
+
+    plt = plot(ylabel="Inhibition (%)", xlabel="Lidocain (µM)", xscale=:log10, legendfontsize=10, legend=:topleft)
+    xticks!(plt, [0.1, 1.0, 10.0,100.0,1000.0,10000.0, 100000.0])
+
+    plot!(plt, C, inhibition_1_3, label="NaV1.3", color=gate_colors["m3"])
+    plot!(plt, C, inhibition_1_7, label="NaV1.7", color=gate_colors["m7"])
+    plot!(plt, C, inhibition_1_8, label="NaV1.8", color=gate_colors["m8"])
+    plot!(plt, C, inhibition_NMDA, label="NMDA", color=:blue, linestyle=:dash)
+    
+    savefig(plt, "plots/default/lido_inhibition.pdf")
 end
 
 function legend()

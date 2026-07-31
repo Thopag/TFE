@@ -106,24 +106,26 @@ end
 
 function get_lidocaine_inhibition(C)
     if (C == 0.0)
-        return 1.0, 1.0, 1.0
+        return 0.0, 0.0, 0.0, 0.0
     end
-    remaining_1_3 = 1.0 - lidocain_1_3_resting_inib(C)
-    remaining_1_7 = 1.0 - lidocain_1_7_channel(C)
-    remaining_1_8 = 1.0 - lidocain_1_8_channel(C)
-    return remaining_1_3, remaining_1_7, remaining_1_8
+    inhibition_1_3 = lidocain_1_3_resting_inib(C)
+    inhibition_1_7 = lidocain_1_7_channel(C)
+    inhibition_1_8 = lidocain_1_8_channel(C)
+    inhibition_NMDA = NMDA_inib(C)
+    return inhibition_1_3, inhibition_1_7, inhibition_1_8, inhibition_NMDA
 end
 
 # ----------------- Lidocaine shift inhibition trajectory ----------------- #
 
 function add_lido_shift_inhib_traj(plt)
 
-    lido_concentrations = 10 .^ range(log10(0.01), log10(1000), length=1000)
+    lido_concentrations = 10 .^ range(log10(0.01), log10(10000), length=1000)
 
     results = get_lidocaine_inhibition.(lido_concentrations)
-    remaining_1_3 = [r[1] for r in results]
-    remaining_1_7 = [r[2] for r in results]
-    remaining_1_8 = [r[3] for r in results]
+    inhibition_1_3 = [r[1] for r in results]
+    inhibition_1_7 = [r[2] for r in results]
+    inhibition_1_8 = [r[3] for r in results]
+    inhibition_NMDA = [r[4] for r in results]
 
     lido_shifts_inact_1_8 = .- lido_h8.(lido_concentrations) 
     lido_shifts_act_1_8 = lido_m8.(lido_concentrations)
@@ -131,13 +133,14 @@ function add_lido_shift_inhib_traj(plt)
     lido_shifts_1_3 = .- lido_h3.(lido_concentrations)
     lido_shifts_1_8 = lido_shifts_inact_1_8 .+ lido_shifts_act_1_8
 
-    plot!(plt, 1.0 .- remaining_1_8, lido_shifts_1_8, color=:cyan, label="", linewidth = 3)
+    plot!(plt, inhibition_1_8, inhibition_NMDA, color=:cyan, label="", linewidth = 3)
 
     test_point = [100.0, 1000.0, 10000.0]
     results = get_lidocaine_inhibition.(test_point)
-    remaining_1_3 = [r[1] for r in results]
-    remaining_1_7 = [r[2] for r in results]
-    remaining_1_8 = [r[3] for r in results]
+    inhibition_1_3 = [r[1] for r in results]
+    inhibition_1_7 = [r[2] for r in results]
+    inhibition_1_8 = [r[3] for r in results]
+    inhibition_NMDA = [r[4] for r in results]
 
     lido_shifts_inact_1_8 = .- lido_h8.(test_point) 
     lido_shifts_act_1_8 = lido_m8.(test_point)
@@ -145,7 +148,7 @@ function add_lido_shift_inhib_traj(plt)
     lido_shifts_1_3 = .- lido_h3.(test_point)
     lido_shifts_1_8 = lido_shifts_inact_1_8 .+ lido_shifts_act_1_8
 
-    scatter!(plt, 1.0 .- remaining_1_8, lido_shifts_1_8, color=:cyan, markersize=4, label="", markerstrokewidth = 0.0)
+    scatter!(plt,  inhibition_1_8, inhibition_NMDA, color=:cyan, markersize=4, label="", markerstrokewidth = 0.0)
 
     return plt
 end

@@ -138,11 +138,11 @@ function launch_plan(pp, plan_exct, plan_freq)
         println("plan_exct was already done")
     end
 
-    # if isnothing(plan_freq)
-    #     plan_freq = run_frequency_plan(pp)
-    # else
-    #     println("plan_freq was already done")
-    # end
+    if isnothing(plan_freq)
+        plan_freq = run_frequency_plan(pp)
+    else
+        println("plan_freq was already done")
+    end
 
     return plan_exct, plan_freq
 end

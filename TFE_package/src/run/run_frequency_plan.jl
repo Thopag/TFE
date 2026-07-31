@@ -17,11 +17,13 @@ function run_frequency_plan(pp::PlanParameters)
     return results
 end
 
-function plot_3D_plane(pp::PlanParameters, results::FrequencyPlanResults, data::FrequencyPlanData, file_prefix)
+function plot_3D_plane(pp::PlanParameters, results::FrequencyPlanResults, data::FrequencyPlanData, exct_data::Union{Nothing,ExcitabilityPlanData}, file_prefix)
+
+    spiking_filter = true
 
     cs = get(colorschemes[:rainbow], range(0.01, 0.99, length=256))
     cmap = cgrad(cs, 25, categorical = true)
-    clip = (0.0, 200.0)
+    clip = :native #(0.0, 200.0)
 
     VEC_amp = results.VEC_amp
 
@@ -38,6 +40,15 @@ function plot_3D_plane(pp::PlanParameters, results::FrequencyPlanResults, data::
     I_pts = Float64[]
 
     for (k,amp) in enumerate(VEC_amp)
+
+        M_freq = data.VEC_M_freq[k]
+
+        if !isnothing(exct_data) && spiking_filter
+            M_spiking = exct_data.M_spiking
+            filter = Int.(M_spiking .<= amp)
+            M_freq = M_freq .* filter
+        end
+    
         for (i,x_i) in enumerate(VEC_col_param)
             for (j,y_j) in enumerate(VEC_row_param)
                 push!(X_pts, x_i)
@@ -45,7 +56,7 @@ function plot_3D_plane(pp::PlanParameters, results::FrequencyPlanResults, data::
                 push!(Z_pts, amp)
 
                 # Your 4th value (intensity) at (x_i, y_j, z_val)
-                val = data.VEC_M_freq[k][j,i]
+                val = M_freq[j,i]
                 push!(I_pts, val)
             end
         end
@@ -70,7 +81,7 @@ end
 function plot_data_frequency_plan(pp::PlanParameters, results::FrequencyPlanResults, data::FrequencyPlanData, exct_data::Union{Nothing,ExcitabilityPlanData}, file_prefix; with_lido_traj=false)
 
     reverse = true
-    spiking_filter = false
+    spiking_filter = true
 
     if spiking_filter
         if !isnothing(exct_data)
@@ -85,11 +96,13 @@ function plot_data_frequency_plan(pp::PlanParameters, results::FrequencyPlanResu
     # [1,4,6,8,10,12,14] inhib
     # [1,3,5,7,9,11]
     # 1:length(VEC_amp)
-    take_idx = [2,6,8,12]
+    take_idx = [2,6,8,14]
     
     cs = get(colorschemes[:rainbow], range(0.01, 0.99, length=256))
     cmap = cgrad(cs, 25, categorical = false)
-    clip = (0.0, 300.0)
+    clip = :native #(0.0, 80.0)
+    m = 400
+    size = (1.05 * m, m)
 
     VEC_row_param = pp.VEC_row_param
     VEC_col_param = pp.VEC_col_param
@@ -103,6 +116,10 @@ function plot_data_frequency_plan(pp::PlanParameters, results::FrequencyPlanResu
 
         row_label = pp.col_label 
         col_label = pp.row_label
+        
+        # var = L"h_{8, \infty}"
+        # var2 = L"m_{8, \infty}"
+        # row_label = "Shift 40% $(var) and 60% $(var2) (mV)"
     end
 
     for (i,amp) in enumerate(VEC_amp)
@@ -113,8 +130,7 @@ function plot_data_frequency_plan(pp::PlanParameters, results::FrequencyPlanResu
             M_freq = data.VEC_M_freq[i]
 
             if !isnothing(exct_data) && spiking_filter
-                filter = Int.(M_spiking .<= amp)
-                M_freq = M_freq .* filter
+                filter = ifelse.(M_spiking .<= amp, true, false)
             end
 
             if reverse
@@ -129,13 +145,21 @@ function plot_data_frequency_plan(pp::PlanParameters, results::FrequencyPlanResu
             x_limits = (-diff_x/8, VEC_col_param[end] + diff_x/8)
             y_limits = (-diff_y/8, VEC_row_param[end] + diff_y/8)
 
-            plt_freq = plot(xlabel=col_label, ylabel=row_label)
+            plt_freq = plot(xlabel=col_label, ylabel=row_label, size=size)
             title!(plt_freq, "$amp pA")
 
-            #println("$(VEC_col_param), $(VEC_row_param)")
             heatmap!(plt_freq, VEC_col_param, VEC_row_param, M_freq, background_color_inside = :black, c = cmap, clims=clip)
 
             plot!(plt_freq, xlims=x_limits, ylims=y_limits)
+
+            ################### spiking region ###################
+
+            if !isnothing(exct_data) && spiking_filter
+                if reverse
+                    filter = transpose(filter)
+                end
+                contour!(plt_freq, VEC_col_param, VEC_row_param, filter, levels = [0.5], color = :white, linewidth = 3)
+            end
 
             ################### Lido Traj ###################
             if with_lido_traj
@@ -160,6 +184,7 @@ function plot_frequency_plan(pp::PlanParameters, results::FrequencyPlanResults, 
             n_exct_result = nothing
         end
         plot_data_frequency_plan(pp, results, results.nociceptor, n_exct_result, "$(file_prefix)_nociceptor"; with_lido_traj=with_lido_traj)
+        #plot_3D_plane(pp, results, results.nociceptor, n_exct_result, "$(file_prefix)_pn_3D_plane")
     else
         println("(plot_frequency_plan) No nociceptor")
     end
@@ -171,7 +196,7 @@ function plot_frequency_plan(pp::PlanParameters, results::FrequencyPlanResults, 
             pn_exct_result = nothing
         end
         plot_data_frequency_plan(pp, results, results.projection_neuron, pn_exct_result, "$(file_prefix)_projection_neuron"; with_lido_traj=with_lido_traj)
-        #plot_3D_plane(pp, results, results.projection_neuron, "$(file_prefix)_pn_3D_plane")
+        #plot_3D_plane(pp, results, results.projection_neuron, pn_exct_result, "$(file_prefix)_pn_3D_plane")
     else
         println("(plot_frequency_plan) No projection neuron")
     end
