@@ -52,8 +52,8 @@ function plot_SS_current_analyses(results::SSCurrentResults, fp::FileParameters;
 
     # --- save --- #
 
-    # savefig(p_n, "plots/default/$(file_prefix)_SS_current_n.pdf")
-    # savefig(p_pn, "plots/default/$(file_prefix)_SS_current_pn.pdf")
+    savefig(p_n, "plots/default/$(file_prefix)_SS_current_n.pdf")
+    savefig(p_pn, "plots/default/$(file_prefix)_SS_current_pn.pdf")
 
     return p_n, p_pn
 end

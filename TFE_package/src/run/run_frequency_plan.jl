@@ -78,10 +78,11 @@ function plot_3D_plane(pp::PlanParameters, results::FrequencyPlanResults, data::
     display(plt)
 end
 
-function plot_data_frequency_plan(pp::PlanParameters, results::FrequencyPlanResults, data::FrequencyPlanData, exct_data::Union{Nothing,ExcitabilityPlanData}, file_prefix; with_lido_traj=false)
+function plot_data_frequency_plan(pp::PlanParameters, results::FrequencyPlanResults, data::FrequencyPlanData, exct_data::Union{Nothing,ExcitabilityPlanData}, file_prefix)
 
-    reverse = true
+    reverse = false
     spiking_filter = true
+    with_lido_traj = false
 
     if spiking_filter
         if !isnothing(exct_data)
@@ -100,7 +101,7 @@ function plot_data_frequency_plan(pp::PlanParameters, results::FrequencyPlanResu
     
     cs = get(colorschemes[:rainbow], range(0.01, 0.99, length=256))
     cmap = cgrad(cs, 25, categorical = false)
-    clip = :native #(0.0, 80.0)
+    clip = (0.0, 300.0)
     m = 400
     size = (1.05 * m, m)
 
@@ -175,15 +176,13 @@ end
 
 function plot_frequency_plan(pp::PlanParameters, results::FrequencyPlanResults, exct_result::Union{Nothing, ExcitabilityPlanResults}; file_prefix = "default")
 
-    with_lido_traj = true
-
     if !isnothing(results.nociceptor)
         if !isnothing(exct_result)
             n_exct_result = exct_result.nociceptor
         else
             n_exct_result = nothing
         end
-        plot_data_frequency_plan(pp, results, results.nociceptor, n_exct_result, "$(file_prefix)_nociceptor"; with_lido_traj=with_lido_traj)
+        plot_data_frequency_plan(pp, results, results.nociceptor, n_exct_result, "$(file_prefix)_nociceptor")
         #plot_3D_plane(pp, results, results.nociceptor, n_exct_result, "$(file_prefix)_pn_3D_plane")
     else
         println("(plot_frequency_plan) No nociceptor")
@@ -195,7 +194,7 @@ function plot_frequency_plan(pp::PlanParameters, results::FrequencyPlanResults, 
         else
             pn_exct_result = nothing
         end
-        plot_data_frequency_plan(pp, results, results.projection_neuron, pn_exct_result, "$(file_prefix)_projection_neuron"; with_lido_traj=with_lido_traj)
+        plot_data_frequency_plan(pp, results, results.projection_neuron, n_exct_result, "$(file_prefix)_projection_neuron")
         #plot_3D_plane(pp, results, results.projection_neuron, pn_exct_result, "$(file_prefix)_pn_3D_plane")
     else
         println("(plot_frequency_plan) No projection neuron")

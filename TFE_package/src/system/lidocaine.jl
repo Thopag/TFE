@@ -7,6 +7,7 @@ struct LidocaineParameters
     shift_h7::Float64
     shift_h8::Float64
     shift_m8::Float64
+    shift_Mgblock::Float64
     with_shift::Bool
 end
 
@@ -15,10 +16,11 @@ function lidocaine_parameter(;
     shift_h7 = 0.0,
     shift_h8 = 0.0,
     shift_m8 = 0.0,
+    shift_Mgblock = 0.0,
     with_shift = false,
     )
 
-    lidocaine = LidocaineParameters(shift_h3, shift_h7, shift_h8, shift_m8, with_shift)
+    lidocaine = LidocaineParameters(shift_h3, shift_h7, shift_h8, shift_m8, shift_Mgblock, with_shift)
 
     return lidocaine
 end
@@ -89,6 +91,13 @@ end
     return shift
 end
 
+@inline function Mgblock_shift(shift, with_shift)
+    if !with_shift
+        return 0.0
+    end
+    return shift
+end
+
 # ----------------- Lidocaine conductance inhibition ----------------- #
 
 @inline hill(D, f_max, IC50, h, y0) = y0 + (f_max * D^h) / (IC50^h + D^h)
@@ -133,7 +142,7 @@ function add_lido_shift_inhib_traj(plt)
     lido_shifts_1_3 = .- lido_h3.(lido_concentrations)
     lido_shifts_1_8 = lido_shifts_inact_1_8 .+ lido_shifts_act_1_8
 
-    plot!(plt, inhibition_1_8, inhibition_NMDA, color=:cyan, label="", linewidth = 3)
+    plot!(plt, lido_shifts_act_1_8, inhibition_NMDA, color=:cyan, label="", linewidth = 3)
 
     test_point = [100.0, 1000.0, 10000.0]
     results = get_lidocaine_inhibition.(test_point)
@@ -148,7 +157,7 @@ function add_lido_shift_inhib_traj(plt)
     lido_shifts_1_3 = .- lido_h3.(test_point)
     lido_shifts_1_8 = lido_shifts_inact_1_8 .+ lido_shifts_act_1_8
 
-    scatter!(plt,  inhibition_1_8, inhibition_NMDA, color=:cyan, markersize=4, label="", markerstrokewidth = 0.0)
+    scatter!(plt,  lido_shifts_act_1_8, inhibition_NMDA, color=:cyan, markersize=4, label="", markerstrokewidth = 0.0)
 
     return plt
 end

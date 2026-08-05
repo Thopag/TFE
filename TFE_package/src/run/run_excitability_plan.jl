@@ -92,13 +92,13 @@ end
 function plot_excitability_plan(pp::PlanParameters, results::ExcitabilityPlanResults; file_prefix = "default")
 
     if !isnothing(results.nociceptor)
-        plot_data_excitability_plan(pp, results, results.nociceptor, "$(file_prefix)_nociceptor")
+        #plot_data_excitability_plan(pp, results, results.nociceptor, "$(file_prefix)_nociceptor")
     else
         println("(plot_excitability_plan) No nociceptor")
     end
 
     if !isnothing(results.projection_neuron)
-        plot_data_excitability_plan(pp, results, results.projection_neuron, "$(file_prefix)_projection_neuron")
+        #plot_data_excitability_plan(pp, results, results.projection_neuron, "$(file_prefix)_projection_neuron")
     else
         println("(plot_excitability_plan) No projection neuron")
     end

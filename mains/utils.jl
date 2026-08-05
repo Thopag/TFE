@@ -3,18 +3,29 @@ function load_file(file)
 
     println("Loading...")
     
+    # Old command to load
+    # @time data = load("JLD2_save/$(file).jld2")
+
     # Mute the warning about function loading
     data = with_logger(ConsoleLogger(stderr, Logging.Error)) do
-        @time data = load("JLD2_save/$(file).jld2")
+        @time data = jldopen("JLD2_save/$(file).jld2", "r")
     end
-    fp              = data["fp"]
-    pp              = data["pp"]
+
+    fp = with_logger(ConsoleLogger(stderr, Logging.Error)) do
+        fp  = data["fp"]
+    end
+    pp = with_logger(ConsoleLogger(stderr, Logging.Error)) do
+        pp  = data["pp"]
+    end
+
     analyse_r       = data["analyse_r"]
     bifurcation_r   = data["bifurcation_r"]
     DIC_r           = data["DIC_r"]
     SS_current_r    = data["SS_current_r"]
     plan_exct       = data["plan_exct"]
     plan_freq       = data["plan_freq"]
+
+    close(data)
 
     println("--- Loaded [$(file).jld2] ---")
     println("")
@@ -59,23 +70,23 @@ function launch_analyses(fp, analyse_r, bifurcation_r, DIC_r, SS_current_r)
         println("analyse_r was already done")
     end
 
-    if isnothing(bifurcation_r)
-        bifurcation_r = run_bifurcation_analyses(fp)
-    else
-        println("bifurcation_r was already done")
-    end
+    # if isnothing(bifurcation_r)
+    #     bifurcation_r = run_bifurcation_analyses(fp)
+    # else
+    #     println("bifurcation_r was already done")
+    # end
 
-    if isnothing(DIC_r)
-        DIC_r = run_DIC_analyses(fp)
-    else
-        println("DIC_r was already done")
-    end
+    # if isnothing(DIC_r)
+    #     DIC_r = run_DIC_analyses(fp)
+    # else
+    #     println("DIC_r was already done")
+    # end
 
-    if isnothing(SS_current_r)
-        SS_current_r = run_SS_current_analyses(fp) 
-    else
-        println("SS_current_r was already done")
-    end
+    # if isnothing(SS_current_r)
+    #     SS_current_r = run_SS_current_analyses(fp) 
+    # else
+    #     println("SS_current_r was already done")
+    # end
     return analyse_r, bifurcation_r, DIC_r, SS_current_r
 end
 
@@ -83,13 +94,13 @@ function plot_analyses(fp, analyse_r, bifurcation_r, DIC_r, SS_current_r, file_p
 
     println("----------- Start Ploting Analyses -----------")
 
-    # SS_current_analyses
-    if !isnothing(SS_current_r)
-        plot_SS_current_analyses(SS_current_r, fp; file_prefix = file_prefix)
-        println("SS_current_analyses done")
-    else
-        println("No SS_current_analyses")
-    end
+    # # SS_current_analyses
+    # if !isnothing(SS_current_r)
+    #     plot_SS_current_analyses(SS_current_r, fp; file_prefix = file_prefix)
+    #     println("SS_current_analyses done")
+    # else
+    #     println("No SS_current_analyses")
+    # end
 
     # parameter_analyses
     if !isnothing(analyse_r)
@@ -99,7 +110,7 @@ function plot_analyses(fp, analyse_r, bifurcation_r, DIC_r, SS_current_r, file_p
         println("No analyse_r")
     end
 
-    # bifurcation_current_analyses
+    # # bifurcation_current_analyses
     # if !isnothing(bifurcation_r)
     #     plot_bifurcation_analyses(bifurcation_r, analyse_r, fp; file_prefix = file_prefix)
     #     println("bifurcation_analyses done")

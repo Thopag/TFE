@@ -49,7 +49,7 @@ function plot_simulations(plt, p_model, sol_n, sol_pn, sol_s, i; color = nothing
         t = sol_n.t
         n_current = retrieve_nociceptor_currents(sol_n, p_model)
 
-        voltage = 0
+        voltage = 1
         if voltage != 0
             yticks= [-90, -65, -40, 0, 30]
             ylabel!(plt[voltage], "DRG Voltage (mV)", ylims=(-100,50), yticks=yticks)
@@ -98,13 +98,13 @@ function plot_simulations(plt, p_model, sol_n, sol_pn, sol_s, i; color = nothing
         pn_current = retrieve_projection_neuron_currents(sol_pn, p_model)
         pn = p_model.projection_neuron
 
-        voltage = 1
+        voltage = 2
         if voltage != 0
             yticks= [-90, -65, -40, 0, 30]
             ylabel!(plt[voltage], "DH Voltage (mV)", ylims=(-100,50), yticks=yticks)
 
             # if i == 1 
-            #     vline!(plt[voltage], sol_n.t_spikes, color=:red, alpha=0.6, label="")
+            #     vline!(plt[voltage], sol_n.t_spikes, color=:red, linestyle=:dash, alpha=0.6, label="")
             # end
             plot!(plt[voltage], t, sol_pn.V, color = something(color, :black), label=something(empty_label, ""), linewidth=1.0)
         end
@@ -115,7 +115,7 @@ function plot_simulations(plt, p_model, sol_n, sol_pn, sol_s, i; color = nothing
             ylabel!(plt[Ca], "$temp (mM)")
 
             # if i == 1 
-            #     vline!(plt[Ca], sol_n.t_spikes, color=:red, alpha=0.6, label="")
+            #     vline!(plt[Ca], sol_n.t_spikes, color=:red, linestyle=:dash, alpha=0.6, label="")
             # end
             plot!(plt[Ca], t, sol_pn.Ca_i, color = something(color, :black), label=something(empty_label, ""))
         end
@@ -150,9 +150,9 @@ function plot_simulations(plt, p_model, sol_n, sol_pn, sol_s, i; color = nothing
         currents = 0
         if currents != 0
             var = L"I_{NMDA}"
-            ylabel!(plt[currents], "$var (µA/cm2)")
+            ylabel!(plt[currents], "$var (µA/cm2)", ylims=(-6,15))
             if i == 1 
-                vline!(plt[currents], sol_n.t_spikes, color=:red, alpha=0.6, label="")
+                vline!(plt[currents], sol_n.t_spikes, color=:red, linestyle=:dash, alpha=0.6, label="")
             end
             plot!(plt[currents], legend=:topright)
 
@@ -219,7 +219,7 @@ function make_simulations(VEC_p_model, u0, duration, VEC_label, DIV, with_nocice
     println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
     println("")
 
-    n_fig = 1
+    n_fig = 2
     #size = (750, 175*n_fig)
     #size = (600, 175*n_fig)
     size = (450, 175*n_fig)

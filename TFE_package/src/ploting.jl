@@ -1,4 +1,4 @@
-export reponse_time, plot_SS_function, plot_tau_function, plot_availability, GHK_plot, SS_shift_plot, legend, plot_lido_inhib
+export reponse_time, plot_SS_function, plot_tau_function, plot_availability, GHK_plot, SS_shift_plot, legend, plot_lido_inhib, random_plot
 
 const pattern_list   = ["No spike"    , "Single spike", "Two spikes", "Transient" , "Spiking" ]
 const markers_list   = [:circle       , :utriangle    , :dtriangle  , :diamond    , :square   ]
@@ -275,4 +275,22 @@ function legend()
     plot!(plt , [], []  , marker=:square, label="Spiking", markersize=m_size, markerstrokecolor = :match, markerstrokewidth = 0.0, color = :black)
 
     savefig(plt, "plots/default/legend.pdf")
+end
+
+function random_plot()
+
+    V = -100.0:0.5:45.0
+    xticks = [-120, -90, -60, -30, 0, 30, 60]
+    plt = plot(xticks= xticks)
+
+    xlabel!(plt, "Voltage (mV)")
+    ylabel!(plt, "Mgblock (-)")
+
+    g(x) = NMDA_Mg_block(x)
+    f(x) = NMDA_Mg_block(x; shift=25.0 ,with_shift=true)
+
+    plot!(plt, V, f.(V), color=:red, label="", linewidth=2)
+    plot!(plt, V, g.(V), color=:black, label="", linewidth=2)
+
+    savefig(plt, "plots/default/random.pdf")
 end

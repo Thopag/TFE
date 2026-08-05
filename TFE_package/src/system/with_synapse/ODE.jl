@@ -10,6 +10,8 @@ include("currents.jl")
 function synapse_state(du,u,p,V)
 
     s = p.synapse
+    lido    = p.lidocaine
+    with_shift = lido.with_shift
 
     # --- variables --- #
 
@@ -24,7 +26,7 @@ function synapse_state(du,u,p,V)
 
     # --- currents --- #
 
-    tmp = INMDA(V, A_NMDA, B_NMDA, s.g_NMDA, s.E_NMDA)
+    tmp = INMDA(V, A_NMDA, B_NMDA, s.g_NMDA, s.E_NMDA; shift=lido.shift_Mgblock, with_shift=with_shift)
 
     Isyn = 0.0
     Isyn += tmp
