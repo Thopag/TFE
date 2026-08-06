@@ -3,6 +3,7 @@ include("utils.jl")
 function main()
 
     baseline_files = ["DIV0_baseline",
+            "DIV7_baseline_2x_g7_WITH_pLf",
             "proj_baseline",
             ]
 
@@ -45,8 +46,8 @@ function main()
     # plan
     # start = 5
 
-    file = "shift/DIV0_m8_shift_0.5-NMDA"
-    start = 6
+    file = "plan/DIV0_NMDA_inhib_h8_shift"
+    start = 5
 
     fp, pp, analyse_r, bifurcation_r, DIC_r, SS_current_r, plan_exct, plan_freq = load_file(file)
 

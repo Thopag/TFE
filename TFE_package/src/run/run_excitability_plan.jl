@@ -62,11 +62,11 @@ function plot_data_excitability_plan(pp::PlanParameters, results::ExcitabilityPl
 
     # ---------- make heatmap ---------- #
 
-    diff_x = VEC_col_param[2]-VEC_col_param[1]
-    diff_y = VEC_row_param[2]-VEC_row_param[1]
+    diff_x = abs(VEC_col_param[2]-VEC_col_param[1])
+    diff_y = abs(VEC_row_param[2]-VEC_row_param[1])
 
-    x_limits = (-diff_x/8, VEC_col_param[end] + diff_x/8)
-    y_limits = (-diff_y/8, VEC_row_param[end] + diff_y/8)
+    x_limits = (VEC_col_param[1] -diff_x/8, VEC_col_param[end] + diff_x/8)
+    y_limits = (VEC_row_param[1] -diff_y/8, VEC_row_param[end] + diff_y/8)
 
     plt_rheobase = plot(title="rheobase", xlabel=col_label, ylabel=row_label, size=size)
     plt_spiking = plot(title="spiking", xlabel=col_label, ylabel=row_label, size=size)

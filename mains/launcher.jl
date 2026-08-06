@@ -10,17 +10,17 @@ function get_file_parameter(u0, duration, DIV, p_stim, nociceptor_parameter, wit
     shift_mg = -20.0:5.0:20.0
     amps = 10.0:0.5:14.0
 
-    VEC_inter_parameter = shift_mg
-    VEC_label = ["$k" for k in VEC_inter_parameter]
+    VEC_inter_parameter = [0.0]
+    VEC_label = ["" for k in VEC_inter_parameter]
 
     # VEC_inter_parameter_2 = [0.0, 0.64]
     # VEC_label = ["" for (k,m) in zip(VEC_inter_parameter,VEC_inter_parameter_2)]
 
-    parameter_label = "Shift Mgblock (mV)"
+    parameter_label = ""
 
     # -------- Create the VEC_p_model -------- #
 
-    n = nociceptor_parameter(;)
+    n = nociceptor_parameter(;g_NaV1p7 = 35.0 * 1.0)
     pn = projection_neuron_parameter(;)
     s = synapse_parameter(;)
     lido = lidocaine_parameter(;)
@@ -36,7 +36,7 @@ function get_file_parameter(u0, duration, DIV, p_stim, nociceptor_parameter, wit
     VEC_p_proj = [projection_neuron_parameter(;) for p in VEC_inter_parameter]
     VEC_p_syn = [synapse_parameter(;g_NMDA = 1.0 * (1-p)) for p in VEC_inter_parameter]
 
-    VEC_p_model = [model_parameter(;stimulation=stim, nociceptor=n, projection_neuron=pn, synapse=s, lidocaine=i) for i in VEC_p_lido]
+    VEC_p_model = [model_parameter(;stimulation=stim, nociceptor=n, projection_neuron=pn, synapse=s, lidocaine=lido) for i in VEC_p_lido]
     #VEC_p_model = [model_parameter(;stimulation=stim, nociceptor=j, projection_neuron=pn, synapse=s, lidocaine=i) for (i,j) in zip(VEC_p_lido,VEC_p_noci) ]
 
     fp = file_parameters(u0, duration, VEC_p_model, VEC_label, parameter_label
@@ -81,7 +81,7 @@ end
 
 function main()
 
-    DIV = "DIV0"
+    DIV = "DIV7"
 
     # -------- File name -------- #
 
@@ -90,8 +90,8 @@ function main()
 
     # -------- Launching options -------- #
 
-    with_simulations = false
-    make_plan = true
+    with_simulations = true
+    make_plan = false
     make_analyses = false
     rheobase = false
 
@@ -130,7 +130,7 @@ function main()
     stim_on = 300.0                    # ms
     stim_length = 1400.0               # ms
 
-    amp = 20.0
+    amp = 100.0
 
     n_pulse = 5
     is_activated = nothing

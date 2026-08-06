@@ -24,9 +24,7 @@ end
 function main()
 
     files = [
-            # "plan/DIV0_NMDA_inhib_m8_shift",
-            "plan/DIV0_shift_Mgblock_inhib_NMDA",
-            "plan/DIV0_NMDA_inhib_h8_shift",
+
             ]
 
     for file in files
@@ -38,7 +36,7 @@ function main()
         launch_from_file(file)
     end
 
-    #launch_from_file("shift/DIV7_h3_shift")
+    #launch_from_file("")
 
 end
 
