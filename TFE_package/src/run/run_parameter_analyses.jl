@@ -30,16 +30,16 @@ function plot_frequency_response(n_data::AnalyseData, pn_data::AnalyseData, VEC_
     size = (350, 250)
     size = (300, 200)
 
-    n_M_freq       = n_data.M_freq
+    n_M_freq       = n_data.M_peak_count
     n_M_pattern    = n_data.M_pattern
-    pn_M_freq       = pn_data.M_freq
+    pn_M_freq       = pn_data.M_peak_count
     pn_M_pattern    = pn_data.M_pattern
 
-    plt = plot(xlabel="DRG Frequency (Hz)", size=size, legendfontsize=4, legend=:bottomright)
-    ylabel!(plt, "DH Frequency (Hz)")
+    plt = plot(xlabel="DRG N spike count (-)", size=size, legendfontsize=4, legend=:bottomright)
+    ylabel!(plt, "PN spike count (-)")
 
-    #xlims!(plt, (0, 100), xticks=[0,20,40,60,80,100])
-    #ylims!(plt, (0, 300), yticks=[0,50,100,150,200,250,300])
+    # xlims!(plt, (0, 100), xticks=[0,20,40,60,80,100])
+    # ylims!(plt, (0, 300), yticks=[0,50,100,150,200,250,300])
     # xlims!(plt, (0, 100), xticks=[0,20,40,60,80,100])
     # ylims!(plt, (0, 60), yticks=[0,10,20,30,40,50,60])
     plt_DRG = plot(xlabel="DRG stimulation (pA)", ylabel= "DRG Frequency (Hz)", size=size)
@@ -51,7 +51,7 @@ function plot_frequency_response(n_data::AnalyseData, pn_data::AnalyseData, VEC_
 
 
         if spiking_filtering
-            binary_value  = ifelse.(2 .<= n_VEC_pattern .<= 4, 1, 0)
+            binary_value  = ifelse.(2 .<= n_VEC_pattern .<= 3, 1, 0)
             #binary_form  = markers_list[ ifelse.(n_VEC_pattern .< 4, 1, 5) ]
 
             VEC_afferent = n_VEC_freq[binary_value .== 1]

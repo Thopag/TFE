@@ -23,9 +23,7 @@ end
 
 function main()
 
-    files = [
-
-            ]
+    files = ["DIV7_baseline_2x_g7_no_g8"]
 
     for file in files
         println("-------------------------------------")
