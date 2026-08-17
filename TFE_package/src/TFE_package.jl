@@ -34,15 +34,4 @@ include("run/run_excitability_plan.jl")
 include("run/run_frequency_plan.jl")
 include("run/run_rheobase_bar.jl")
 
-# precompile(simulation, (Vector{Float64}, Tuple{Float64, Float64}, ModelParameters))
-
-# function warm_up()
-#     tspan = (0.0, 0.5)
-#     u0 = DIV0_u0()
-#     p_noci = DIV0_parameter()
-#     p_stim = stimulation_parameter(0.0; on=1.0, length=2.0)
-#     p_model = model_parameter(p_stim, p_noci)
-#     simulation(u0, tspan, p_model)
-# end
-
 end

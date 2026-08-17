@@ -64,7 +64,6 @@ function plot_bifurcation_analyses(results::BifurcationResults, analyse_r::Union
 
     # init plot
     xticks = results.param_min:30:results.param_max
-    #xlimits = (0.0, results.param_max)
     plt = plot(xlabel="amp (pA)", ylabel=" Voltage (mV)", legendfontsize=7, legend = :bottomleft, xticks=xticks, xlims=xlimits)
 
     # add legend

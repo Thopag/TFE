@@ -21,7 +21,6 @@ function used_simulation(p_model, u0, duration, with_nociceptor, with_projection
 
     if !isnothing(sol_pn)
         sol = sol_pn
-        sol = sol_n
     else
         sol = sol_n
     end
@@ -53,7 +52,7 @@ function plot_simulations(plt, p_model, sol_n, sol_pn, sol_s, i; color = nothing
         voltage = 1
         if voltage != 0
             yticks= [-90, -65, -40, 0, 30]
-            ylabel!(plt[voltage], "Voltage (mV)", ylims=(-100,50), yticks=yticks)
+            ylabel!(plt[voltage], "DRGN Voltage (mV)", ylims=(-100,50), yticks=yticks)
 
             plot!(plt[voltage], t, sol_n.V, color = something(color, :black), label=something(empty_label, ""), linewidth=1.0)
         end
@@ -70,24 +69,32 @@ function plot_simulations(plt, p_model, sol_n, sol_pn, sol_s, i; color = nothing
             # plot!(plt[currents], t, .- n_current.INaV1p7, color = something(color, gate_colors["m7"]), label= L"-I_{NaV1.7}")
             plot!(plt[currents], t, .- n_current.INaV1p8, color = gate_colors["m8"], label= L"-I_{NaV1.8}")
 
-            # plot!(plt[currents], t, n_current.IK_dr, color = gate_colors["ndr"], label= L"I_{K_{dr}}")
-            # plot!(plt[currents], t, n_current.IK_M, color = gate_colors["nM"], label= L"I_{K_M}")
-            # plot!(plt[currents], t, n_current.IK_AHP, color = gate_colors["zAHP"], label= L"I_{z_{AHP}}")
-            #plot!(plt[currents], t, n_current.ILeak, color = :black, label= L"I_{leak}")
-
             plot!(plt[currents], t, n_current.Iext, color = :black, linestyle=:dash, label= L"I_{ext}")
             #ylims!(plt[currents], ( - 0.05*maximum(n_current.Iext), 1.1*maximum(n_current.Iext)) )
-
-            ylims!(plt[currents], (-0.2, 1.25) )
         end
 
         gates = 0
         if gates != 0
-            var = L"h_7"
-            ylabel!(plt[gates], "$var (-)")
+            ylabel!(plt[gates], "Gate variables (-)", ylims=(-0.05,1.0))
 
-            plot!(plt[gates], t, sol_n.h7, color = something(color, gate_colors["h7"]), linestyle=:dash, label="")
+            # Sodium
+            plot!(plt[gates], t, sol_n.m3, color = something(color, gate_colors["m3"]), linestyle=gate_styles["m3"], label=L"m_3")
+            plot!(plt[gates], t, sol_n.h3, color = something(color, gate_colors["h3"]), linestyle=gate_styles["h3"], label=L"h_3")
 
+            plot!(plt[gates], t, sol_n.m7, color = something(color, gate_colors["m7"]), linestyle=gate_styles["m7"], label=L"m_7")
+            plot!(plt[gates], t, sol_n.h7, color = something(color, gate_colors["h7"]), linestyle=gate_styles["h7"], label=L"h_7")
+
+            plot!(plt[gates], t, sol_n.m8, color = something(color, gate_colors["m8"]), linestyle=gate_styles["m8"], label=L"m_8")
+            plot!(plt[gates], t, sol_n.h8, color = something(color, gate_colors["h8"]), linestyle=gate_styles["h8"], label=L"h_8")
+
+            ylabel!(plt[gates+1], "Gate variables (-)", ylims=(-0.05,1.0))
+
+            # Potassium
+            plot!(plt[gates+1], t, sol_n.ndr, color = something(color, gate_colors["ndr"]), linestyle=gate_styles["ndr"], label=L"n_{dr}")
+            plot!(plt[gates+1], t, sol_n.ldr, color = something(color, gate_colors["ldr"]), linestyle=gate_styles["ldr"], label=L"l_{dr}")
+
+            plot!(plt[gates+1], t, sol_n.nM, color = something(color, gate_colors["nM"]), linestyle=gate_styles["mM"], label=L"n_M")
+            plot!(plt[gates+1], t, sol_n.zAHP, color = something(color, gate_colors["zAHP"]), linestyle=gate_styles["zAHP"], label=L"z_{AHP}")
         end
 
         instant_freq = 0
@@ -111,10 +118,10 @@ function plot_simulations(plt, p_model, sol_n, sol_pn, sol_s, i; color = nothing
         pn_current = retrieve_projection_neuron_currents(sol_pn, p_model)
         pn = p_model.projection_neuron
 
-        voltage = 0
+        voltage = 3
         if voltage != 0
             yticks= [-90, -65, -40, 0, 30]
-            ylabel!(plt[voltage], "DH Voltage (mV)", ylims=(-100,50), yticks=yticks)
+            ylabel!(plt[voltage], "PrjN Voltage (mV)", ylims=(-100,50), yticks=yticks)
 
             # if i == 1 
             #     vline!(plt[voltage], sol_n.t_spikes, color=:red, linestyle=:dash, alpha=0.6, label="")
@@ -122,10 +129,24 @@ function plot_simulations(plt, p_model, sol_n, sol_pn, sol_s, i; color = nothing
             plot!(plt[voltage], t, sol_pn.V, color = something(color, :black), label=something(empty_label, ""), linewidth=1.0)
         end
 
+        gates = 0
+        if gates != 0
+            ylabel!(plt[gates], "Gate variables (-)", ylims=(-0.05,1.0))
+            # plot!(plt[gates], t, sol_pn.mNa, color = something(color, gate_colors["mNa"]), linestyle=gate_styles["mNa"], label=L"m_{Na}")
+            # plot!(plt[gates], t, sol_pn.hNa, color = something(color, gate_colors["hNa"]), linestyle=gate_styles["hNa"], label=L"h_{Na}")
+
+            # ylabel!(plt[gates+1], "Gate variables (-)", ylims=(-0.05,1.0))
+            # plot!(plt[gates+1], t, sol_pn.mdr, color = something(color, gate_colors["mdr"]), linestyle=gate_styles["mdr"], label=L"m_{dr}")
+            # plot!(plt[gates+1], t, sol_pn.mir, color = something(color, gate_colors["mir"]), linestyle=gate_styles["mir"], label=L"m_{ir}")
+
+            plot!(plt[gates], t, sol_pn.mLs, color = something(color, gate_colors["mLs"]), linestyle=gate_styles["mLs"], label=L"m_{Ls}")
+            plot!(plt[gates], t, sol_pn.hLs, color = something(color, gate_colors["hLs"]), linestyle=gate_styles["hLs"], label=L"h_{Ls}")
+        end
+
         instant_freq = 0
         if instant_freq != 0
             t_spikes = sol_pn.t_spikes
-            ylabel!(plt[instant_freq], "PN Instant frequency (Hz)")
+            ylabel!(plt[instant_freq], "PrjN Instant frequency (Hz)")
             freqs = instant_freqs(t_spikes)
             freq, pattern = get_excitability(t_spikes, p_model.stimulation.off)
 
@@ -139,27 +160,7 @@ function plot_simulations(plt, p_model, sol_n, sol_pn, sol_s, i; color = nothing
         if Ca != 0
             temp = L"[Ca^{2+}]_i"
             ylabel!(plt[Ca], "$temp (mM)")
-
-            # if i == 1 
-            #     vline!(plt[Ca], sol_n.t_spikes, color=:red, linestyle=:dash, alpha=0.6, label="")
-            # end
             plot!(plt[Ca], t, sol_pn.Ca_i, color = something(color, :black), label=something(empty_label, ""))
-        end
-
-        currents = 0
-        if currents != 0
-            ylabel!(plt[currents], "Current (µA/cm2)")
-
-            plot!(plt[currents], t, pn_current.Iext, color = :black, label=L"I_{ext}", linewidth=1.5, linestyle=:dash, alpha=1.0)
-            #plot!(plt[currents], t, pn_current.INa, color = :red, label=L"I_{Na}", alpha=0.7)
-            ylims!(plt[currents], (-15, 10))
-        end
-
-        r = 0
-        if r != 0
-            Ca_o = p_model.projection_neuron.Ca_o
-            y = ghk_LeFranc.(sol_pn.V, sol_pn.Ca_i, Ca_o)
-            plot!(plt[r], t, y, color = something(color, :black), label=something(empty_label, ""))
         end
 
     end
@@ -169,69 +170,35 @@ function plot_simulations(plt, p_model, sol_n, sol_pn, sol_s, i; color = nothing
         t = sol_s.t
         s_current = retrieve_synapse_currents(sol_s, p_model)
 
-        # bin_centers, counts = compute_ccg(sol_n.t_spikes, sol_pn.t_spikes; bin_width=1.0, window=50.0)
-        # plt_corr = plot(bin_centers, counts)
-        # savefig(plt_corr, "plots/simulation/corr.pdf")
-
         currents = 0
         if currents != 0
-            var = L"I_{syn}"
             ylabel!(plt[currents], "Current (µA/cm2)")
-
-            # if i == 1 
-            #     vline!(plt[currents], sol_n.t_spikes, color=:red, linestyle=:dash, alpha=0.6, label="")
-            # end
-
-            ICa_i = pn_current.ICa_Lf .+ pn_current.ICa_Ls
             Isyn = s_current.INMDA .+ s_current.IAMPA
-
             plot!(plt[currents], t, Isyn, color = something(color, :black), linestyle=:dash, label=L"I_{syn}", alpha=0.9)
-
-            #plot!(plt[currents], t, ICa_i, color = something(color, :green), label=something(empty_label, "ICa_i"))
             plot!(plt[currents], t, s_current.IAMPA, color = something(color, :purple), label=L"I_{AMPA}", alpha=0.7) 
             plot!(plt[currents], t, s_current.INMDA, color = something(color, :blue), label=L"I_{NMDA}", alpha=0.7) 
-            
-            #plot!(plt[currents], t, ICa_i, color = :green, label=L"I_{[Ca^{2+}]_i}", alpha=0.5) 
-
-            #plot!(plt[currents], t, pn_current.INa, color = :red, label=L"I_{Na}", alpha=0.7)
-            #ylims!(plt[currents], (-15, 10))
         end
 
-        channel = 0
+        channel = 2
         if channel != 0
             ylabel!(plt[channel], "Gates Availability (-)")
             plot!(plt[channel], legend=:topright)
 
-            availability_NMDA = (sol_s.B_NMDA .- sol_s.A_NMDA) # .* NMDA_Mg_block.(sol_pn.V)
+            availability_NMDA = (sol_s.B_NMDA .- sol_s.A_NMDA) .* NMDA_Mg_block.(sol_pn.V)
             plot!(plt[channel], t, availability_NMDA, color = :blue, label="NMDA", alpha=1.0) 
 
             availability_AMPA = sol_s.B_AMPA .- sol_s.A_AMPA
             plot!(plt[channel], t, availability_AMPA, color = :purple, label="AMPA", alpha=1.0) 
-
         end
     end
 
     # --------------------- STIMULATION --------------------- #
-
-    y_positions = [0, 1]
-    y_labels = ["off", "on"]
-
-    stim_binary = 0
-    if stim_binary != 0
-        amp = p_model.stimulation.amp
-        is_activated = p_model.stimulation.is_activated
-        ylabel!(plt[stim_binary], "")
-        plot!(plt[stim_binary], t, is_activated.(t) .* 1, color= something(color, :black), label=something(empty_label, "")
-                                    , xticks=[300.0, 1700.0], yticks = (y_positions, y_labels), ylims=(-0.2,1.2))
-    end
-
     stim_pA = 0
     if stim_pA != 0
         amp = p_model.stimulation.amp
         is_activated = p_model.stimulation.is_activated
         ylabel!(plt[stim_pA], "Stimulation (pA)")
-        plot!(plt[stim_pA], t, is_activated.(t) .* amp, color= something(color, :black), label=something(empty_label, "")
-                                    , yticks = [6.5, 9.5], xticks=[300])
+        plot!(plt[stim_pA], t, is_activated.(t) .* amp, color= something(color, :black), label=something(empty_label, ""))
     end
 end
 
@@ -245,12 +212,8 @@ function make_simulations(VEC_p_model, u0, duration, VEC_label, DIV, with_nocice
     println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
     println("")
 
-    n_fig = 1
-    #size = (750, 175*n_fig)
-    #size = (600, 175*n_fig)
+    n_fig = 3
     size = (450, 175*n_fig)
-    #size = (250, 175*n_fig)
-    #size = (300, 150*n_fig)
 
     x_label_size = 10
     y_label_size = 10
@@ -259,18 +222,14 @@ function make_simulations(VEC_p_model, u0, duration, VEC_label, DIV, with_nocice
     y_tick_size = 8
 
     # Simulation plot
-    xlimits = (0.0, duration)
     xlimits = (275.0, duration)
-    #xlimits = (350.0, duration)
-    xticks = :native #[xlimits[1], xlimits[end]]
+    xticks = :native
     plt = plot(layout = (n_fig, 1), link = :x, xlims=xlimits, size = size, xaxis = nothing, left_margin = 5mm,bottom_margin = 5mm, margin = 5mm)
     plot!(plt[end], xaxis = "Time (ms)", xticks=xticks)
 
     for i in 1:(n_fig)
         plot!(plt[i], xticks=xticks, xtickfontsize = x_tick_size, xguidefontsize = x_label_size)
         plot!(plt[i], ytickfontsize = y_tick_size, yguidefontsize = y_label_size)
-
-        #plot!(plt[i], legend=false)
         plot!(plt[i], legendfontsize=6)
     end
 
@@ -278,12 +237,6 @@ function make_simulations(VEC_p_model, u0, duration, VEC_label, DIV, with_nocice
         plot!(plt[i], xformatter = _ -> "")
     end
     
-    # size=(450, 150)
-    # Freq plot
-    p_freq = plot(xaxis = "Time (ms)", yaxis = "DRG Instant frequency (Hz)", xticks=xticks, xlims=xlimits)
-    plot!(p_freq, yguidefontsize = 7, legendfontsize=7, size=(size[1], 175), left_margin = 5mm,bottom_margin = 5mm, margin = 5mm)
-    plot!(p_freq, xformatter = _ -> "", xaxis = "")
-
     L = length(VEC_p_model)
     if L > 1
         VEC_color = palette(:rainbow, L)
@@ -295,41 +248,20 @@ function make_simulations(VEC_p_model, u0, duration, VEC_label, DIV, with_nocice
         
             println("---- plot ----")
             plot_simulations(plt, p_model, sol_n, sol_pn, sol_s, i; color = color, label = label)
-
             println("----------------------------------------") 
         end
     else # if L == 1
 
         p_model = VEC_p_model[1]
-
         println("-------------- Single ---------------")
         sol_n, sol_pn, sol_s, t_spikes, freqs = used_simulation(p_model, u0, duration, with_nociceptor, with_projection_neuron)
 
         println("---- plot ----")
         plot_simulations(plt, p_model, sol_n, sol_pn, sol_s, 1)
-
-        amp = VEC_p_model[1].stimulation.amp
-        #annotate_amp(plt[1], amp)
-
-        if length(freqs) > 1
-            plot!(p_freq, t_spikes[1:end-1], freqs, color=:black, label="", marker=:circle, markersize=2, markerstrokecolor = :match, markerstrokewidth = 0.0)
-        end
         println("----------------------------------------") 
-        #plot_spikes(p_model, sol_n, sol_pn, sol_s, file_prefix)
     end
 
-    #savefig(plt, "plots/simulation/$(file_prefix).png")
     savefig(plt, "plots/simulation/$(file_prefix).pdf")
-    #savefig(p_freq, "plots/simulation/$(file_prefix)_freqs.pdf")
-
-    l = @layout [
-        a{0.3h}
-        b{0.7h}
-    ]
-    #merge = plot(p_freq, plt, layout = l, size = (size[1], 1.5*size[2]), link = :x)
-    #savefig(merge, "plots/simulation/$(file_prefix)_merge.pdf")
-
-    println("Save Plots in [plots/simulation/$(file_prefix)]")
     return
 end
 

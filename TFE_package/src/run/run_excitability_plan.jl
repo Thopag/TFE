@@ -50,10 +50,6 @@ function plot_data_excitability_plan(pp::PlanParameters, results::ExcitabilityPl
         row_label = pp.col_label 
         col_label = pp.row_label
 
-        # var = L"h_{8, \infty}"
-        # var2 = L"m_{8, \infty}"
-        # row_label = "Shift 40% $(var) and 60% $(var2) (mV)"
-
         VEC_amp = results.VEC_amp
 
         M_rheobase = transpose(data.M_rheobase)
@@ -92,13 +88,13 @@ end
 function plot_excitability_plan(pp::PlanParameters, results::ExcitabilityPlanResults; file_prefix = "default")
 
     if !isnothing(results.nociceptor)
-        #plot_data_excitability_plan(pp, results, results.nociceptor, "$(file_prefix)_nociceptor")
+        plot_data_excitability_plan(pp, results, results.nociceptor, "$(file_prefix)_nociceptor")
     else
         println("(plot_excitability_plan) No nociceptor")
     end
 
     if !isnothing(results.projection_neuron)
-        #plot_data_excitability_plan(pp, results, results.projection_neuron, "$(file_prefix)_projection_neuron")
+        plot_data_excitability_plan(pp, results, results.projection_neuron, "$(file_prefix)_projection_neuron")
     else
         println("(plot_excitability_plan) No projection neuron")
     end

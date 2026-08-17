@@ -1,4 +1,4 @@
-export reponse_time, plot_SS_function, plot_tau_function, plot_availability, GHK_plot, SS_shift_plot, legend, plot_lido_inhib, random_plot
+export reponse_time, plot_SS_function, plot_tau_function, plot_availability, GHK_plot, SS_shift_plot, legend, plot_lido_inhib, Mgblock_plot
 
 const pattern_list   = ["No spike"    , "Single spike", "Two spikes", "Transient" , "Spiking" ]
 const markers_list   = [:circle       , :utriangle    , :dtriangle  , :diamond    , :square   ]
@@ -54,8 +54,6 @@ function plot_SS_function(; file_prefix = "default")
 
     V = -120.0:0.5:60.0
     xticks = [-120, -90, -60, -30, 0, 30, 60]
-
-    # In the futur : add the adaptation with p_model
 
     p_n = plot(xlabel="Voltage (mV)", ylabel= "(-)", legendfontsize=11, legend=:right
                                         , xticks = xticks)
@@ -277,7 +275,7 @@ function legend()
     savefig(plt, "plots/default/legend.pdf")
 end
 
-function random_plot()
+function Mgblock_plot()
 
     V = -100.0:0.5:45.0
     xticks = [-120, -90, -60, -30, 0, 30, 60]

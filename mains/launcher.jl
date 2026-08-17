@@ -20,10 +20,10 @@ function get_file_parameter(u0, duration, DIV, p_stim, nociceptor_parameter, wit
 
     # -------- Create the VEC_p_model -------- #
 
-    n = nociceptor_parameter(;g_NaV1p8 = 0.0, g_NaV1p3 = 0.0, g_NaV1p7 = 0.0)
+    n = nociceptor_parameter(;)
     pn = projection_neuron_parameter(;)
     s = synapse_parameter(;)
-    lido = lidocaine_parameter(;) #shift_m8 = 1.0 * 15.0, with_shift = false)
+    lido = lidocaine_parameter(;)
     stim = p_stim
 
     VEC_p_stim = [change_stimulation_amp(amp, stim) for amp in VEC_inter_parameter]
@@ -96,7 +96,7 @@ function main()
     rheobase = false
 
     with_nociceptor = true
-    with_projection_neuron = false
+    with_projection_neuron = true
 
     # -------- PARAMETER SET TYPE -------- #
 
@@ -126,11 +126,11 @@ function main()
 
     # -------- Stimulation -------- #
 
-    duration = 450.0                   # ms
+    duration = 500.0                   # ms
     stim_on = 300.0                    # ms
     stim_length = 1400.0               # ms
 
-    amp = 300.0
+    amp = 60.0
 
     n_pulse = 5
     is_activated = nothing

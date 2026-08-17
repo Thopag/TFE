@@ -1,6 +1,0 @@
-{
-    "workbench.colorTheme": "Light+",
-    // "julia.executablePath": "C:\\Users\\ana2d\\.julia\\juliaup\\julia-1.10.2+0.x64.w64.mingw32\\bin\\julia.exe",
-    // "julia.languageServerExecutablePath": "C:\\Users\\ana2d\\.julia\\juliaup\\julia-1.10.2+0.x64.w64.mingw32\\bin\\julia.exe",
-    "julia.environmentPath": ".vscode/env"
-}

@@ -107,7 +107,6 @@ end
 @inline lidocain_1_8_channel(D) = hill(D, 0.9698, 118.31, 1.06, 4.78 / 100)
 
 # From Sheets et al. 2008
-@inline lidocain_1_3_inact_inib(D) = hill(D, 0.949, 284, 0.48, 0)
 @inline lidocain_1_3_resting_inib(D) = hill(D, 0.997, 1462, 1.35, 0)
 
 # From Sugimote et al. 2003
