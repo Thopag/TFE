@@ -14,6 +14,6 @@ The code is divided into two primary directories:
 * **`mains/`**: Contains execution scripts that should be run after setting up the environment.
 * **`TFE_package/`**: Contains the core codebase responsible for running simulations, processing results, and generating plots.
 
-> **Setup:** Make sure to initialize the environment using [`setup.jl`](TFE\TFE_package\setup.jl) before running scripts in `mains/`.
+> **Setup:** Make sure to initialize the environment using [`setup.jl`](TFE_package/setup.jl) before running scripts in `mains/`.
 
-For detailed information about the internal package structure, see the [TFE_package README](TFE_package\src\README.md).
+For detailed information about the internal package structure, see the [TFE_package README](TFE_package/src/README.md).
