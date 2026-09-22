@@ -1,14 +1,3 @@
-## Structure
-
-```text
-TFE_package/src/
-├── TFE_package.jl
-├── ploting.jl
-├── system/
-├── tools/
-└── run/
-
-```
 
 ### Core Files
 
