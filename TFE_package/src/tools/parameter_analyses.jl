@@ -8,7 +8,6 @@ struct AnalyseData
     VEC_rheobase::Vector{Union{Nothing,Float32}}
 end
 
-
 struct AnalyseResults
     nociceptor::Union{Nothing,AnalyseData}
     projection_neuron::Union{Nothing,AnalyseData}

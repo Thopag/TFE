@@ -2,9 +2,6 @@
 function load_file(file)
 
     println("Loading...")
-    
-    # Old command to load
-    # @time data = load("JLD2_save/$(file).jld2")
 
     # Mute the warning about function loading
     data = with_logger(ConsoleLogger(stderr, Logging.Error)) do
@@ -20,8 +17,6 @@ function load_file(file)
 
     analyse_r       = data["analyse_r"]
     bifurcation_r   = data["bifurcation_r"]
-    DIC_r           = data["DIC_r"]
-    SS_current_r    = data["SS_current_r"]
     plan_exct       = data["plan_exct"]
     plan_freq       = data["plan_freq"]
 
@@ -29,23 +24,23 @@ function load_file(file)
 
     println("--- Loaded [$(file).jld2] ---")
     println("")
-    return fp, pp, analyse_r, bifurcation_r, DIC_r, SS_current_r, plan_exct, plan_freq
+    return fp, pp, analyse_r, bifurcation_r, plan_exct, plan_freq
 end
 
-function save(file; fp=nothing, pp=nothing, analyse_r=nothing, bifurcation_r=nothing, DIC_r=nothing, SS_current_r=nothing, plan_exct=nothing, plan_freq=nothing)
+function save(file; fp=nothing, pp=nothing, analyse_r=nothing, bifurcation_r=nothing, plan_exct=nothing, plan_freq=nothing)
 
     println("")
     println("----------- Start Saving -----------")
     # Mute the warning about function saving
     with_logger(ConsoleLogger(stderr, Logging.Error)) do
-        @time jldsave("JLD2_save/$(file).jld2"; fp, pp, analyse_r, bifurcation_r, DIC_r, SS_current_r, plan_exct, plan_freq)
+        @time jldsave("JLD2_save/$(file).jld2"; fp, pp, analyse_r, bifurcation_r, plan_exct, plan_freq)
     end
     println("----------- Finish Saving -----------")
 end
 
 # ------------------------- Analyses ------------------------ #
 
-function launch_analyses(fp, analyse_r, bifurcation_r, DIC_r, SS_current_r)
+function launch_analyses(fp, analyse_r, bifurcation_r)
 
     if isnothing(fp)
         println("(launch_analyses) NO FP")
@@ -76,31 +71,12 @@ function launch_analyses(fp, analyse_r, bifurcation_r, DIC_r, SS_current_r)
     #     println("bifurcation_r was already done")
     # end
 
-    # if isnothing(DIC_r)
-    #     DIC_r = run_DIC_analyses(fp)
-    # else
-    #     println("DIC_r was already done")
-    # end
-
-    # if isnothing(SS_current_r)
-    #     SS_current_r = run_SS_current_analyses(fp) 
-    # else
-    #     println("SS_current_r was already done")
-    # end
-    return analyse_r, bifurcation_r, DIC_r, SS_current_r
+    return analyse_r, bifurcation_r
 end
 
-function plot_analyses(fp, analyse_r, bifurcation_r, DIC_r, SS_current_r, file_prefix)
+function plot_analyses(fp, analyse_r, bifurcation_r, file_prefix)
 
     println("----------- Start Ploting Analyses -----------")
-
-    # # SS_current_analyses
-    # if !isnothing(SS_current_r)
-    #     plot_SS_current_analyses(SS_current_r, fp; file_prefix = file_prefix)
-    #     println("SS_current_analyses done")
-    # else
-    #     println("No SS_current_analyses")
-    # end
 
     # parameter_analyses
     if !isnothing(analyse_r)

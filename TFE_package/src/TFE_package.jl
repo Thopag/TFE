@@ -15,19 +15,14 @@ include("tools/file_saving_parameters.jl")
 
 include("tools/parameter_analyses.jl")
 include("tools/bifurcation.jl")
-include("tools/DIC.jl")
-include("tools/SS_currents.jl")
 include("tools/excitability_plan.jl")
 include("tools/frequency_plan.jl")
-include("tools/isolate_spikes.jl")
 
 # RUNS
 include("run/run_simulations.jl")
 
 include("run/run_parameter_analyses.jl")
 include("run/run_bifurcation_analyses.jl")
-include("run/run_DIC_analyses.jl")
-include("run/run_SS_current_analyses.jl")
 include("run/run_excitability_plan.jl")
 include("run/run_frequency_plan.jl")
 include("run/run_rheobase_bar.jl")

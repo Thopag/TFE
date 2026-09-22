@@ -51,11 +51,11 @@ function main()
     file = "plan/DIV0_inhib_NaV1.8_shift"
     start = 5
 
-    fp, pp, analyse_r, bifurcation_r, DIC_r, SS_current_r, plan_exct, plan_freq = load_file(file)
+    fp, pp, analyse_r, bifurcation_r, plan_exct, plan_freq = load_file(file)
 
     file = file[start:end]
 
-    plot_analyses(fp, analyse_r, bifurcation_r, DIC_r, SS_current_r, file)
+    plot_analyses(fp, analyse_r, bifurcation_r, file)
     plot_plan(pp, plan_exct, plan_freq, file)
 end
 

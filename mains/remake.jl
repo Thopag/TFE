@@ -33,21 +33,21 @@ end
 
 function remake(file)
 
-    fp, pp, analyse_r, bifurcation_r, DIC_r, SS_current_r, plan_exct, plan_freq = load_file(file)
+    fp, pp, analyse_r, bifurcation_r, plan_exct, plan_freq = load_file(file)
 
     # results = nothing to force the remake
 
     if !isnothing(fp)
         file, fp = change_fp(file, fp)
         analyse_r = nothing
-        save(file; fp=fp, analyse_r=analyse_r, bifurcation_r=bifurcation_r, DIC_r=DIC_r, SS_current_r=SS_current_r)
+        save(file; fp=fp, analyse_r=analyse_r, bifurcation_r=bifurcation_r)
     else
         println("No fp")
     end
 
     if !isnothing(pp)
         file, pp = change_pp(file, pp)
-        #save(file; pp=pp, plan_exct=plan_exct, plan_freq=plan_freq)
+        save(file; pp=pp, plan_exct=plan_exct, plan_freq=plan_freq)
     else
         println("No pp")
     end

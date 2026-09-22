@@ -115,8 +115,6 @@ function main()
     fp = nothing
     analyse_r = nothing
     bifurcation_r = nothing
-    DIC_r = nothing
-    SS_current_r = nothing
     plan_exct = nothing
     plan_freq = nothing
 
@@ -154,9 +152,9 @@ function main()
         #plot_plan(pp, plan_exct, plan_freq, file)
     end
     if make_analyses
-        analyse_r, bifurcation_r, DIC_r, SS_current_r = launch_analyses(fp, analyse_r, bifurcation_r, DIC_r, SS_current_r)
-        save(file; fp=fp, analyse_r=analyse_r, bifurcation_r=bifurcation_r, DIC_r=DIC_r, SS_current_r=SS_current_r)
-        plot_analyses(fp, analyse_r, bifurcation_r, DIC_r, SS_current_r, file)
+        analyse_r, bifurcation_r = launch_analyses(fp, analyse_r, bifurcation_r)
+        save(file; fp=fp, analyse_r=analyse_r, bifurcation_r=bifurcation_r)
+        plot_analyses(fp, analyse_r, bifurcation_r, file)
     end
     if rheobase
         run_rheobase_bar(fp.VEC_p_model, u0, duration, fp.VEC_label, fp.parameter_label; file = file)

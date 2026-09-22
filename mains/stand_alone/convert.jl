@@ -62,13 +62,11 @@ function convert(file)
     end
     analyse_r       = data["analyse_r"]
     bifurcation_r   = data["bifurcation_r"]
-    DIC_r           = data["DIC_r"]
-    SS_current_r    = data["SS_current_r"]
     plan_exct       = data["plan_exct"]
     plan_freq       = data["plan_freq"]
 
     close(data)
-    re_save(file; fp=fp, pp=pp, analyse_r=analyse_r, bifurcation_r=bifurcation_r, DIC_r=DIC_r, SS_current_r=SS_current_r, plan_exct=plan_exct, plan_freq=plan_freq)
+    re_save(file; fp=fp, pp=pp, analyse_r=analyse_r, bifurcation_r=bifurcation_r, plan_exct=plan_exct, plan_freq=plan_freq)
     return 
 end
 
