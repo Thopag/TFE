@@ -1,4 +1,5 @@
 
+# --------------------------- Ca_Ls --------------------------- #
 
 function mLs_inf(V)
 	## Based on LeFrancLeMasson2010 --> m_inf =  -0.0048+(1.0257/(1+exp(-(V-(-20.4565))/4))^0.4731) #paper values

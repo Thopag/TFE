@@ -1,4 +1,5 @@
 
+# --------------------------- AMPA --------------------------- #
 
 function dot_A_AMPA(A_AMPA, tau_rise_AMPA)
     return -A_AMPA/tau_rise_AMPA

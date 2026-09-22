@@ -48,8 +48,8 @@ function main()
     # plan
     # start = 5
 
-    file = "DIV7_baseline_2x_g7_no_g8"
-    start = 1
+    file = "plan/DIV0_inhib_NaV1.8_shift"
+    start = 5
 
     fp, pp, analyse_r, bifurcation_r, DIC_r, SS_current_r, plan_exct, plan_freq = load_file(file)
 

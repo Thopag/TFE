@@ -1,4 +1,5 @@
 
+# --------------------------- K_M --------------------------- #
 
 function mM_inf(V)
 	## Inspired from Kv7.2 Micelli #mK72inf_Micelli

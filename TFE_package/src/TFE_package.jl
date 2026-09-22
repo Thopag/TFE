@@ -9,7 +9,6 @@ include("system/model_parameters.jl")
 include("system/nociceptor/simulation.jl")
 include("system/projection_neuron/simulation.jl")
 include("system/with_synapse/simulation.jl")
-include("system/test_n1_n2/simulation.jl")
 
 include("tools/excitability.jl")
 include("tools/file_saving_parameters.jl")
@@ -20,7 +19,6 @@ include("tools/DIC.jl")
 include("tools/SS_currents.jl")
 include("tools/excitability_plan.jl")
 include("tools/frequency_plan.jl")
-include("tools/correlogram.jl")
 include("tools/isolate_spikes.jl")
 
 # RUNS

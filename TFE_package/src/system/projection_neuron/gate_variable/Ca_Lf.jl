@@ -1,4 +1,5 @@
 
+# --------------------------- Ca_Lf --------------------------- #
 
 function mLf_inf(V)
 	## Based on LeFrancLeMasson2010 --> m_inf = -0.0012 + (1.0029/(1+exp((-(V+14.3907))/3.1029  #paper values without the typo (V1/2~-14, not the opposite)

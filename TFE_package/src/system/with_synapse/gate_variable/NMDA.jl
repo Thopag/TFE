@@ -1,4 +1,5 @@
 
+# --------------------------- NMDA --------------------------- #
 
 function dot_A_NMDA(A_NMDA, tau_rise_NMDA)
     return -A_NMDA/tau_rise_NMDA

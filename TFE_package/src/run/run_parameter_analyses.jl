@@ -91,7 +91,7 @@ function plot_data_analyse(data::AnalyseData, VEC_label, VEC_amp, inter_axe_labe
     # [1,4,6,8,10,12,14] inhib
     # [1,3,5,7,9,11]
     # 1:length(VEC_label)
-    take_idx = 1:length(VEC_label)
+    take_idx = [1,4]
 
     L = length(take_idx)
     VEC_color = palette(:rainbow, L)
@@ -102,7 +102,7 @@ function plot_data_analyse(data::AnalyseData, VEC_label, VEC_amp, inter_axe_labe
     xticks = VEC_amp[1]:50:VEC_amp[end]
     
     p_peaks   = plot(xlabel=amp_label, ylabel= "Peak count (-)", xticks=xticks)
-    p_freqs   = plot(xlabel=amp_label, ylabel= "Frequency (Hz)" , xticks=xticks) #, size = (400, 250))
+    p_freqs   = plot(xlabel=amp_label, ylabel= "Frequency (Hz)" , xticks=xticks, size = (400, 250))
     p_height  = plot(xlabel=amp_label, ylabel= "Height (mV)"    , xticks=xticks)
     p_width   = plot(xlabel=amp_label, ylabel= "Width (ms)"     , xticks=xticks)
 
@@ -112,7 +112,7 @@ function plot_data_analyse(data::AnalyseData, VEC_label, VEC_amp, inter_axe_labe
                                                                                                 )#, size = (400, 200))
 
     p_pattern = plot(left_margin = 5mm,bottom_margin = 5mm, margin = 5mm)
-    #plot!(p_pattern, xtickfontsize = 8, xguidefontsize = 11, yguidefontsize = 9, size = (350, 175))
+    plot!(p_pattern, xtickfontsize = 8, xguidefontsize = 11, yguidefontsize = 9, size = (350, 175))
     plot!(p_pattern, xticks=xticks, xlabel=amp_label, ylabel=inter_axe_label, yticks = (1:length(take_idx), VEC_label[take_idx]))
 
     # Add color legend
@@ -175,8 +175,8 @@ function plot_data_analyse(data::AnalyseData, VEC_label, VEC_amp, inter_axe_labe
 
     # --- save --- #
 
-    savefig(p_peaks, "plots/default/$(file_prefix)_peaks-curve.pdf")
-    savefig(p_freqs, "plots/default/$(file_prefix)_F-I-curve.pdf")
+    #savefig(p_peaks, "plots/default/$(file_prefix)_peaks-curve.pdf")
+    savefig(p_freqs, "plots/default/$(file_prefix)_F-I-curve.svg")
     # savefig(p_height, "plots/default/$(file_prefix)_first_height.pdf")
     # savefig(p_width, "plots/default/$(file_prefix)_first_width.pdf")
 

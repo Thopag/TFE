@@ -1,3 +1,10 @@
+"""
+###     This file contains the different parameter structures
+###     and the functions to create instances of these structures.
+###
+###     Where here the "parameters" refer mostly to numerical constants used in equations
+"""
+
 export multiple_pulse, stimulation_parameter, change_stimulation_amp, noise_parameter, model_parameter, from_model_parameter, indexes_parameter
 
 include("lidocaine.jl")
@@ -25,8 +32,14 @@ function multiple_pulse(;T=150.0, n_pulse=6, start=500.0, length=75.0)
     return is_activated
 end
 
+# Function to create a StimulationParameters instance
+# By default, it creates a constante step input current starting 
+# starting from "on" during "length" ms
+#
+# A custom activation function can by directly given by the "is_act" arg
+#
 function stimulation_parameter(amp::Float64;
-    Ihold::Float64 = 0.0,              # [pA]     # Note: In original model, Ihold = -3.0 for DIV0 and 0.0 for DIV7
+    Ihold::Float64 = 0.0,              # [pA]
     on::Float64 = 300.0,               # [ms]
     length::Float64 = 1400.0,           # [ms]
     is_act = nothing
@@ -46,6 +59,7 @@ function stimulation_parameter(amp::Float64;
     return stimulation
 end
 
+# Recreate a new instance where only the amplitude of the stimulation is modified
 function change_stimulation_amp(amp::Float64, stim::StimulationParameters)
     return StimulationParameters(amp, stim.Ihold, stim.on, stim.off, stim.is_activated)
 end
@@ -75,6 +89,10 @@ end
 
 # --------------- DATA SAVING --------------- #
 
+#
+# Structure to save the timing and amplitude of 
+# the afferent and response spikes
+#
 struct SavedEvents
     n_t_spikes::Vector{Float64}
     n_V_spikes::Vector{Float64}
@@ -139,6 +157,10 @@ function model_parameter(;
     return ModelParameters(stim, n, pn, s, lido, new_noise, saved_events, new_idx)
 end
 
+#
+# Recreate a new instance of ModelParameters from another one
+# while updating with the given parameter structs
+#
 function from_model_parameter(p_model::ModelParameters; 
                     stimulation::Union{Nothing,StimulationParameters}              = nothing,
                     nociceptor::Union{Nothing,NociceptorParameters}                = nothing,

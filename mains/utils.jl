@@ -110,13 +110,13 @@ function plot_analyses(fp, analyse_r, bifurcation_r, DIC_r, SS_current_r, file_p
         println("No analyse_r")
     end
 
-    # # bifurcation_current_analyses
-    # if !isnothing(bifurcation_r)
-    #     plot_bifurcation_analyses(bifurcation_r, analyse_r, fp; file_prefix = file_prefix)
-    #     println("bifurcation_analyses done")
-    # else
-    #     println("No bifurcation_analyses")
-    # end
+    # bifurcation_current_analyses
+    if !isnothing(bifurcation_r)
+        plot_bifurcation_analyses(bifurcation_r, analyse_r, fp; file_prefix = file_prefix)
+        println("bifurcation_analyses done")
+    else
+        println("No bifurcation_analyses")
+    end
 
     println("----------- End Ploting Analyses -----------")
     return

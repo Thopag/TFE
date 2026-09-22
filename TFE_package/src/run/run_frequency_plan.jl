@@ -80,9 +80,9 @@ end
 
 function plot_data_frequency_plan(pp::PlanParameters, results::FrequencyPlanResults, data::FrequencyPlanData, exct_data::Union{Nothing,ExcitabilityPlanData}, file_prefix)
 
-    reverse = false
+    reverse = true
     spiking_filter = true
-    with_lido_traj = false
+    with_lido_traj = true
 
     if spiking_filter
         if !isnothing(exct_data)
@@ -97,11 +97,11 @@ function plot_data_frequency_plan(pp::PlanParameters, results::FrequencyPlanResu
     # [1,4,6,8,10,12,14] inhib
     # [1,3,5,7,9,11]
     # 1:length(VEC_amp)
-    take_idx = [2,6,8,14]
+    take_idx = [8]
     
     cs = get(colorschemes[:rainbow], range(0.01, 0.99, length=256))
     cmap = cgrad(cs, 25, categorical = false)
-    clip = (0.0, 300.0)
+    clip = (0.0, 225.0)
     m = 400
     size = (1.05 * m, m)
 
@@ -169,7 +169,7 @@ function plot_data_frequency_plan(pp::PlanParameters, results::FrequencyPlanResu
 
             # ---------- save figures ---------- #
 
-            savefig(plt_freq, "plots/default/$(file_prefix)_freq_plan_$(amp)pA.pdf")
+            savefig(plt_freq, "plots/default/$(file_prefix)_freq_plan_$(amp)pA.svg")
         end
     end
 end

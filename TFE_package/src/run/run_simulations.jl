@@ -49,10 +49,10 @@ function plot_simulations(plt, p_model, sol_n, sol_pn, sol_s, i; color = nothing
         t = sol_n.t
         n_current = retrieve_nociceptor_currents(sol_n, p_model)
 
-        voltage = 1
+        voltage = 2
         if voltage != 0
             yticks= [-90, -65, -40, 0, 30]
-            ylabel!(plt[voltage], "DRGN Voltage (mV)", ylims=(-100,50), yticks=yticks)
+            ylabel!(plt[voltage], "Voltage (mV)", ylims=(-100,50), yticks=yticks)
 
             plot!(plt[voltage], t, sol_n.V, color = something(color, :black), label=something(empty_label, ""), linewidth=1.0)
         end
@@ -97,15 +97,15 @@ function plot_simulations(plt, p_model, sol_n, sol_pn, sol_s, i; color = nothing
             plot!(plt[gates+1], t, sol_n.zAHP, color = something(color, gate_colors["zAHP"]), linestyle=gate_styles["zAHP"], label=L"z_{AHP}")
         end
 
-        instant_freq = 0
+        instant_freq = 1
         if instant_freq != 0
             t_spikes = sol_n.t_spikes
-            ylabel!(plt[instant_freq], "DRG Instant frequency (Hz)")
+            ylabel!(plt[instant_freq], "TO ADD", ylims=(50,100))
             freqs = instant_freqs(t_spikes)
             freq, pattern = get_excitability(t_spikes, p_model.stimulation.off)
 
             plot!(plt[instant_freq], t_spikes[1:end-1], freqs, color = something(color, :black), label=something(empty_label, "")
-                                                                    , marker=:circle, markersize=1.5, markerstrokecolor = :match, markerstrokewidth = 0.0)
+                                                                    , marker=:circle, markersize=3, markerstrokecolor = :match, markerstrokewidth = 0.0)
             println()
             println("Nociceptor frequency : $freq")
         end
@@ -118,8 +118,8 @@ function plot_simulations(plt, p_model, sol_n, sol_pn, sol_s, i; color = nothing
         pn_current = retrieve_projection_neuron_currents(sol_pn, p_model)
         pn = p_model.projection_neuron
 
-        voltage = 3
-        if voltage != 0
+        voltage = 2
+        if voltage != 1
             yticks= [-90, -65, -40, 0, 30]
             ylabel!(plt[voltage], "PrjN Voltage (mV)", ylims=(-100,50), yticks=yticks)
 
@@ -146,12 +146,12 @@ function plot_simulations(plt, p_model, sol_n, sol_pn, sol_s, i; color = nothing
         instant_freq = 0
         if instant_freq != 0
             t_spikes = sol_pn.t_spikes
-            ylabel!(plt[instant_freq], "PrjN Instant frequency (Hz)")
             freqs = instant_freqs(t_spikes)
             freq, pattern = get_excitability(t_spikes, p_model.stimulation.off)
 
             plot!(plt[instant_freq], t_spikes[1:end-1], freqs, color = something(color, :black), label=something(empty_label, "")
                                                                     , marker=:circle, markersize=1.5, markerstrokecolor = :match, markerstrokewidth = 0.0)
+
             println()
             println("Projection neuron frequency : $freq")
         end
@@ -161,6 +161,14 @@ function plot_simulations(plt, p_model, sol_n, sol_pn, sol_s, i; color = nothing
             temp = L"[Ca^{2+}]_i"
             ylabel!(plt[Ca], "$temp (mM)")
             plot!(plt[Ca], t, sol_pn.Ca_i, color = something(color, :black), label=something(empty_label, ""))
+        end
+
+        currents = 0
+        if currents != 0
+            var = L"I_{Ca_{Ls}}"
+            ylabel!(plt[currents], "$var (µA/cm2)")
+            plot!(plt[currents], t, pn_current.ICa_Ls, color = something(color, :black), label="", alpha=0.9)
+            #plot!(plt[currents], t, pn_current.INa, color = something(color, :red), label="", alpha=0.9)
         end
 
     end
@@ -174,21 +182,21 @@ function plot_simulations(plt, p_model, sol_n, sol_pn, sol_s, i; color = nothing
         if currents != 0
             ylabel!(plt[currents], "Current (µA/cm2)")
             Isyn = s_current.INMDA .+ s_current.IAMPA
-            plot!(plt[currents], t, Isyn, color = something(color, :black), linestyle=:dash, label=L"I_{syn}", alpha=0.9)
-            plot!(plt[currents], t, s_current.IAMPA, color = something(color, :purple), label=L"I_{AMPA}", alpha=0.7) 
+            #plot!(plt[currents], t, Isyn, color = something(color, :black), linestyle=:dash, label=L"I_{syn}", alpha=0.9)
+            #plot!(plt[currents], t, s_current.IAMPA, color = something(color, :purple), label=L"I_{AMPA}", alpha=0.7) 
             plot!(plt[currents], t, s_current.INMDA, color = something(color, :blue), label=L"I_{NMDA}", alpha=0.7) 
         end
 
-        channel = 2
+        channel = 0
         if channel != 0
             ylabel!(plt[channel], "Gates Availability (-)")
             plot!(plt[channel], legend=:topright)
 
-            availability_NMDA = (sol_s.B_NMDA .- sol_s.A_NMDA) .* NMDA_Mg_block.(sol_pn.V)
+            availability_NMDA = (sol_s.B_NMDA .- sol_s.A_NMDA) #.* NMDA_Mg_block.(sol_pn.V)
             plot!(plt[channel], t, availability_NMDA, color = :blue, label="NMDA", alpha=1.0) 
 
-            availability_AMPA = sol_s.B_AMPA .- sol_s.A_AMPA
-            plot!(plt[channel], t, availability_AMPA, color = :purple, label="AMPA", alpha=1.0) 
+            # availability_AMPA = sol_s.B_AMPA .- sol_s.A_AMPA
+            # plot!(plt[channel], t, availability_AMPA, color = :purple, label="AMPA", alpha=1.0) 
         end
     end
 
@@ -212,7 +220,7 @@ function make_simulations(VEC_p_model, u0, duration, VEC_label, DIV, with_nocice
     println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
     println("")
 
-    n_fig = 3
+    n_fig = 2
     size = (450, 175*n_fig)
 
     x_label_size = 10
@@ -261,7 +269,7 @@ function make_simulations(VEC_p_model, u0, duration, VEC_label, DIV, with_nocice
         println("----------------------------------------") 
     end
 
-    savefig(plt, "plots/simulation/$(file_prefix).pdf")
+    savefig(plt, "plots/simulation/$(file_prefix).svg")
     return
 end
 

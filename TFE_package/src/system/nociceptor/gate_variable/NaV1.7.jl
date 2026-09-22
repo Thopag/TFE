@@ -1,22 +1,22 @@
 
 # --------------------------- NaV1.7 --------------------------- #
 
-function alpha_m7(V; lido_shift::Float64=0)
+function alpha_m7(V; lido_shift::Float64=0.0)
     jp = 4.2
     return 10.22/(1+exp((V-(-7.19-jp+lido_shift))/-15.43))
 end
 
-function alpha_h7(V; lido_shift::Float64=0)
+function alpha_h7(V; lido_shift::Float64=0.0)
     jp = 4.2
     return 0.0744/(1+exp((V-(-99.76-jp+lido_shift))/11.07))
 end
 
-function beta_m7(V; lido_shift::Float64=0)
+function beta_m7(V; lido_shift::Float64=0.0)
     jp = 4.2
     return 23.76/(1+exp((V-(-70.37-jp+lido_shift))/14.53))
 end
 
-function beta_h7(V; lido_shift::Float64=0)
+function beta_h7(V; lido_shift::Float64=0.0)
     jp = 4.2
     return 2.54/(1+exp((V-(-7.8-jp+lido_shift))/-10.68))
 end

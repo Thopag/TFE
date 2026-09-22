@@ -20,8 +20,6 @@ struct SynapseSolution
 end
 
 # doc solve : https://docs.sciml.ai/DiffEqDocs/stable/basics/common_solver_opts/
-# add the t solve after to optimize
-# and save index ?
 
 function with_synapse_simulation(u0, tspan, p)
 

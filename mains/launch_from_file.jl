@@ -23,7 +23,7 @@ end
 
 function main()
 
-    files = ["DIV7_baseline_2x_g7_no_g8"]
+    files = ["inhibition/DIV7_2x_g7_inhib"]
 
     for file in files
         println("-------------------------------------")

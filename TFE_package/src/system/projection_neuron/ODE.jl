@@ -59,13 +59,6 @@ function projection_neuron_state(du,u,p; Iext=0.0, Isyn=0.0, ICa_from_syn=0.0)
     du[9] = dot_mLf(V, mLf)
     du[10] = dot_hLf(V, hLf)
 
-    # To remove was for testing
-    # if Ca_i >= 0.0
-    #     du[11] = 0.0
-    # else
-    #     du[11] = dot_Ca_i(Ca_i, I_Ca_i+ICa_from_syn, pn)
-    # end
-
     du[11] = dot_Ca_i(Ca_i, I_Ca_i+ICa_from_syn, pn)
 
     return

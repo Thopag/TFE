@@ -24,6 +24,7 @@ function make_bifurcation(p_model, u0, lens_param, p_min, p_max)
     prob = BifurcationProblem(bifurcation_system_nociceptor, u0, new_p_model, lens_param, 
         record_from_solution = (x, p; k...) -> x[:], inplace = true)
 
+    # To make the bifurcation diagram of the PrjN
     # u0 = u0[p_model.idx.pn]
     # prob = BifurcationProblem(bifurcation_system_projection_neuron, u0, new_p_model, lens_param, 
     #     record_from_solution = (x, p; k...) -> x[:], inplace = true)

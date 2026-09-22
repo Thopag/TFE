@@ -21,11 +21,13 @@ function lidocaine_parameter(;
     )
 
     lidocaine = LidocaineParameters(shift_h3, shift_h7, shift_h8, shift_m8, shift_Mgblock, with_shift)
-
     return lidocaine
 end
 
 # ----------------- Lidocaine Steady state shift----------------- #
+
+
+# ---- 1.3 ---- #
 
 # 1.3 inactivation
 # 20 mV shift at 1000 µM (Sheets et al. 2008)
@@ -46,6 +48,8 @@ end
     return 0.0
 end
 
+# ---- 1.7 ---- #
+
 # 1.7 inactivation
 # 23 mV shift at 1000 µM (Sheets et al. 2008)
 # 10.6 mV shift at 100 µM (Chevrier et al. 2004)
@@ -64,6 +68,8 @@ end
 @inline function m7_shift()
     return 0.0
 end
+
+# ---- 1.8 ---- #
 
 # 1.8 inactivation
 # 4.8 mV shift at 1000 µM (Sheets et al. 2008)
@@ -90,6 +96,8 @@ end
     end
     return shift
 end
+
+# ---- Mgblock ---- #
 
 @inline function Mgblock_shift(shift, with_shift)
     if !with_shift
@@ -141,7 +149,7 @@ function add_lido_shift_inhib_traj(plt)
     lido_shifts_1_3 = .- lido_h3.(lido_concentrations)
     lido_shifts_1_8 = lido_shifts_inact_1_8 .+ lido_shifts_act_1_8
 
-    plot!(plt, lido_shifts_act_1_8, inhibition_NMDA, color=:cyan, label="", linewidth = 3)
+    plot!(plt, inhibition_1_8, lido_shifts_1_8, color=:cyan, label="", linewidth = 3)
 
     test_point = [100.0, 1000.0, 10000.0]
     results = get_lidocaine_inhibition.(test_point)
@@ -156,7 +164,7 @@ function add_lido_shift_inhib_traj(plt)
     lido_shifts_1_3 = .- lido_h3.(test_point)
     lido_shifts_1_8 = lido_shifts_inact_1_8 .+ lido_shifts_act_1_8
 
-    scatter!(plt,  lido_shifts_act_1_8, inhibition_NMDA, color=:cyan, markersize=4, label="", markerstrokewidth = 0.0)
+    scatter!(plt, inhibition_1_8,  lido_shifts_1_8, color=:cyan, markersize=4, label="", markerstrokewidth = 0.0)
 
     return plt
 end
