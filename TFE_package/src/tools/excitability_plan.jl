@@ -1,7 +1,10 @@
+export ExcitabilityPlanData, ExcitabilityPlanResults
 
 struct ExcitabilityPlanData
     M_rheobase::Matrix{Float64}
     M_spiking::Matrix{Float64}
+    M_freq_3xrheobase::Matrix{Float64}
+    M_pattern_3xrheobase::Matrix{Float64}
 end
 
 struct ExcitabilityPlanResults
@@ -14,7 +17,10 @@ function excitability_plan_data(n_row, n_col)
 
     M_rheobase = fill(NaN64, n_row, n_col)
     M_spiking = fill(NaN64, n_row, n_col)
-    return ExcitabilityPlanData(M_rheobase, M_spiking)
+    M_freq_3xrheobase = fill(NaN64, n_row, n_col)
+    M_pattern_3xrheobase = fill(NaN64, n_row, n_col)
+
+    return ExcitabilityPlanData(M_rheobase, M_spiking, M_freq_3xrheobase, M_pattern_3xrheobase)
 end
 
 function excitability_plan_result(VEC_amp, M_p_model, with_nociceptor, with_projection_neuron)
@@ -45,10 +51,10 @@ function choose_excitability_plan_simulation_function(results::ExcitabilityPlanR
         simulation_function = with_synapse_simulation
     elseif with_nociceptor
         simulation_function = nociceptor_simulation
-        pn_is_finded = 2
+        pn_is_finded = 3
     elseif with_projection_neuron
         simulation_function = projection_neuron_simulation
-        n_is_finded = 2
+        n_is_finded = 3
     else
         prinln("(choose_excitability_plan_simulation_function) I NEED AT LEAST A NEURON (nociceptor or projection neuron)")
     end
@@ -59,6 +65,8 @@ function find_pattern(amps, p_model, u0, i::Int, j::Int, results::ExcitabilityPl
 
     stim = p_model.stimulation
     simulation, n_is_finded, pn_is_finded = choose_excitability_plan_simulation_function(results)
+
+    n_3xrheobase_is_done = false
 
     L = length(amps)
     for (k,amp) in enumerate(amps)
@@ -98,6 +106,26 @@ function find_pattern(amps, p_model, u0, i::Int, j::Int, results::ExcitabilityPl
                 results.projection_neuron.M_spiking[i, j] = amp
                 pn_is_finded += 1
             end
+        end
+
+        if (n_is_finded < 3) && (!n_3xrheobase_is_done) && (n_is_finded >= 1)
+            # Add the 3x rheobase
+            i_stim = change_stimulation_amp(amp * 3.0, stim)
+            i_p_model = from_model_parameter(p_model; stimulation=i_stim)
+            sol_n, sol_pn, sol_s = simulation(u0, (0.0, duration), i_p_model)
+
+            if !isnothing(sol_n)
+                freq, pattern = get_excitability(sol_n.t_spikes, i_stim.off)
+                results.nociceptor.M_freq_3xrheobase[i, j] = freq
+                results.nociceptor.M_pattern_3xrheobase[i, j] = pattern
+            end
+
+            if !isnothing(sol_pn)
+                freq, pattern = get_excitability(sol_pn.t_spikes, i_stim.off)
+                results.projection_neuron.M_freq_3xrheobase[i, j] = freq
+                results.projection_neuron.M_pattern_3xrheobase[i, j] = pattern
+            end
+            n_3xrheobase_is_done = true
         end
 
         # Finded all

@@ -49,7 +49,7 @@ function plot_simulations(plt, p_model, sol_n, sol_pn, sol_s, i; color = nothing
         t = sol_n.t
         n_current = retrieve_nociceptor_currents(sol_n, p_model)
 
-        voltage = 2
+        voltage = 1
         if voltage != 0
             yticks= [-90, -65, -40, 0, 30]
             ylabel!(plt[voltage], "Voltage (mV)", ylims=(-100,50), yticks=yticks)
@@ -100,13 +100,13 @@ function plot_simulations(plt, p_model, sol_n, sol_pn, sol_s, i; color = nothing
         instant_freq = 1
         if instant_freq != 0
             t_spikes = sol_n.t_spikes
-            ylabel!(plt[instant_freq], "TO ADD", ylims=(50,100))
             freqs = instant_freqs(t_spikes)
             freq, pattern = get_excitability(t_spikes, p_model.stimulation.off)
 
-            plot!(plt[instant_freq], t_spikes[1:end-1], freqs, color = something(color, :black), label=something(empty_label, "")
-                                                                    , marker=:circle, markersize=3, markerstrokecolor = :match, markerstrokewidth = 0.0)
-            println()
+            # ylabel!(plt[instant_freq], "Instant freq", ylims=(50,100))
+            # plot!(plt[instant_freq], t_spikes[1:end-1], freqs, color = something(color, :black), label=something(empty_label, "")
+            #                                                         , marker=:circle, markersize=3, markerstrokecolor = :match, markerstrokewidth = 0.0)
+            # println()
             println("Nociceptor frequency : $freq")
         end
 
@@ -119,7 +119,7 @@ function plot_simulations(plt, p_model, sol_n, sol_pn, sol_s, i; color = nothing
         pn = p_model.projection_neuron
 
         voltage = 2
-        if voltage != 1
+        if voltage != 0
             yticks= [-90, -65, -40, 0, 30]
             ylabel!(plt[voltage], "PrjN Voltage (mV)", ylims=(-100,50), yticks=yticks)
 
@@ -143,14 +143,14 @@ function plot_simulations(plt, p_model, sol_n, sol_pn, sol_s, i; color = nothing
             plot!(plt[gates], t, sol_pn.hLs, color = something(color, gate_colors["hLs"]), linestyle=gate_styles["hLs"], label=L"h_{Ls}")
         end
 
-        instant_freq = 0
+        instant_freq = 1
         if instant_freq != 0
             t_spikes = sol_pn.t_spikes
             freqs = instant_freqs(t_spikes)
             freq, pattern = get_excitability(t_spikes, p_model.stimulation.off)
 
-            plot!(plt[instant_freq], t_spikes[1:end-1], freqs, color = something(color, :black), label=something(empty_label, "")
-                                                                    , marker=:circle, markersize=1.5, markerstrokecolor = :match, markerstrokewidth = 0.0)
+            # plot!(plt[instant_freq], t_spikes[1:end-1], freqs, color = something(color, :black), label=something(empty_label, "")
+            #                                                         , marker=:circle, markersize=1.5, markerstrokecolor = :match, markerstrokewidth = 0.0)
 
             println()
             println("Projection neuron frequency : $freq")
@@ -221,17 +221,18 @@ function make_simulations(VEC_p_model, u0, duration, VEC_label, DIV, with_nocice
     println("")
 
     n_fig = 2
-    size = (450, 175*n_fig)
+    #size = (450, 175*n_fig)
+    size = (250, 150*n_fig)
 
-    x_label_size = 10
-    y_label_size = 10
+    x_label_size = 11
+    y_label_size = 9
 
     x_tick_size = 8
     y_tick_size = 8
 
     # Simulation plot
     xlimits = (275.0, duration)
-    xticks = :native
+    xticks = [300.0, 700.0]  #:native
     plt = plot(layout = (n_fig, 1), link = :x, xlims=xlimits, size = size, xaxis = nothing, left_margin = 5mm,bottom_margin = 5mm, margin = 5mm)
     plot!(plt[end], xaxis = "Time (ms)", xticks=xticks)
 

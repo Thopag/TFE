@@ -4,7 +4,7 @@ function run_frequency_plan(pp::PlanParameters)
 
     # -------- amp vectors -------- #
 
-    VEC_amp = [50.0:10.0:90.0; 100.0:25.0:300.0]
+    VEC_amp = [10.0:10.0:40.0; 50.0:25.0:125.0; 150.0:50.0:300.0]
 
     println("")
     println("----------- Start frequency Plan -----------")
@@ -83,6 +83,7 @@ function plot_data_frequency_plan(pp::PlanParameters, results::FrequencyPlanResu
     reverse = true
     spiking_filter = true
     with_lido_traj = true
+    in_log = false
 
     if spiking_filter
         if !isnothing(exct_data)
@@ -97,11 +98,12 @@ function plot_data_frequency_plan(pp::PlanParameters, results::FrequencyPlanResu
     # [1,4,6,8,10,12,14] inhib
     # [1,3,5,7,9,11]
     # 1:length(VEC_amp)
-    take_idx = [8]
+    take_idx = [10]
     
-    cs = get(colorschemes[:rainbow], range(0.01, 0.99, length=256))
+    #cs = get(colorschemes[:rainbow], range(0.01, 0.99, length=256))
+    cs = get(colorschemes[:darkrainbow], range(0.01, 0.99, length=256))
     cmap = cgrad(cs, 25, categorical = false)
-    clip = (0.0, 225.0)
+    clip = (0.0, 260.0)
     m = 400
     size = (1.05 * m, m)
 
@@ -121,6 +123,17 @@ function plot_data_frequency_plan(pp::PlanParameters, results::FrequencyPlanResu
         # var = L"h_{8, \infty}"
         # var2 = L"m_{8, \infty}"
         # row_label = "Shift 40% $(var) and 60% $(var2) (mV)"
+    end
+
+    if in_log
+        row_real_value = VEC_row_param
+        col_real_value = VEC_col_param
+
+        VEC_row_param = 1.0:length(VEC_row_param)
+        VEC_col_param = 1.0:length(VEC_col_param)
+
+        xticks = (VEC_col_param, col_real_value)
+        yticks = (VEC_row_param, row_real_value)
     end
 
     for (i,amp) in enumerate(VEC_amp)
@@ -152,6 +165,10 @@ function plot_data_frequency_plan(pp::PlanParameters, results::FrequencyPlanResu
             heatmap!(plt_freq, VEC_col_param, VEC_row_param, M_freq, background_color_inside = :black, c = cmap, clims=clip)
 
             plot!(plt_freq, xlims=x_limits, ylims=y_limits)
+
+            if in_log
+                plot!(plt_freq, xticks=xticks, yticks=yticks)
+            end
 
             ################### spiking region ###################
 

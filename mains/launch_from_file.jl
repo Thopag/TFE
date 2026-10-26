@@ -23,7 +23,14 @@ end
 
 function main()
 
-    files = ["inhibition/DIV7_2x_g7_inhib"]
+    files = ["paper/DIV0_NaV1p8_modulation_space",
+            "paper/DIV7_NaV1p7_modulation_space",
+            "paper/DIV0_m8_shift",
+            "paper/DIV0_h8_shift",
+            "paper/DIV0_NaV1p8_inhib",
+            "paper/DIV7_h7_shift",
+            "paper/DIV7_NaV1p7_inhib",
+            ]
 
     for file in files
         println("-------------------------------------")

@@ -1,8 +1,12 @@
 export reponse_time, plot_SS_function, plot_tau_function, plot_availability, GHK_plot, SS_shift_plot, legend, plot_lido_inhib, Mgblock_plot
 
-const pattern_list   = ["No spike"    , "Single spike", "Two spikes", "Transient" , "Spiking" ]
-const markers_list   = [:circle       , :utriangle    , :dtriangle  , :diamond    , :square   ]
-const colors_list    = [:midnightblue , :darkgreen    , :yellowgreen, :orange     , :red3     ]
+# const pattern_list   = ["No spike"    , "Single spike", "Two spikes", "Transient" , "Spiking" ]
+# const markers_list   = [:circle       , :utriangle    , :dtriangle  , :diamond    , :square   ]
+# const colors_list    = [:midnightblue , :darkgreen    , :yellowgreen, :orange     , :red3     ]
+
+const pattern_list   = ["No spike"    , "Single spike", "Depolarization Block", "Depolarization Block" , "Sustained Spiking" ]
+const markers_list   = [:circle       , :utriangle    , :diamond, :diamond    , :square   ]
+const colors_list    = [:midnightblue , :darkgreen    , :orange, :orange     , :red3     ]
 
 const pattern_palette = cgrad(colors_list, categorical = true)
 
@@ -221,26 +225,35 @@ end
 
 function SS_shift_plot()
 
-    xticks = [-120, -90, -60, -30, 0, 30, 60]
+    xticks = [-120, -60, 0, 60]
+    yticks = [0.0, 1.0]
 
     V = -120.0:0.5:60.0
-    shift = [0.0, 5.0, 10.0, 12.5, 22.5]
+    shift = [0.0, 5.0, 10.0, 15.0, 20.0, 25.0]
+    shift = reverse(shift)
+
     L = length(shift)
-    palette = get_palette(L, :Reds, :red; dark=0.95, light=0.4)
-    plt = plot(xlabel="Voltage (mV)", ylabel= "(-)", xticks = xticks, legend=false, size=(300,200))
+    palette = get_palette(L, :Greys, :grey; dark=0.95, light=0.4)
+    plt = plot(xlabel="Voltage (mV)", ylabel= "SS gate variable (-)", xticks = xticks, yticks = yticks, legend=false, size=(200,150))
+
+    plot!(plt, xtickfontsize = 6, xguidefontsize = 7)
+    plot!(plt, ytickfontsize = 7, yguidefontsize = 7)
 
     # plot!(plt, [], [], linestyle = :dash, label="$(shift[1]) mV", color=palette[1])
     # plot!(plt, [], [], linestyle = :dash, label="$(shift[end]) mV", color=palette[end])
 
-    vec = m8_inf.(V; shift=0.0, with_shift= true)
-    plot!(plt, V, vec, linestyle = :solid, label="", color=:red)
+    vec = m7_inf.(V; shift=0.0, with_shift= true)
+    plot!(plt, V, vec, linestyle = :solid, label="", color=:black)
 
     for (i,s) in enumerate(shift)
         c = palette[i]
         vec = h7_inf.(V; shift=s, with_shift= true)
         plot!(plt, V, vec, linestyle = :dash, label="", color=c)
+
+        # vec = m8_inf.(V; shift=0.6 * s, with_shift= true)
+        # plot!(plt, V, vec, label="", color=c)
     end
-    savefig(plt, "plots/default/SS_shift.pdf")
+    savefig(plt, "plots/default/SS_shift.svg")
 end
 
 function plot_lido_inhib()

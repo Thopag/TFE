@@ -1,38 +1,66 @@
 
-# 1. Fix the internal LidocaineParameters mismatch
-function JLD2.rconvert(::Type{TFE_package.LidocaineParameters}, reconstructed::JLD2.ReconstructedStatic)
-    return lidocaine_parameter(;
-        shift_h3      = reconstructed.shift_h3,
-        shift_h7      = reconstructed.shift_h7,
-        shift_h8      = reconstructed.shift_h8,
-        shift_m8      = reconstructed.shift_m8,
-        shift_Mgblock = 0.0,
-        with_shift    = reconstructed.with_shift,
+# # 1. Fix the internal LidocaineParameters mismatch
+# function JLD2.rconvert(::Type{TFE_package.LidocaineParameters}, reconstructed::JLD2.ReconstructedStatic)
+#     return lidocaine_parameter(;
+#         shift_h3      = reconstructed.shift_h3,
+#         shift_h7      = reconstructed.shift_h7,
+#         shift_h8      = reconstructed.shift_h8,
+#         shift_m8      = reconstructed.shift_m8,
+#         shift_Mgblock = 0.0,
+#         with_shift    = reconstructed.with_shift,
+#     )
+# end
+
+# # 2. Fix the master ModelParameters mismatch
+# function JLD2.rconvert(::Type{TFE_package.ModelParameters}, reconstructed::JLD2.ReconstructedStatic)
+#     # reconstructed.lidocaine is also a ReconstructedStatic object
+#     old_lidocaine = reconstructed.lidocaine
+    
+#     fixed_lidocaine = lidocaine_parameter(;
+#         shift_h3      = old_lidocaine.shift_h3,
+#         shift_h7      = old_lidocaine.shift_h7,
+#         shift_h8      = old_lidocaine.shift_h8,
+#         shift_m8      = old_lidocaine.shift_m8,
+#         shift_Mgblock = 0.0,
+#         with_shift    = old_lidocaine.with_shift,
+#     )
+
+#     return model_parameter(; stimulation = reconstructed.stimulation,
+#                     nociceptor = reconstructed.nociceptor,
+#                     projection_neuron = reconstructed.projection_neuron, 
+#                     synapse = reconstructed.synapse,
+#                     lidocaine = fixed_lidocaine,
+#                     noise = reconstructed.noise,
+#                     idx = reconstructed.idx,
+#                     )
+# end
+
+# 1. Convert reconstructed ExcitabilityPlanData (whether static or mutable)
+function JLD2.rconvert(::Type{TFE_package.ExcitabilityPlanData}, reconstructed::Union{JLD2.ReconstructedStatic, JLD2.ReconstructedMutable})
+    # Extract the fields that existed previously, and provide safe defaults for new fields
+    rheobase = reconstructed.M_rheobase
+    spiking = reconstructed.M_spiking
+    
+    return ExcitabilityPlanData(
+        rheobase,
+        spiking,
+        rheobase, # Default or mapping for your 3rd field
+        rheobase  # Default or mapping for your 4th field (e.g., M_freq_3xrheobase)
     )
 end
 
-# 2. Fix the master ModelParameters mismatch
-function JLD2.rconvert(::Type{TFE_package.ModelParameters}, reconstructed::JLD2.ReconstructedStatic)
-    # reconstructed.lidocaine is also a ReconstructedStatic object
-    old_lidocaine = reconstructed.lidocaine
+# 2. Convert reconstructed ExcitabilityPlanResults
+function JLD2.rconvert(::Type{TFE_package.ExcitabilityPlanResults}, reconstructed::Union{JLD2.ReconstructedStatic, JLD2.ReconstructedMutable})
     
-    fixed_lidocaine = lidocaine_parameter(;
-        shift_h3      = old_lidocaine.shift_h3,
-        shift_h7      = old_lidocaine.shift_h7,
-        shift_h8      = old_lidocaine.shift_h8,
-        shift_m8      = old_lidocaine.shift_m8,
-        shift_Mgblock = 0.0,
-        with_shift    = old_lidocaine.with_shift,
-    )
+    # Recursively let JLD2 rconvert the nested fields
+    fixed_nociceptor = JLD2.rconvert(TFE_package.ExcitabilityPlanData, reconstructed.nociceptor)
+    fixed_projection_neuron = JLD2.rconvert(TFE_package.ExcitabilityPlanData, reconstructed.projection_neuron)
 
-    return model_parameter(; stimulation = reconstructed.stimulation,
-                    nociceptor = reconstructed.nociceptor,
-                    projection_neuron = reconstructed.projection_neuron, 
-                    synapse = reconstructed.synapse,
-                    lidocaine = fixed_lidocaine,
-                    noise = reconstructed.noise,
-                    idx = reconstructed.idx,
-                    )
+    return ExcitabilityPlanResults(
+        fixed_nociceptor,
+        fixed_projection_neuron,
+        reconstructed.VEC_amp
+    )
 end
 
 function re_save(file; fp=nothing, pp=nothing, analyse_r=nothing, bifurcation_r=nothing, DIC_r=nothing, SS_current_r=nothing, plan_exct=nothing, plan_freq=nothing)
