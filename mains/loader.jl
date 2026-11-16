@@ -11,7 +11,7 @@ function main()
     # plan
     # start = 5
 
-    file = "paper/DIV0_NaV1p8_modulation_space"
+    file = "paper/DIV0_NaV1p8_inhib"
     start = 6
 
     fp, pp, analyse_r, bifurcation_r, plan_exct, plan_freq = load_file(file)
@@ -21,5 +21,6 @@ function main()
     plot_analyses(fp, analyse_r, bifurcation_r, file)
     plot_plan(pp, plan_exct, plan_freq, file)
 end
+
 
 main()

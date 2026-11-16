@@ -118,7 +118,7 @@ function plot_simulations(plt, p_model, sol_n, sol_pn, sol_s, i; color = nothing
         pn_current = retrieve_projection_neuron_currents(sol_pn, p_model)
         pn = p_model.projection_neuron
 
-        voltage = 2
+        voltage = 1
         if voltage != 0
             yticks= [-90, -65, -40, 0, 30]
             ylabel!(plt[voltage], "PrjN Voltage (mV)", ylims=(-100,50), yticks=yticks)
@@ -220,19 +220,19 @@ function make_simulations(VEC_p_model, u0, duration, VEC_label, DIV, with_nocice
     println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
     println("")
 
-    n_fig = 2
+    n_fig = 1
     #size = (450, 175*n_fig)
-    size = (250, 150*n_fig)
+    size = (300, 150*n_fig)
 
-    x_label_size = 11
+    x_label_size = 9
     y_label_size = 9
 
-    x_tick_size = 8
-    y_tick_size = 8
+    x_tick_size = 9
+    y_tick_size = 7
 
     # Simulation plot
     xlimits = (275.0, duration)
-    xticks = [300.0, 700.0]  #:native
+    xticks = [300.0, 2000.0]  #:native
     plt = plot(layout = (n_fig, 1), link = :x, xlims=xlimits, size = size, xaxis = nothing, left_margin = 5mm,bottom_margin = 5mm, margin = 5mm)
     plot!(plt[end], xaxis = "Time (ms)", xticks=xticks)
 

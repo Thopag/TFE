@@ -24,7 +24,8 @@ function plot_data_excitability_plan(pp::PlanParameters, results::ExcitabilityPl
     with_lido_traj = true
     in_log = false
 
-    cs = get(colorschemes[:nipy_spectral], range(0.15, 0.97, length=256))
+    #cs = get(colorschemes[:nipy_spectral], range(0.15, 0.97, length=256))
+    cs = get(colorschemes[:rainbow1], range(0.0, 1.0, length=256))
     cmap = cgrad(cs, 25, categorical = false, rev = true) #, scale = :exp)
 
     # ---------- get matrices ---------- #
@@ -37,7 +38,7 @@ function plot_data_excitability_plan(pp::PlanParameters, results::ExcitabilityPl
 
     VEC_amp = results.VEC_amp
     clip = (VEC_amp[1],VEC_amp[end])
-    clip = (0.0,75)
+    clip = (0.0,300)
     m = 400
     size = ( 1.05 * m, m)
 
@@ -110,8 +111,8 @@ function plot_data_excitability_plan(pp::PlanParameters, results::ExcitabilityPl
 
     savefig(plt_rheobase, "plots/default/$(file_prefix)_rheobase_plan.svg")
     savefig(plt_spiking, "plots/default/$(file_prefix)_spiking_plan.svg")
-    savefig(plt_freq_3xrheobase, "plots/default/$(file_prefix)_freq_3xrheobase_plan.svg")
-    savefig(plt_pattern_3xrheobase, "plots/default/$(file_prefix)_pattern_3xrheobase_plan.svg")
+    # savefig(plt_freq_3xrheobase, "plots/default/$(file_prefix)_freq_3xrheobase_plan.svg")
+    # savefig(plt_pattern_3xrheobase, "plots/default/$(file_prefix)_pattern_3xrheobase_plan.svg")
 end
 
 function plot_excitability_plan(pp::PlanParameters, results::ExcitabilityPlanResults; file_prefix = "default")
@@ -122,11 +123,11 @@ function plot_excitability_plan(pp::PlanParameters, results::ExcitabilityPlanRes
         println("(plot_excitability_plan) No nociceptor")
     end
 
-    if !isnothing(results.projection_neuron)
-        plot_data_excitability_plan(pp, results, results.projection_neuron, "$(file_prefix)_projection_neuron")
-    else
-        println("(plot_excitability_plan) No projection neuron")
-    end
+    # if !isnothing(results.projection_neuron)
+    #     plot_data_excitability_plan(pp, results, results.projection_neuron, "$(file_prefix)_projection_neuron")
+    # else
+    #     println("(plot_excitability_plan) No projection neuron")
+    # end
 
     return
 end

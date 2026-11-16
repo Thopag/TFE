@@ -27,7 +27,7 @@ function plot_frequency_response(n_data::AnalyseData, pn_data::AnalyseData, VEC_
 
     L = length(take_idx)
     VEC_color = palette(:rainbow, L)
-    size = (350, 250)
+    size = (500, 300)
 
     n_M_freq       = n_data.M_freq
     n_M_pattern    = n_data.M_pattern
@@ -64,6 +64,21 @@ function plot_frequency_response(n_data::AnalyseData, pn_data::AnalyseData, VEC_
         end
 
         if i in take_idx
+
+            indice = findfirst(x -> x >= 1, n_VEC_pattern)
+            if !isnothing(indice)
+                println("Rheobase for [$(label)] : [$(VEC_amp[indice])]")
+            else
+                println("Rheobase for [$(label)] : [nothing]")
+            end
+
+            indice = findfirst(x -> x >= 4, n_VEC_pattern)
+            if !isnothing(indice)
+                println("Spiking apperance for [$(label)] : [$(VEC_amp[indice])]")
+            else
+                println("Spiking apperance for [$(label)] : [nothing]")
+            end
+    
             j += 1
             c = VEC_color[j]
             m_size = 2.0
