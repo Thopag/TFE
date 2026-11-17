@@ -1,160 +1,213 @@
 
 function load_file(file)
 
-    println("Loading...")
+    println("Loading : $(file)")
 
-    # Mute the warning about function loading
-    data = with_logger(ConsoleLogger(stderr, Logging.Error)) do
-        @time data = jldopen("JLD2_save/$(file).jld2", "r")
+    f_1D = nothing
+    filepath = "JLD2_save/$(file)_1D_parameters.jld2"
+    if isfile(filepath)
+        println("Get 1D_parameters")
+        jldopen(filepath, "r") do f
+            f_1D = f["f_1D"]
+        end
     end
 
-    fp = with_logger(ConsoleLogger(stderr, Logging.Error)) do
-        fp  = data["fp"]
+    f_2D = nothing
+    filepath = "JLD2_save/$(file)_2D_parameters.jld2"
+    if isfile(filepath)
+        println("Get 2D_parameters")
+        jldopen(filepath, "r") do f
+            f_2D = f["f_2D"]
+        end
     end
-    pp = with_logger(ConsoleLogger(stderr, Logging.Error)) do
-        pp  = data["pp"]
+
+    r_1D = nothing
+    filepath = "JLD2_save/$(file)_1D_result.jld2"
+    if isfile(filepath)
+        println("Get 1D_result")
+        jldopen(filepath, "r") do f
+            r_1D = f["r_1D"]
+        end
     end
 
-    analyse_r       = data["analyse_r"]
-    bifurcation_r   = data["bifurcation_r"]
-    plan_exct       = data["plan_exct"]
-    plan_freq       = data["plan_freq"]
+    r_2D_I = nothing
+    filepath = "JLD2_save/$(file)_2D_result_I.jld2"
+    if isfile(filepath)
+        println("Get 2D_result_I")
+        jldopen(filepath, "r") do f
+            r_2D_I = f["r_2D_I"]
+        end
+    end
 
-    close(data)
+    r_2D_freq = nothing
+    filepath = "JLD2_save/$(file)_2D_result_freq.jld2"
+    if isfile(filepath)
+        println("Get 2D_result_freq")
+        jldopen(filepath, "r") do f
+            r_2D_freq = f["r_2D_freq"]
+        end
+    end
 
-    println("--- Loaded [$(file).jld2] ---")
-    println("")
-    return fp, pp, analyse_r, bifurcation_r, plan_exct, plan_freq
+    println("End Loading")
+
+    return f_1D, f_2D, r_1D, r_2D_I, r_2D_freq
 end
 
-function save(file; fp=nothing, pp=nothing, analyse_r=nothing, bifurcation_r=nothing, plan_exct=nothing, plan_freq=nothing)
+function save(file; f_1D=nothing, f_2D=nothing, r_1D=nothing, r_2D_I=nothing, r_2D_freq=nothing)
 
     println("")
-    println("----------- Start Saving -----------")
-    # Mute the warning about function saving
-    with_logger(ConsoleLogger(stderr, Logging.Error)) do
-        @time jldsave("JLD2_save/$(file).jld2"; fp, pp, analyse_r, bifurcation_r, plan_exct, plan_freq)
+    println("----------- Start Saving $(file) -----------")
+
+    if !isnothing(f_1D)
+        println("Save 1D_parameters")
+        filepath = "JLD2_save/$(file)_1D_parameters.jld2"
+        jldsave(filepath; f_1D)
     end
+
+    if !isnothing(f_2D)
+        println("Save 2D_parameters")
+        filepath = "JLD2_save/$(file)_2D_parameters.jld2"
+        jldsave(filepath; f_2D)
+    end
+
+    if !isnothing(r_1D)
+        println("Save 1D_result")
+        filepath = "JLD2_save/$(file)_1D_result.jld2"
+        jldsave(filepath; r_1D)
+    end
+
+    if !isnothing(r_2D_I)
+        println("Save 2D_result_I")
+        filepath = "JLD2_save/$(file)_2D_result_I.jld2"
+        jldsave(filepath; r_2D_I)
+    end
+
+    if !isnothing(r_2D_freq)
+        println("Save 2D_result_freq")
+        filepath = "JLD2_save/$(file)_2D_result_freq.jld2"
+        jldsave(filepath; r_2D_freq)
+    end
+
     println("----------- Finish Saving -----------")
 end
 
-# ------------------------- Analyses ------------------------ #
+# ------------------------- Print setup ------------------------ #
 
-function launch_analyses(fp, analyse_r, bifurcation_r)
+function print_analyses_setup(f_1D)
 
-    if isnothing(fp)
-        println("(launch_analyses) NO FP")
-        return
+    if isnothing(f_1D)
+        println("(print_analyses_setup) NO f_1D")
+        return false
     end
 
     println("%%%%%%%%%%%%%%%%%%%%% LAUNCH %%%%%%%%%%%%%%%%%%%%%")
-    println("Parameter set type : [$(fp.DIV)]")
-    println("Simulation of [$(fp.duration)] ms")
-    println("Nociceptor is [$(fp.with_nociceptor)] and projection neuron is [$(fp.with_projection_neuron)]")
+    println("Parameter set type : [$(f_1D.DIV)]")
+    println("Simulation of [$(f_1D.duration)] ms")
+    println("Nociceptor is [$(f_1D.with_nociceptor)] and projection neuron is [$(f_1D.with_projection_neuron)]")
     println("")
-    println("Inter parameter is [$(fp.parameter_label)]")
-    println("And labels : [$(fp.VEC_label)]")
+    println("Inter parameter is [$(f_1D.parameter_label)]")
+    println("And labels : [$(f_1D.VEC_label)]")
     println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
     println("")
-    
-    # -------- Analyses -------- #
 
-    if isnothing(analyse_r)
-        analyse_r = run_parameter_analyses(fp)
-    else
-        println("analyse_r was already done")
-    end
-
-    # if isnothing(bifurcation_r)
-    #     bifurcation_r = run_bifurcation_analyses(fp)
-    # else
-    #     println("bifurcation_r was already done")
-    # end
-
-    return analyse_r, bifurcation_r
+    return true
 end
 
-function plot_analyses(fp, analyse_r, bifurcation_r, file_prefix)
+function print_plan_setup(f_2D)
+
+    if isnothing(f_2D)
+        println("(print_plan_setup) NO f_2D")
+        return false
+    end
+
+    println("%%%%%%%%%%%%%%%%%%%%% LAUNCH %%%%%%%%%%%%%%%%%%%%%")
+    println("Parameter set type : [$(f_2D.DIV)]")
+    println("Simulation of [$(f_2D.duration)] ms")
+    println("Nociceptor is [$(f_2D.with_nociceptor)] and projection neuron is [$(f_2D.with_projection_neuron)]")
+    println("")
+    println("With row [$(f_2D.row_label)] : [$(f_2D.VEC_row_param)]")
+    println("With col [$(f_2D.col_label)] : [$(f_2D.VEC_col_param)]")
+    println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+    println("")
+
+    return true
+end
+
+# ------------------------- Launchers ------------------------ #
+
+function launch_analyses(f_1D, r_1D)
+    if isnothing(r_1D)
+        r_1D = run_parameter_analyses(f_1D)
+    else
+        println("(launch_analyses) r_1D was already done")
+    end
+    return r_1D
+end
+
+function launch_current_plan(f_2D, r_2D_I)
+    
+    if isnothing(r_2D_I)
+        r_2D_I = run_current_plan(f_2D)
+    else
+        println("(launch_current_plan) r_2D_I was already done")
+    end
+    return r_2D_I
+end
+
+function launch_frequency_plan(f_2D, r_2D_freq)
+
+    if isnothing(r_2D_freq)
+        r_2D_freq = run_frequency_plan(f_2D)
+    else
+        println("(launch_frequency_plan) r_2D_freq was already done")
+    end
+    return r_2D_freq
+end
+
+# ------------------------- Show ------------------------ #
+
+function show_analyses(f_1D, r_1D, file_prefix)
 
     println("----------- Start Ploting Analyses -----------")
 
     # parameter_analyses
-    if !isnothing(analyse_r)
-        plot_parameter_analyses(analyse_r, fp; file_prefix = file_prefix)
-        println("parameter_analyses done")
+    if !isnothing(r_1D)
+        plot_parameter_analyses(r_1D, f_1D; file_prefix = file_prefix)
     else
-        println("No analyse_r")
-    end
-
-    # bifurcation_current_analyses
-    if !isnothing(bifurcation_r)
-        plot_bifurcation_analyses(bifurcation_r, analyse_r, fp; file_prefix = file_prefix)
-        println("bifurcation_analyses done")
-    else
-        println("No bifurcation_analyses")
+        println("(show_analyses) No r_1D")
     end
 
     println("----------- End Ploting Analyses -----------")
     return
 end
 
-# ------------------------- PLAN ------------------------ #
+function show_current_plan(f_2D, r_2D_I, file_prefix)
 
-function launch_plan(pp, plan_exct, plan_freq)
-
-    if isnothing(pp)
-        println("(launch_plan) NO PP")
-        return
-    end
-
-    println("%%%%%%%%%%%%%%%%%%%%% LAUNCH %%%%%%%%%%%%%%%%%%%%%")
-    println("Parameter set type : [$(pp.DIV)]")
-    println("Simulation of [$(pp.duration)] ms")
-    println("Nociceptor is [$(pp.with_nociceptor)] and projection neuron is [$(pp.with_projection_neuron)]")
-    println("")
-    println("With row [$(pp.row_label)] : [$(pp.VEC_row_param)]")
-    println("With col [$(pp.col_label)] : [$(pp.VEC_col_param)]")
-    println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-    println("")
-    
-    # -------- Make Plans -------- #
-
-    if isnothing(plan_exct)
-        plan_exct = run_excitability_plan(pp)
-    else
-        println("plan_exct was already done")
-    end
-
-    if isnothing(plan_freq)
-        plan_freq = run_frequency_plan(pp)
-    else
-        println("plan_freq was already done")
-    end
-
-    return plan_exct, plan_freq
-end
-
-function plot_plan(pp, plan_exct, plan_freq, file_prefix)
-
-    println("----------- Start Ploting Excitability Plan -----------")
+    println("----------- Start Ploting Current Plan -----------")
 
     # excitability_plan
-    if !isnothing(plan_exct)
-        plot_excitability_plan(pp, plan_exct; file_prefix = file_prefix)
-        println("excitability_plan done")
+    if !isnothing(r_2D_I)
+        plot_current_plan(f_2D, r_2D_I; file_prefix = file_prefix)
     else
-        println("No plan_exct")
+        println("(show_current_plan) No r_2D_I")
     end
 
-    # freq_plan
-    if !isnothing(plan_freq)
-        plot_frequency_plan(pp, plan_freq, plan_exct; file_prefix = file_prefix)
-        println("frequency_plan done")
+    println("----------- End Ploting Current Plan -----------")
+
+    return
+end
+
+function show_frequency_plan(f_2D, r_2D_freq, file_prefix)
+
+    println("----------- Start Ploting Frequency Plan -----------")
+
+    if !isnothing(r_2D_freq)
+        plot_frequency_plan(f_2D, r_2D_freq; file_prefix = file_prefix)
     else
-        println("No plan_freq")
+        println("(show_frequency_plan) No r_2D_freq")
     end
 
-    println("----------- End Ploting Excitability Plan -----------")
+    println("----------- End Ploting Frequency Plan -----------")
 
     return
 end

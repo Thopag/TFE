@@ -1,7 +1,6 @@
-export file_parameters, plan_parameters
+export file_1D, file_2D
 
-
-struct FileParameters
+struct File1D
     u0::Vector{Float64}
     duration::Float64
     VEC_p_model::Vector{ModelParameters}
@@ -12,13 +11,13 @@ struct FileParameters
     with_projection_neuron::Bool
 end
 
-function file_parameters(u0, duration, VEC_p_model, VEC_label, parameter_label, DIV, with_nociceptor, with_projection_neuron)
-    return FileParameters(u0, duration, VEC_p_model, VEC_label, parameter_label, DIV, with_nociceptor, with_projection_neuron)
+function file_1D(u0, duration, VEC_p_model, VEC_label, parameter_label, DIV, with_nociceptor, with_projection_neuron)
+    return File1D(u0, duration, VEC_p_model, VEC_label, parameter_label, DIV, with_nociceptor, with_projection_neuron)
 end
 
 #---------------------------------------------------------#
 
-struct PlanParameters
+struct File2D
     u0::Vector{Float64}
     duration::Float64
     M_p_model::Matrix{ModelParameters}
@@ -31,6 +30,6 @@ struct PlanParameters
     with_projection_neuron::Bool
 end
 
-function plan_parameters(u0, duration, M_p_model, VEC_row_param, VEC_col_param, row_label, col_label, DIV, with_nociceptor, with_projection_neuron)
-    return PlanParameters(u0, duration, M_p_model, VEC_row_param, VEC_col_param, row_label, col_label, DIV, with_nociceptor, with_projection_neuron)
+function file_2D(u0, duration, M_p_model, VEC_row_param, VEC_col_param, row_label, col_label, DIV, with_nociceptor, with_projection_neuron)
+    return File2D(u0, duration, M_p_model, VEC_row_param, VEC_col_param, row_label, col_label, DIV, with_nociceptor, with_projection_neuron)
 end

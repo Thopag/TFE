@@ -1,6 +1,8 @@
 
 struct FrequencyPlanData
-    VEC_M_freq::Vector{Matrix{Float64}}
+    VEC_M_init_freq::Vector{Matrix{Float64}}
+    VEC_M_sust_freq::Vector{Matrix{Float64}}
+    VEC_M_pattern::Vector{Matrix{Int}}
 end
 
 struct FrequencyPlanResults
@@ -11,8 +13,10 @@ end
 
 function frequency_plan_data(L, n_row, n_col)
 
-    VEC_M_freq = [fill(NaN, n_row, n_col) for _ in 1:L]
-    return FrequencyPlanData(VEC_M_freq)
+    VEC_M_init_freq = [fill(NaN, n_row, n_col) for _ in 1:L]
+    VEC_M_sust_freq = [fill(NaN, n_row, n_col) for _ in 1:L]
+    VEC_M_pattern = [fill(-1, n_row, n_col) for _ in 1:L]
+    return FrequencyPlanData(VEC_M_init_freq, VEC_M_sust_freq, VEC_M_pattern)
 end
 
 function frequency_plan_result(VEC_amp, M_p_model, with_nociceptor, with_projection_neuron)
@@ -33,27 +37,10 @@ function frequency_plan_result(VEC_amp, M_p_model, with_nociceptor, with_project
     return FrequencyPlanResults(n, pn, VEC_amp)
 end
 
-function choose_frequency_plan_simulation_function(results::FrequencyPlanResults)
-
-    with_nociceptor = !isnothing(results.nociceptor)
-    with_projection_neuron = !isnothing(results.projection_neuron) 
-
-    if with_nociceptor && with_projection_neuron
-        simulation_function = with_synapse_simulation
-    elseif with_nociceptor
-        simulation_function = nociceptor_simulation
-    elseif with_projection_neuron
-        simulation_function = projection_neuron_simulation
-    else
-        prinln("(choose_frequency_plan_simulation_function) I NEED AT LEAST A NEURON (nociceptor or projection neuron)")
-    end
-    return simulation_function
-end
-
 function add_freq(VEC_amp, p_model, u0, i::Int, j::Int, results::FrequencyPlanResults, duration)
 
     stim = p_model.stimulation
-    simulation  = choose_frequency_plan_simulation_function(results)
+    simulation  = choose_simulation_function(!isnothing(results.nociceptor), !isnothing(results.projection_neuron))
 
     for (k, amp) in enumerate(VEC_amp)
     
@@ -63,16 +50,20 @@ function add_freq(VEC_amp, p_model, u0, i::Int, j::Int, results::FrequencyPlanRe
         sol_n, sol_pn, sol_s = simulation(u0, (0.0, duration), new_p_model)
 
         if !isnothing(sol_n)
-            freq, pattern = get_excitability(sol_n.t_spikes, new_stim.off)
+            init_freq, sust_freq, pattern = get_firing_pattern(sol_n.t_spikes, new_stim.off)
+            results.nociceptor.VEC_M_pattern[k][i, j] = pattern
             if pattern != 0
-                results.nociceptor.VEC_M_freq[k][i, j] = freq
+                results.nociceptor.VEC_M_init_freq[k][i, j] = init_freq
+                results.nociceptor.VEC_M_sust_freq[k][i, j] = sust_freq
             end
         end
 
         if !isnothing(sol_pn)
-            freq, pattern = get_excitability(sol_pn.t_spikes, new_stim.off)
+            init_freq, sust_freq, pattern = get_firing_pattern(sol_pn.t_spikes, new_stim.off)
+            results.projection_neuron.VEC_M_pattern[k][i, j] = pattern
             if pattern != 0
-                results.projection_neuron.VEC_M_freq[k][i, j] = freq
+                results.projection_neuron.VEC_M_init_freq[k][i, j] = init_freq
+                results.projection_neuron.VEC_M_sust_freq[k][i, j] = sust_freq
             end
         end
     end
@@ -85,7 +76,7 @@ function fill_frequency_plan_result(i::Int, j::Int, results::FrequencyPlanResult
     VEC_amp = results.VEC_amp
 
     n_row, n_col = size(M_p_model)
-    println("\r Row : $(round((((i)-1)/n_row*100), digits=2)) % ----- Col : $(round((((j)-1)/n_col*100), digits=2)) %")
+    println("Row : $(round((((i)-1)/n_row*100), digits=2)) % ----- Col : $(round((((j)-1)/n_col*100), digits=2)) %")
 
     add_freq(VEC_amp, p_model, u0, i, j, results, duration)
 
@@ -93,12 +84,12 @@ function fill_frequency_plan_result(i::Int, j::Int, results::FrequencyPlanResult
     return
 end
 
-function frequency_plan(VEC_amp, pp::PlanParameters)
+function frequency_plan(VEC_amp, f_2D::File2D)
 
-    u0 = pp.u0
-    duration = pp.duration
-    M_p_model = pp.M_p_model
-    results = frequency_plan_result(VEC_amp, M_p_model, pp.with_nociceptor, pp.with_projection_neuron)
+    u0 = f_2D.u0
+    duration = f_2D.duration
+    M_p_model = f_2D.M_p_model
+    results = frequency_plan_result(VEC_amp, M_p_model, f_2D.with_nociceptor, f_2D.with_projection_neuron)
     for j in axes(M_p_model, 2)
         for i in axes(M_p_model, 1)
             fill_frequency_plan_result(i, j, results, M_p_model, u0, duration)

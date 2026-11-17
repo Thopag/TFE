@@ -1,112 +1,35 @@
 include("utils.jl")
 
-function get_file_parameter(u0, duration, DIV, p_stim, nociceptor_parameter, with_nociceptor, with_projection_neuron)
-
-    var = L"g_{NaV1.8}"
-
-    # -------- Inter Parameter -------- #
-    inhibs = 0.0:0.3:1.0
-    shifts = 0.0:1.5:15.0
-    shift_mg = -20.0:5.0:20.0
-    amps = 10.0:0.5:14.0
-    lidos = [0.0, 100.0, 1000.0]
-
-    VEC_inter_parameter = 0.0:0.0
-    VEC_label = ["" for k in VEC_inter_parameter]
-
-    #VEC_inter_parameter_2 = [100.0, 1000.0]
-    # VEC_label = ["" for (k,m) in zip(VEC_inter_parameter,VEC_inter_parameter_2)]
-
-    parameter_label = ""
-
-    # -------- Create the VEC_p_model -------- #
-    C = 0.0
-    # inhib = get_lidocaine_inhibition(C)[3]
-    # shift = abs(lido_h8(C)) + abs(lido_m8(C))
-
-    # inhib = get_lidocaine_inhibition(C)[2]
-    # shift = abs(lido_h7(C))
-
-    inhib = 0.6
-    shift = 0.0
-
-    n = nociceptor_parameter(; g_NaV1p8 = 30.0 * (1-inhib))
-    pn = projection_neuron_parameter(;)
-    s = synapse_parameter(;)
-    lido = lidocaine_parameter(; shift_h8 = 0.0 * shift, shift_m8 = 0.0 * shift, shift_h7 = 0.0 * shift, with_shift = true)
-    stim = p_stim
-
-    VEC_p_stim = [change_stimulation_amp(amp, stim) for amp in VEC_inter_parameter]
-
-    VEC_p_lido = [lidocaine_parameter(;shift_h3 = 0.0 * p, shift_h7 = 0.0 * p, shift_h8 = 0.0 , shift_m8 = 0.0,
-                                                                shift_Mgblock = 0.0 * p, with_shift = true)
-                                                                                     for p in VEC_inter_parameter]
-
-    VEC_p_noci = [nociceptor_parameter(;g_NaV1p8 = 30.0 * (1-p)) for p in VEC_inter_parameter]
-    VEC_p_proj = [projection_neuron_parameter(;) for p in VEC_inter_parameter]
-    VEC_p_syn = [synapse_parameter(;g_NMDA = 1.0 * (1-p)) for p in VEC_inter_parameter]
-
-    VEC_p_model = [model_parameter(;stimulation=stim, nociceptor=n, projection_neuron=pn, synapse=s, lidocaine=lido) for i in VEC_p_noci]
-    #VEC_p_model = [model_parameter(;stimulation=stim, nociceptor=j, projection_neuron=pn, synapse=s, lidocaine=i) for (i,j) in zip(VEC_p_lido,VEC_p_noci) ]
-
-    fp = file_parameters(u0, duration, VEC_p_model, VEC_label, parameter_label
-                                                            , DIV, with_nociceptor, with_projection_neuron)
-
-    return fp
-end
-
-function get_plan_parameter(u0, duration, DIV, p_stim, nociceptor_parameter, with_nociceptor, with_projection_neuron)
-
-    var = L"h_{7, \infty}"
-
-    # -------- Row Parameter -------- #
-    inhibs = 0.0:0.05:1.0
-    g = 0.0:10.0:100.0
-
-    VEC_row_param = inhibs
-    row_label = "Inhibition (-)"
-    # -------- Col Parameter -------- #
-    inhibs = 0:0.5:1.0
-    shift = 0.0:2.5:25.0
-    g = 0.0:0.1:1.0
-
-    VEC_col_param = shift
-    col_label = "1.0 h7 (mV)"
-    # -------- Create matrix -------- #
-
-    M_p_lido = [lidocaine_parameter(;shift_h3 = 0.0 * c, shift_h7 = 1.0 * c, shift_h8 = 0.0 * c, shift_m8 = 0.0 * c, with_shift = true) 
-                                                                            for r in VEC_row_param, c in VEC_col_param]
-
-    M_p_noci = [nociceptor_parameter(;g_NaV1p7 = 70.0 * (1.0-r) ) for r in VEC_row_param, c in VEC_col_param]
-    M_p_proj = [projection_neuron_parameter(;) for r in VEC_row_param, c in VEC_col_param]
-    M_p_syn = [synapse_parameter(;) for r in VEC_row_param, c in VEC_col_param]
-
-    M_p_model = [model_parameter(;stimulation=p_stim, nociceptor=n, projection_neuron=pn, synapse=s, lidocaine=lido) for (n,pn,s,lido) in zip(M_p_noci,M_p_proj,M_p_syn, M_p_lido)]
-
-    pp = plan_parameters(u0, duration, M_p_model, VEC_row_param, VEC_col_param, row_label, col_label
-                                                            , DIV, with_nociceptor, with_projection_neuron)
-
-    return pp
-end
+include("1D_parameters.jl")
+include("2D_parameters.jl")
 
 function main()
 
+    # -------- Network -------- #
+
     DIV = "DIV0"
+    with_nociceptor = true
+    with_projection_neuron = true
+
+    # -------- Stimulation -------- #
+ 
+    duration = 2000.0      # ms
+    stim_on = 300.0        # ms
+    stim_length = 1400.0   # ms
+
+    amp = 39.0
 
     # -------- File name -------- #
 
     file = "$(DIV)_default"
-    #file = "paper/trash"
+    #file = "data/$(DIV)_Nav1p7_2D"
 
     # -------- Launching options -------- #
 
-    with_simulations = true
-    make_plan = false
-    make_analyses = false
-    rheobase = false
+    launch_simulations = false
+    launch_1D = false
+    launch_2D = true
 
-    with_nociceptor = true
-    with_projection_neuron = false
     # -------- PARAMETER SET TYPE -------- #
 
     if DIV == "DIV0"
@@ -121,52 +44,50 @@ function main()
         Ihold = 0.0
     end
 
-    fp = nothing
-    analyse_r = nothing
-    bifurcation_r = nothing
-    plan_exct = nothing
-    plan_freq = nothing
+    f_1D = nothing
+    r_1D = nothing
+    r_2D_I = nothing
+    r_2D_freq = nothing
 
     # -------- Initial Condition -------- #
 
     u0 = get_synapse_u0(set_u0_noci)
 
-    # -------- Stimulation -------- #
- 
-    duration = 2000.0                   # ms
-    stim_on = 300.0                    # ms
-    stim_length = 1400.0               # ms
+    # --------------------------- Make parameters --------------------------- #
 
-    amp = 100.0
+    p_stim = stimulation_parameter(amp; on=stim_on, length=stim_length, Ihold=Ihold)
 
-    n_pulse = 7
-    is_activated = nothing
-    #is_activated = multiple_pulse(;T=(duration-stim_on)/n_pulse, n_pulse=n_pulse, start=300.0, length=50.0)
-    p_stim = stimulation_parameter(amp; on=stim_on, length=stim_length, Ihold=Ihold, is_act=is_activated)
+    f_1D = make_1D_parameters(u0, duration, DIV, p_stim, nociceptor_parameter, with_nociceptor, with_projection_neuron)
+    f_2D = make_2D_parameters(u0, duration, DIV, p_stim, nociceptor_parameter, with_nociceptor, with_projection_neuron)
 
-    # --------------------------------------------------------------------- #
+    if launch_simulations
+        VEC_p_model = f_1D.VEC_p_model
 
-    fp = get_file_parameter(u0, duration, DIV, p_stim, nociceptor_parameter, with_nociceptor, with_projection_neuron)
-    pp = get_plan_parameter(u0, duration, DIV, p_stim, nociceptor_parameter, with_nociceptor, with_projection_neuron)
-
-    if with_simulations
-        VEC_p_model = fp.VEC_p_model
-
-        #VEC_p_model = [VEC_p_model[1]]
-        make_simulations(VEC_p_model, u0, duration, fp.VEC_label, DIV, with_nociceptor, with_projection_neuron; file_prefix = file)
+        VEC_p_model = [VEC_p_model[1]]
+        make_simulations(VEC_p_model, u0, duration, f_1D.VEC_label, DIV, with_nociceptor, with_projection_neuron; file_prefix = file)
     end
-    if make_plan
-        #plan_exct, plan_freq = launch_plan(pp, plan_exct, plan_freq)
-        save(file; pp=pp, plan_exct=plan_exct, plan_freq=plan_freq)
-        #plot_plan(pp, plan_exct, plan_freq, file)
+    if launch_1D
+        if print_analyses_setup(f_1D)
+            save(file; f_1D=f_1D)
+
+            # r_1D = launch_analyses(f_1D, r_1D)
+            # save(file; r_1D=r_1D)
+        
+            # show_analyses(f_1D, r_1D, file)
+        end
     end
-    if make_analyses
-        analyse_r, bifurcation_r = launch_analyses(fp, analyse_r, bifurcation_r)
-        save(file; fp=fp, analyse_r=analyse_r, bifurcation_r=bifurcation_r)
-        plot_analyses(fp, analyse_r, bifurcation_r, file)
-    end
-    if rheobase
-        run_rheobase_bar(fp.VEC_p_model, u0, duration, fp.VEC_label, fp.parameter_label; file = file)
+    if launch_2D
+        if print_plan_setup(f_2D)
+            save(file; f_2D=f_2D)
+
+            # r_2D_I = launch_current_plan(f_2D, r_2D_I)
+            # save(file; r_2D_I=r_2D_I)
+            # r_2D_freq = launch_frequency_plan(f_2D, r_2D_freq)
+            # save(file; r_2D_freq=r_2D_freq)
+
+            # show_current_plan(f_2D, r_2D_I, file)
+            # show_frequency_plan(f_2D, r_2D_freq, file)
+        end
     end
 end
 

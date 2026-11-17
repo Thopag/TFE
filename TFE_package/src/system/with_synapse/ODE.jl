@@ -95,27 +95,3 @@ function stochastic_system_with_synapse(du,u,p,t)
     end
     return
 end
-
-# ----------- for bifurcation ----------- #
-
-function bifurcation_system_with_synapse(du,u,p)
-
-    idx = p.idx
-    # -- Iext value on nociceptor -- #
-    stim    = p.stimulation
-    n       = p.nociceptor
-
-    Iext = stim.Ihold + stim.amp # [pA]
-    Iext = Iext * (10^-6) / (n.CellArea * (10^-8))      # [µA/cm^2]
-
-    # -- update nociceptor variables -- #
-    nociceptor_state(view(du, idx.n), view(u, idx.n), p; Iext=Iext, Inoise=Inoise)
-
-    # -- update synapse -- #
-    V_post_syn = u[idx.pn[1]]
-    Isyn, ICa_from_syn = synapse_state(view(du, idx.s),view(u, idx.s),p,V_post_syn)
-
-    # -- update projection_neuron variables -- #
-    projection_neuron_state(view(du, idx.pn), view(u, idx.pn), p; Isyn=Isyn, ICa_from_syn=ICa_from_syn)
-    return du
-end

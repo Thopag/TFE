@@ -106,21 +106,3 @@ function stochastic_system_nociceptor(du,u,p,t)
     end
     return
 end
-
-
-# ----------- for bifurcation ----------- #
-
-function bifurcation_system_nociceptor(du,u,p)
-
-    idx = p.idx
-    # -- Iext value -- #
-    stim    = p.stimulation
-    n       = p.nociceptor
-
-    Iext = stim.Ihold + stim.amp # [pA]
-    Iext = Iext * (10^-6) / (n.CellArea * (10^-8))      # [µA/cm^2]
-
-    # -- update nociceptor variables -- #
-    nociceptor_state(view(du, idx.n), view(u, idx.n), p; Iext=Iext)
-    return du
-end

@@ -184,3 +184,19 @@ function from_model_parameter(p_model::ModelParameters;
         
     return ModelParameters(stim, n, pn, s, lido, new_noise, saved_events, new_idx)
 end
+
+# -- Function used in the different tool to select the right simulation -- #
+
+function choose_simulation_function(with_nociceptor, with_projection_neuron)
+
+    if with_nociceptor && with_projection_neuron
+        simulation_function = with_synapse_simulation
+    elseif with_nociceptor
+        simulation_function = nociceptor_simulation
+    elseif with_projection_neuron
+        simulation_function = projection_neuron_simulation
+    else
+        prinln("(choose_simulation_function) I NEED AT LEAST A NEURON (nociceptor or projection neuron)")
+    end
+    return simulation_function
+end

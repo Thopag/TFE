@@ -1,39 +1,10 @@
-export reponse_time, plot_SS_function, plot_tau_function, plot_availability, GHK_plot, SS_shift_plot, legend, plot_lido_inhib, Mgblock_plot
 
-# const pattern_list   = ["No spike"    , "Single spike", "Two spikes", "Transient" , "Spiking" ]
-# const markers_list   = [:circle       , :utriangle    , :dtriangle  , :diamond    , :square   ]
-# const colors_list    = [:midnightblue , :darkgreen    , :yellowgreen, :orange     , :red3     ]
 
-const pattern_list   = ["No spike"    , "Single spike", "Depolarization Block", "Depolarization Block" , "Sustained Spiking" ]
-const markers_list   = [:circle       , :utriangle    , :diamond, :diamond    , :square   ]
-const colors_list    = [:midnightblue , :darkgreen    , :orange, :orange     , :red3     ]
+const pattern_list   = ["No spike"    , "Single spike", "Depolarization Block" , "Sustained Spiking" ]
+const markers_list   = [:circle       , :utriangle    , :diamond    , :square   ]
+const colors_list    = [:midnightblue , :darkgreen    , :orange     , :red3     ]
 
 const pattern_palette = cgrad(colors_list, categorical = true)
-
-const label_bif_specialpoint = Dict{Symbol, String}(:hopf => "Hopf", :bp => "Branch Point", :endpoint => "End Point")
-
-function get_palette(L, colors, color; dark=0.95, light=0.4)
-
-    if L == 1
-        return [color]
-    end
-    return [get(colorschemes[colors], i) for i in range(light, stop=dark, length=L)]
-end
-
-function reponse_time(t_resp, sol_t)
-    mask = [any(tp == t for tp in t_resp) for t in sol_t]
-    return sol_t, Int.(mask)
-end
-
-function annotate_amp(plt, amp)
-    xlims = Plots.xlims(plt)
-    ylims = Plots.ylims(plt)
-    annotate!(plt,
-        xlims[2] - 0.025*(xlims[2]-xlims[1]),
-        ylims[2] - 0.025*(ylims[2]-ylims[1]),
-        text("$amp pA", 11, :black))
-    return
-end
 
 const n_gates_labels = ["m3", "h3", "m7", "h7", "m8", "h8", "ldr", "ndr", "nM", "zAHP"]
 const n_gates_colors = [:blue, :blue, :red, :red, :green, :green, :orange, :orange, :purple, :brown]
@@ -52,256 +23,111 @@ const gate_styles = Dict(key => style for (key, style) in zip(vcat(n_gates_label
 const gates_SS_labels = Dict(key => color for (key, color) in zip(vcat(n_gates_labels, pn_gates_labels), vcat(n_gates_SS_labels, pn_gates_SS_labels)))
 const gates_tau_labels = Dict(key => style for (key, style) in zip(vcat(n_gates_labels, pn_gates_labels), vcat(n_gates_tau_labels, pn_gates_tau_labels)))
 
-#-------------------- Stand alone plot function --------------------#
-
-function plot_SS_function(; file_prefix = "default")
-
-    V = -120.0:0.5:60.0
-    xticks = [-120, -90, -60, -30, 0, 30, 60]
-
-    p_n = plot(xlabel="Voltage (mV)", ylabel= "(-)", legendfontsize=11, legend=:right
-                                        , xticks = xticks)
-
-    p_pn = plot(xlabel="Voltage (mV)", ylabel= "(-)", legendfontsize=11, legend=:right
-                                        , xticks = xticks)
-
-    m3 = m3_inf.(V)
-    h3 = h3_inf.(V)
-    m7 = m7_inf.(V)
-    h7 = h7_inf.(V)
-    m8 = m8_inf.(V)
-    h8 = h8_inf.(V)
-    nM = nM_inf.(V)
-    ndr = ndr_inf.(V)
-    ldr = ldr_inf.(V)
-    zAHP = zAHP_inf.(V)
-
-    n_gates = [m3, h3, m7, h7, m8, h8, ldr, ndr, nM, zAHP]
-    n_gate_values = Dict(key => vec for (key, vec) in zip(n_gates_labels, n_gates))
-
-    for l in n_gates_labels[1:6]
-        c     = gate_colors[l]
-        style = gate_styles[l]
-        lab = gates_SS_labels[l]
-        vec   = n_gate_values[l]
-        plot!(p_n, V, vec, label=lab, color=c, linestyle=style, linewidth=2)
+function get_palette(L, colors, color; dark=0.95, light=0.4)
+    if L == 1
+        return [color]
     end
-
-    mNa = mNa_inf.(V)
-    hNa = hNa_inf.(V)
-    mdr = mdr_inf.(V)
-    mir = mir_inf.(V)
-    mM  = mM_inf.(V)
-
-    mLf = mLf_inf.(V)
-    hLf = hLf_inf.(V)
-    mLs = mLs_inf.(V)
-    hLs = hLs_inf.(V)
-
-    pn_gates = [mNa, hNa, mdr, mir, mM, mLf, hLf, mLs, hLs]
-    pn_gate_values = Dict(key => vec for (key, vec) in zip(pn_gates_labels, pn_gates))
-
-    for l in pn_gates_labels[6:end]
-        c     = gate_colors[l]
-        style = gate_styles[l]
-        lab = gates_SS_labels[l]
-        vec   = pn_gate_values[l]
-        plot!(p_pn, V, vec, label=lab, color=c, linestyle=style, linewidth=2)
-    end
-
-    #savefig(p_n, "plots/default/$(file_prefix)_SS_gates_n.pdf")
-    savefig(p_pn, "plots/default/$(file_prefix)_SS_gates_pn.pdf")
+    return [get(colorschemes[colors], i) for i in range(light, stop=dark, length=L)]
 end
 
-function plot_tau_function(; file_prefix = "default")
+function make_heatmap(M, x_values, y_values, x_label, y_label, clip, cmap)
 
-    V = -120.0:0.5:60.0
-    xticks = [-120, -90, -60, -30, 0, 30, 60]
-    yticks = [0.01, 0.1, 1.0, 10.0, 100.0, 1000.0, 10000.0]
+    m = 400
+    size = ( 1.05 * m, m)
 
-    ylims = [0.001, 50000.0]
+    # Manage the heatmap edges
+    diff_x = abs(x_values[2]-x_values[1])
+    diff_y = abs(y_values[2]-y_values[1])
+
+    x_limits = (x_values[1] -diff_x/8, x_values[end] + diff_x/8)
+    y_limits = (y_values[1] -diff_y/8, y_values[end] + diff_y/8)
+
+    # make the heatmap
+    plt = plot(xlabel=x_label, ylabel=y_label, size=size)
+
+    heatmap!(plt, x_values, y_values, M, background_color_inside = :black, c = cmap, clims=clip)
+    plot!(plt, xlims=x_limits, ylims=y_limits)
+
+    return plt
+end
+
+# ---------- Current space ---------- #
+
+function compute_in_out_Iions(Iion_s)
+    ## Compute in and out currents vector for each "complete" current vector in soma
+    VEC_Iion_in = []
+    VEC_Iion_out = []
+    for i in eachindex(Iion_s)
+        Iion_in = zeros(size(Iion_s[i]))
+        Iion_in[Iion_s[i].<0]  .= Iion_s[i][Iion_s[i].<0] #Negative current is inward
     
-    # In the futur : add the adaptation with p_model
-
-    p_n = plot(xlabel="Voltage (mV)", ylabel= "Time (ms)", legendfontsize=11, legend=:bottom
-                                        , xticks = xticks, yscale=:log10, yticks = yticks, ylims = ylims)
-
-    p_pn = plot(xlabel="Voltage (mV)", ylabel= "Time (ms)", legendfontsize=11, legend=:topright
-                                        , xticks = xticks, yscale=:log10, yticks = yticks,ylims = ylims)
-
-    m3 = tau_m3.(V)
-    h3 = tau_h3.(V)
-    m7 = tau_m7.(V)
-    h7 = tau_h7.(V)
-    m8 = tau_m8.(V)
-    h8 = tau_h8.(V)
-    nM = tau_nM.(V)
-    ndr = tau_ndr.(V)
-    ldr = tau_ldr.(V)
-    zAHP = tau_zAHP.(V)
-
-    n_gates = [m3, h3, m7, h7, m8, h8, ldr, ndr, nM, zAHP]
-    n_gate_values = Dict(key => vec for (key, vec) in zip(n_gates_labels, n_gates))
-
-    for l in n_gates_labels[7:end]
-        c     = gate_colors[l]
-        style = gate_styles[l]
-        lab   = gates_tau_labels[l]
-        vec   = n_gate_values[l]
-        plot!(p_n, V, vec, label=lab, color=c, linestyle=style, linewidth=2)
+        Iion_out = zeros(size(Iion_s[i])) 
+        Iion_out[Iion_s[i].>0] .= Iion_s[i][Iion_s[i].>0] #Positive current is outward
+        push!(VEC_Iion_in,Iion_in)
+        push!(VEC_Iion_out,Iion_out)
     end
-
-    mNa = tau_mNa.(V)
-    hNa = tau_hNa.(V)
-    mdr = tau_mdr.(V)
-    mir = tau_mir.(V)
-    mM  = tau_mM.(V)
-
-    mLf = tau_mLf.(V)
-    hLf = tau_hLf.(V)
-    mLs = tau_mLs.(V)
-    hLs = tau_hLs.(V)
-
-    pn_gates = [mNa, hNa, mdr, mir, mM, mLf, hLf, mLs, hLs]
-    pn_gate_values = Dict(key => vec for (key, vec) in zip(pn_gates_labels, pn_gates))
-
-    for l in pn_gates_labels[6:end]
-        c     = gate_colors[l]
-        style = gate_styles[l]
-        lab = gates_tau_labels[l]
-        vec   = pn_gate_values[l]
-        plot!(p_pn, V, vec, label=lab, color=c, linestyle=style, linewidth=2)
-    end
-    #savefig(p_n, "plots/default/$(file_prefix)_tau_gates_n.pdf")
-    savefig(p_pn, "plots/default/$(file_prefix)_tau_gates_pn.pdf")
-end
-
-function plot_availability(; file_prefix = "default")
-
-    V = -100.0:0.5:45.0
-    xticks = [-120, -90, -60, -30, 0, 30, 60]
-
-    p_n = plot(xlabel="Voltage (mV)", ylabel= "Availability (-)", legendfontsize=9, legend=:topleft
-                                        , xticks = xticks, size = (600, 200), left_margin = 5mm,bottom_margin = 5mm, margin = 5mm)
-
-    m3 = m3_inf.(V)
-    h3 = h3_inf.(V)
-    m7 = m7_inf.(V)
-    h7 = h7_inf.(V)
-    m8 = m8_inf.(V)
-    h8 = h8_inf.(V)
-    nM = nM_inf.(V)
-    ndr = ndr_inf.(V)
-    ldr = ldr_inf.(V)
-    zAHP = zAHP_inf.(V)
-
-    plot!(p_n, V, m3.^3 .* h3 ./ maximum(m3.^3 .* h3), label="NaV1.3", color=gate_colors["m3"], linewidth = 3)
-    plot!(p_n, V, m7.^3 .* h7 ./ maximum(m7.^3 .* h7), label="NaV1.7", color=gate_colors["m7"], linewidth = 3)
-    plot!(p_n, V, m8.^3 .* h8 ./ maximum(m8.^3 .* h8), label="NaV1.8", color=gate_colors["m8"], linewidth = 3)
-
-    savefig(p_n, "plots/default/$(file_prefix)_availability.pdf")
-end
-
-function GHK_plot()
-
-    Ca_o = 2.0
-    V = -60:0.5:50
-    VEC_Ca_i = [5.0e-5, 5.0e-2, 0.1, 0.5, 1.0, 1.5, 2.0]
-    VEC_color = palette(:rainbow, length(VEC_Ca_i))
-
-    plt = plot(xticks= -60:20:40)
-
-    xlabel!(plt, "Voltage (mV)")
-    ylabel!(plt, "GHK (mC/cm3)")
-
-    hline!(plt, [0], color=:black, linestyle=:dot, linewidth=2, label="")
-    for (Ca_i, c) in zip(VEC_Ca_i, VEC_color)
-        GHK = ghk_LeFranc.(V, Ca_i, Ca_o)
-        plot!(plt, V, GHK, color=c, label="$Ca_i mM", linewidth=2)
-    end  
-
-    savefig(plt, "plots/default/GHK.pdf")
-end
-
-function SS_shift_plot()
-
-    xticks = [-120, -60, 0, 60]
-    yticks = [0.0, 1.0]
-
-    V = -120.0:0.5:60.0
-    shift = [0.0, 5.0, 10.0, 15.0, 20.0, 25.0]
-    shift = reverse(shift)
-
-    L = length(shift)
-    palette = get_palette(L, :Greys, :grey; dark=0.95, light=0.4)
-    plt = plot(xlabel="Voltage (mV)", ylabel= "SS gate variable (-)", xticks = xticks, yticks = yticks, legend=false, size=(200,150))
-
-    plot!(plt, xtickfontsize = 6, xguidefontsize = 7)
-    plot!(plt, ytickfontsize = 7, yguidefontsize = 7)
-
-    # plot!(plt, [], [], linestyle = :dash, label="$(shift[1]) mV", color=palette[1])
-    # plot!(plt, [], [], linestyle = :dash, label="$(shift[end]) mV", color=palette[end])
-
-    vec = m7_inf.(V; shift=0.0, with_shift= true)
-    plot!(plt, V, vec, linestyle = :solid, label="", color=:black)
-
-    for (i,s) in enumerate(shift)
-        c = palette[i]
-        vec = h7_inf.(V; shift=s, with_shift= true)
-        plot!(plt, V, vec, linestyle = :dash, label="", color=c)
-
-        # vec = m8_inf.(V; shift=0.6 * s, with_shift= true)
-        # plot!(plt, V, vec, label="", color=c)
-    end
-    savefig(plt, "plots/default/SS_shift.svg")
-end
-
-function plot_lido_inhib()
-
-    C = 10 .^ range(log10(0.1), log10(100000), length=1000)
-
-    results = get_lidocaine_inhibition.(C)
-
-    inhibition_1_3 = [r[1] for r in results]
-    inhibition_1_7 = [r[2] for r in results]
-    inhibition_1_8 = [r[3] for r in results]
-    inhibition_NMDA = [r[4] for r in results]
-
-    plt = plot(ylabel="Inhibition (%)", xlabel="Lidocain (µM)", xscale=:log10, legendfontsize=10, legend=:topleft)
-    xticks!(plt, [0.1, 1.0, 10.0,100.0,1000.0,10000.0, 100000.0])
-
-    plot!(plt, C, inhibition_1_3, label="NaV1.3", color=gate_colors["m3"])
-    plot!(plt, C, inhibition_1_7, label="NaV1.7", color=gate_colors["m7"])
-    plot!(plt, C, inhibition_1_8, label="NaV1.8", color=gate_colors["m8"])
-    plot!(plt, C, inhibition_NMDA, label="NMDA", color=:blue, linestyle=:dash)
     
-    savefig(plt, "plots/default/lido_inhibition.pdf")
+    ## Compute total in and out currents in soma 
+    sum_Iion_in = sum(VEC_Iion_in) #[µA/cm²] 
+    sum_Iion_out = sum(VEC_Iion_out) #[µA/cm²] 
+
+    return VEC_Iion_in, VEC_Iion_out, sum_Iion_in, sum_Iion_out
 end
 
-function legend()
+function add_in_out_ratios(plt_in, plt_out, t, VEC_Iion_in, sum_Iion_in, VEC_Iion_out, sum_Iion_out, Iion_colors, Iion_labels)
 
-    plt = plot(legendfontsize=8, size=(400,400))
-    m_size = 10
-    plot!(plt , [], []  , marker=:circle, label="No spiking", markersize=m_size, markerstrokecolor = :match, markerstrokewidth = 0.0, color = :black)
-    plot!(plt , [], []  , marker=:square, label="Spiking", markersize=m_size, markerstrokecolor = :match, markerstrokewidth = 0.0, color = :black)
+    add_in = false
+    if !isnothing(plt_in)
+        add_in = true
+        plot!(plt_in, ylabel="% in", grid=:none)
+        plot!(plt_in, legend=:topright, fontfamily="Computer Modern")
+    end
 
-    savefig(plt, "plots/default/legend.pdf")
+    add_out = false
+    if !isnothing(plt_out)
+        add_out = true
+        plot!(plt_out, ylabel="% out", grid=:none)
+        plot!(plt_out, legend=:topright, fontfamily="Computer Modern")
+    end
+
+    sum_in_cumul = zeros(size(VEC_Iion_in[1]))
+    previous_ratio_in_cumul = zeros(size(VEC_Iion_in[1]))
+
+    sum_out_cumul = zeros(size(VEC_Iion_out[1]))
+    previous_ratio_out_cumul = zeros(size(VEC_Iion_out[1]))
+
+    for i in eachindex(VEC_Iion_in)
+
+        # -- Inward currents -- #
+        if add_in
+            sum_in_cumul = VEC_Iion_in[i] .+ sum_in_cumul
+            ratio_in_cumul = abs.( sum_in_cumul ./ sum_Iion_in )
+            ratio_in_i = abs.( VEC_Iion_in[i] ./ sum_Iion_in )
+
+            if maximum(ratio_in_i) > 1e-6
+                plot!(plt_in,t,ratio_in_cumul, fillrange=previous_ratio_in_cumul, fillcolor=Iion_colors[i], label=Iion_labels[i], lc=Iion_colors[i], fillalpha=0.95, ylims=(-0.03,1))
+            end
+            previous_ratio_in_cumul = ratio_in_cumul
+        end
+
+        # -- Outward currents -- #
+        if add_out
+            sum_out_cumul = VEC_Iion_out[i] .+ sum_out_cumul
+            ratio_out_cumul = abs.( sum_out_cumul ./ sum_Iion_out )
+            ratio_out_i = abs.( VEC_Iion_out[i] ./ sum_Iion_out )
+
+            if maximum(ratio_out_i) > 1e-6
+                plot!(plt_out,t,ratio_out_cumul, fillrange=previous_ratio_out_cumul, fillcolor=Iion_colors[i], label=Iion_labels[i], lc=Iion_colors[i], fillalpha=0.95, ylims=(-0.03,1))
+            end
+            previous_ratio_out_cumul = ratio_out_cumul
+        end
+    
+    end
+    return plt_in, plt_out
 end
 
-function Mgblock_plot()
-
-    V = -100.0:0.5:45.0
-    xticks = [-120, -90, -60, -30, 0, 30, 60]
-    plt = plot(xticks= xticks)
-
-    xlabel!(plt, "Voltage (mV)")
-    ylabel!(plt, "Mgblock (-)")
-
-    g(x) = NMDA_Mg_block(x)
-    f(x) = NMDA_Mg_block(x; shift=25.0 ,with_shift=true)
-
-    plot!(plt, V, f.(V), color=:red, label="", linewidth=2)
-    plot!(plt, V, g.(V), color=:black, label="", linewidth=2)
-
-    savefig(plt, "plots/default/random.pdf")
+function add_current_space(plt_in, plt_out, t, Iion_s, pal_Iion, lab_Ix)
+    VEC_Iion_in, VEC_Iion_out, sum_Iion_in, sum_Iion_out = compute_in_out_Iions(Iion_s)
+    add_in_out_ratios(plt_in, plt_out, t, VEC_Iion_in, sum_Iion_in, VEC_Iion_out, sum_Iion_out, pal_Iion, lab_Ix)
+    return
 end

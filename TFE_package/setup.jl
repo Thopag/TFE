@@ -7,8 +7,4 @@ Pkg.activate("./TFE_package")
 # Pkg.instantiate()
 
 using TFE_package
-const TFE = TFE_package
-const ODE = TFE_package
-const Ploting = TFE_package
-
 using Plots, LaTeXStrings, ColorSchemes, Accessors, Plots.Measures, JLD2, Logging
