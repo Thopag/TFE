@@ -4,7 +4,8 @@ export DIV0_u0, DIV7_u0, get_DIV0_u0, get_DIV7_u0
 # to give the pointer to the sub_vector and not a copy
 
 function DIV0_u0(u0)
-    u0[1] = -69.5         # V
+    V0 = -62.65
+    u0[1] = V0            # V
     u0[2] = 0.0           # m3
     u0[3] = 0.0           # h3
     u0[4] = 0.0           # m7
@@ -19,7 +20,8 @@ function DIV0_u0(u0)
 end
 
 function DIV7_u0(u0)
-    u0[1] = -70.0         # V
+    V0 = -70.0
+    u0[1] = V0            # V
     u0[2] = 0.0           # m3
     u0[3] = 0.7191        # h3
     u0[4] = 0.0219        # m7
