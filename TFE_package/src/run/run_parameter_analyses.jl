@@ -90,11 +90,13 @@ function plot_data_analyse(data::AnalyseData, VEC_label, VEC_amp, inter_axe_labe
     size = (400, 250)
     xticks = VEC_amp[1]:50:VEC_amp[end]
     
-    p_peaks   = plot(xlabel="Stimulation (pA)", ylabel= "Peak count (-)" , xticks=xticks, size=size)
-    p_init_freqs   = plot(xlabel="Stimulation (pA)", ylabel= "Init Frequency (Hz)" , xticks=xticks, size=size)
-    p_sust_freqs   = plot(xlabel="Stimulation (pA)", ylabel= "Sust Frequency (Hz)" , xticks=xticks, size=size)
-    p_height  = plot(xlabel="Stimulation (pA)", ylabel= "Height (mV)"    , xticks=xticks, size=size)
-    p_width   = plot(xlabel="Stimulation (pA)", ylabel= "Width (ms)"     , xticks=xticks, size=size)
+    # p_init_freqs   = plot(xlabel="Stimulation (pA)", ylabel= "Init Frequency (Hz)" , xticks=xticks, size=size)
+    # p_sust_freqs   = plot(xlabel="Stimulation (pA)", ylabel= "Sust Frequency (Hz)" , xticks=xticks, size=size)
+
+    p_peaks      = plot(xlabel="Stimulation (pA)", ylabel= "Peak count (-)" , xticks=xticks, size=size)
+    p_both_freqs = plot(xlabel="Stimulation (pA)", ylabel= "Frequency (Hz)" , xticks=xticks, size=size)
+    p_height     = plot(xlabel="Stimulation (pA)", ylabel= "Height (mV)"    , xticks=xticks, size=size)
+    p_width      = plot(xlabel="Stimulation (pA)", ylabel= "Width (ms)"     , xticks=xticks, size=size)
 
     p_pattern = plot(left_margin = 5mm,bottom_margin = 5mm, margin = 5mm)
     plot!(p_pattern, xtickfontsize = 8, xguidefontsize = 11, yguidefontsize = 9, size=size)
@@ -125,11 +127,15 @@ function plot_data_analyse(data::AnalyseData, VEC_label, VEC_amp, inter_axe_labe
             j += 1
             c = VEC_color[j]
 
-            plot!(p_height      , VEC_amp, VEC_first_h    , marker=:circle, markersize=m_size, linealpha=0.6, markeralpha=0.9, label=label, markerstrokecolor = :match, markerstrokewidth = 0.0, color = c)
-            plot!(p_width       , VEC_amp, VEC_first_w    , marker=:circle, markersize=m_size, linealpha=0.6, markeralpha=0.9, label=label, markerstrokecolor = :match, markerstrokewidth = 0.0, color = c)
-            plot!(p_peaks       , VEC_amp, VEC_peak_count , marker=:circle, markersize=m_size, linealpha=1.0, markeralpha=0.9, label=label, markerstrokecolor = :match, markerstrokewidth = 0.0, color = c)
-            plot!(p_init_freqs  , VEC_amp, VEC_init_freq  , marker=:circle, markersize=m_size, linealpha=1.0, markeralpha=0.9, label=label, markerstrokecolor = :match, markerstrokewidth = 0.0, color = c)
-            plot!(p_sust_freqs  , VEC_amp, VEC_sust_freq  , marker=:circle, markersize=m_size, linealpha=1.0, markeralpha=0.9, label=label, markerstrokecolor = :match, markerstrokewidth = 0.0, color = c)
+            plot!(p_height      , VEC_amp, VEC_first_h    , marker=:circle, markersize=m_size, linealpha=0.6, markeralpha=0.9, label=label, markerstrokewidth = 0.0, color = c)
+            plot!(p_width       , VEC_amp, VEC_first_w    , marker=:circle, markersize=m_size, linealpha=0.6, markeralpha=0.9, label=label, markerstrokewidth = 0.0, color = c)
+            plot!(p_peaks       , VEC_amp, VEC_peak_count , marker=:circle, markersize=m_size, linealpha=1.0, markeralpha=0.9, label=label, markerstrokewidth = 0.0, color = c)
+
+            plot!(p_both_freqs  , VEC_amp, VEC_init_freq  , marker=:circle, markersize=m_size, linealpha=0.8, markeralpha=0.8, label=label, markerstrokewidth = 0.0, color = :darkblue, markercolor = :match)
+            plot!(p_both_freqs  , VEC_amp, VEC_sust_freq  , marker=:circle, markersize=m_size, linealpha=0.8, markeralpha=0.8, label=label, markerstrokewidth = 0.0, color = :darkred, markercolor = :match)
+        
+            # plot!(p_init_freqs  , VEC_amp, VEC_init_freq  , marker=:circle, markersize=m_size, linealpha=1.0, markeralpha=0.9, label=label, markerstrokewidth = 0.0, color = c)
+            # plot!(p_sust_freqs  , VEC_amp, VEC_sust_freq  , marker=:circle, markersize=m_size, linealpha=1.0, markeralpha=0.9, label=label, markerstrokewidth = 0.0, color = c)
 
             bar!(p_pattern, VEC_amp, fill(j+0.5, length(VEC_amp)), fillto=fill(j-0.45, length(VEC_amp)), lw=0, linecolor=:match, bar_width=(VEC_amp[1]-VEC_amp[2])*1.05, label="", color=pattern_color)
         end
@@ -137,15 +143,17 @@ function plot_data_analyse(data::AnalyseData, VEC_label, VEC_amp, inter_axe_labe
 
     # --- save --- #
 
-    # savefig(p_peaks, "plots/default/$(file_prefix)_peaks-curve.svg")
-    savefig(p_init_freqs, "plots/default/$(file_prefix)_init_freq.svg")
-    savefig(p_sust_freqs, "plots/default/$(file_prefix)_sust_freq.svg")
+    # savefig(p_init_freqs, "plots/default/$(file_prefix)_init_freq.svg")
+    # savefig(p_sust_freqs, "plots/default/$(file_prefix)_sust_freq.svg")
+
+    #savefig(p_peaks, "plots/default/$(file_prefix)_peaks-curve.svg")
+    savefig(p_both_freqs, "plots/default/$(file_prefix)_both_freq.svg")
     # savefig(p_height, "plots/default/$(file_prefix)_first_height.svg")
     # savefig(p_width, "plots/default/$(file_prefix)_first_width.svg")
 
-    savefig(p_pattern, "plots/default/$(file_prefix)_pattern.svg")
+    #savefig(p_pattern, "plots/default/$(file_prefix)_pattern.svg")
 
-    return p_peaks, p_init_freqs, p_sust_freqs, p_height, p_width, p_pattern
+    return
 end
 
 function plot_parameter_analyses(results::AnalyseResults, f_1D::File1D; file_prefix = "default")
