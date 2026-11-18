@@ -29,7 +29,7 @@ function make_1D_parameters(u0, duration, DIV, p_stim, nociceptor_parameter, wit
     inhib = 0.0
     shift = 0.0
 
-    n = nociceptor_parameter(;)
+    n = nociceptor_parameter(;) #g_NaV1p8 = 30.0 * (1-inhib))
     pn = projection_neuron_parameter(;)
     s = synapse_parameter(;)
     lido = lidocaine_parameter(; shift_h8 = 0.0 * shift, shift_m8 = 0.0 * shift, shift_h7 = 0.0 * shift, with_shift = true)

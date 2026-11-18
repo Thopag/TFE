@@ -24,7 +24,7 @@ function plot_simulations(plt, p_model, sol_n, sol_pn, sol_s, i; color = nothing
         init_freq, sust_freq, pattern = get_firing_pattern(t_spikes, p_model.stimulation.off)
         println("DRG neuron init frequency: $(init_freq) - sustained frequency: $(sust_freq) - pattern: $(pattern)")
 
-        voltage = 1
+        voltage = 2
         if voltage != 0
             yticks= [-90, -65, -40, 0, 30]
             ylabel!(plt[voltage], "Voltage (mV)", ylims=(-100,50), yticks=yticks)
@@ -32,24 +32,24 @@ function plot_simulations(plt, p_model, sol_n, sol_pn, sol_s, i; color = nothing
             plot!(plt[voltage], t, sol_n.V, color = something(color, :black), label="", linewidth=1.0)
         end
 
-        instant_freq = 2
+        instant_freq = 1
         if instant_freq != 0
             t_spikes = sol_n.t_spikes
             freqs = instant_freqs(t_spikes)
-            ylabel!(plt[instant_freq], "Instant freq (Hz)")
+            ylabel!(plt[instant_freq], "Instant freq (Hz)") #, ylims=(10,40))
 
             plot!(plt[instant_freq], t_spikes[1:end-1], freqs, color = something(color, :black), label="", marker=:circle, markersize=3, markerstrokecolor = :match, markerstrokewidth = 0.0)
             hline!(plt[instant_freq], [init_freq], color = :red, label="f_init")
             hline!(plt[instant_freq], [sust_freq], color = :blue, label="f_sust")
         end
 
-        current_space = 0
+        current_space = 3
         if current_space != 0 
             VEC_Iion = [n_current.INaV1p3, n_current.INaV1p7, n_current.INaV1p8, n_current.IK_dr, n_current.IK_M, n_current.IK_AHP, n_current.ILeak]
             Iion_labels = ["INaV1p3","INaV1p7","INaV1p8","IK_dr","IK_M","IK_AHP","ILeak"]
             Iion_colors = [:blue, :red, :green, :orange, :purple, :brown, :grey]
 
-            add_current_space(plt[current_space], nothing, t, VEC_Iion, Iion_colors, Iion_labels)
+            add_current_space(plt[current_space], plt[current_space+1], t, VEC_Iion, Iion_colors, Iion_labels)
         end
 
         current = 0
@@ -107,10 +107,10 @@ function make_simulations(VEC_p_model, u0, duration, VEC_label, DIV, with_nocice
     println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
     println("")
 
-    n_fig = 2
+    n_fig = 4
     size = (400, 175*n_fig)
 
-    xlimits = (275.0, duration)
+    xlimits = (0.0, duration)
     xticks = :native #[300.0, 2000.0]
     # x_label_size = 9
     # x_tick_size = 9

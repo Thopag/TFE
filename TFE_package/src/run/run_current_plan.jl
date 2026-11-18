@@ -45,18 +45,25 @@ function plot_data_current_plan(f_2D::File2D, results::CurrentPlanResults, data:
     plt_spiking = make_heatmap(data.M_spiking, x_values, y_values, x_label, y_label, clip_spiking, cmap_spiking)
 
     # -- first spike h heatmap -- #
-    cs_rheo_h = get(colorschemes[:nipy_spectral], range(0.15, 0.97, length=256))
+    cs_rheo_h = get(colorschemes[:RdYlGn_11], range(0.15, 0.97, length=256))
     cmap_rheo_h = cgrad(cs_rheo_h, 25, categorical = false, rev = true)
-    clip_rheo_h = :native
+    clip_rheo_h = (0.0, 40.0)
 
     plt_rheo_h = make_heatmap(data.M_rheo_h, x_values, y_values, x_label, y_label, clip_rheo_h, cmap_rheo_h)
 
     # -- first spike w heatmap -- #
-    cs_rheo_w = get(colorschemes[:nipy_spectral], range(0.15, 0.97, length=256))
+    cs_rheo_w = get(colorschemes[:PiYG_11], range(0.15, 0.97, length=256))
     cmap_rheo_w = cgrad(cs_rheo_w, 25, categorical = false, rev = true)
-    clip_rheo_w = :native
+    clip_rheo_w = (0.5, 12.5)
 
     plt_rheo_w = make_heatmap(data.M_rheo_w, x_values, y_values, x_label, y_label, clip_rheo_w, cmap_rheo_w)
+
+    # -- spiking sustained freq heatmap -- #
+    cs_sust_freq = get(colorschemes[:darkrainbow], range(0.01, 0.99, length=256))
+    cmap_sust_freq = cgrad(cs_sust_freq, 25, categorical = false)
+    clip_sust_freq = :native
+
+    plt_sust_freq = make_heatmap(data.M_s_sust_freq, x_values, y_values, x_label, y_label, clip_sust_freq, cmap_sust_freq)
 
     # Lido Traj
     if with_lido_traj
@@ -70,6 +77,7 @@ function plot_data_current_plan(f_2D::File2D, results::CurrentPlanResults, data:
     savefig(plt_spiking, "plots/default/$(file_prefix)_spiking_plan.svg")
     savefig(plt_rheo_h, "plots/default/$(file_prefix)_rheo_height_plan.svg")
     savefig(plt_rheo_w, "plots/default/$(file_prefix)_rheo_width_plan.svg")
+    #savefig(plt_sust_freq, "plots/default/$(file_prefix)_sustained_spiking_plan.svg")
 end
 
 function plot_current_plan(f_2D::File2D, results::CurrentPlanResults; file_prefix = "default")

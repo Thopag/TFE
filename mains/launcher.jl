@@ -7,17 +7,17 @@ function main()
 
     # -------- Network -------- #
 
-    DIV = "DIV0"
+    DIV = "DIV7"
     with_nociceptor = true
-    with_projection_neuron = true
+    with_projection_neuron = false
 
     # -------- Stimulation -------- #
  
-    duration = 2000.0      # ms
+    duration = 1200.0      # ms
     stim_on = 300.0        # ms
     stim_length = 1400.0   # ms
 
-    amp = 39.0
+    amp = 15.0
 
     # -------- File name -------- #
 
@@ -26,9 +26,9 @@ function main()
 
     # -------- Launching options -------- #
 
-    launch_simulations = false
+    launch_simulations = true
     launch_1D = false
-    launch_2D = true
+    launch_2D = false
 
     # -------- PARAMETER SET TYPE -------- #
 

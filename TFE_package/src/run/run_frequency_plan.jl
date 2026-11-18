@@ -36,28 +36,39 @@ function plot_data_frequency_plan(f_2D::File2D, results::FrequencyPlanResults, d
     # colorbar
     cs = get(colorschemes[:darkrainbow], range(0.01, 0.99, length=256))
     cmap = cgrad(cs, 25, categorical = false)
-    clip = :native
+    clip_init = :native
+    clip_sust = (0.0, 40.0)
+    clip_combined = :native
 
     for (i,amp) in enumerate(VEC_amp)
 
         if i in take_idx
 
+            # Init freq
             M_init_freq = data.VEC_M_init_freq[i]
-            plt_init_freq = make_heatmap(M_init_freq, x_values, y_values, x_label, y_label, clip, cmap)
+            plt_init_freq = make_heatmap(M_init_freq, x_values, y_values, x_label, y_label, clip_init, cmap)
 
+            # Sust freq
             M_sust_freq = data.VEC_M_sust_freq[i]
-            plt_sust_freq = make_heatmap(M_sust_freq, x_values, y_values, x_label, y_label, clip, cmap)
+            #M_sust_freq = replace(M_sust_freq, 0.0 => missing)
+            plt_sust_freq = make_heatmap(M_sust_freq, x_values, y_values, x_label, y_label, clip_sust, cmap)
 
+            # Pattern
             M_pattern = data.VEC_M_pattern[i]
             # replace the -1 by missing
             M_masked = replace(M_pattern, -1 => missing)
             plt_pattern = make_heatmap(M_masked, x_values, y_values, x_label, y_label, (0, 3), pattern_palette)
 
+            # Sust freq for spiking, and init freq for others
+            M_combined = ifelse.(M_pattern .== 3, M_sust_freq, M_init_freq)
+            plt_freq = make_heatmap(M_combined, x_values, y_values, x_label, y_label, clip_combined, cmap)
+
             # Pattern region
             if show_pattern_region
-                filter = ifelse.(M_pattern .== 3, true, false)
-                contour!(plt_init_freq, x_values, y_values, filter, levels = [0.5], color = :white, linewidth = 3)
-                contour!(plt_sust_freq, x_values, y_values, filter, levels = [0.5], color = :white, linewidth = 3)
+                filter_spiking = ifelse.(M_pattern .== 3, true, false)
+                contour!(plt_freq, x_values, y_values, filter_spiking, levels = [0.5], color = :cyan, linewidth = 3)
+                # filter_transient = ifelse.(M_pattern .== 2, true, false)
+                # contour!(plt_freq, x_values, y_values, filter_transient, levels = [0.5], color = :cyan, linewidth = 3)
             end
 
             # Lido Traj
@@ -67,8 +78,9 @@ function plot_data_frequency_plan(f_2D::File2D, results::FrequencyPlanResults, d
 
             # ---------- save figures ---------- #
 
-            savefig(plt_init_freq, "plots/default/$(file_prefix)_init_freq_plan_$(amp)pA.svg")
-            savefig(plt_sust_freq, "plots/default/$(file_prefix)_sust_freq_plan_$(amp)pA.svg")
+            savefig(plt_freq, "plots/default/$(file_prefix)_freq_plan_$(amp)pA.svg")
+            # savefig(plt_init_freq, "plots/default/$(file_prefix)_init_freq_plan_$(amp)pA.svg")
+            # savefig(plt_sust_freq, "plots/default/$(file_prefix)_sust_freq_plan_$(amp)pA.svg")
             savefig(plt_pattern, "plots/default/$(file_prefix)_pattern_plan_$(amp)pA.svg")
         end
     end

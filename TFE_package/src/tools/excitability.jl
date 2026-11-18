@@ -1,6 +1,6 @@
 export get_firing_pattern, find_rheobase, find_spiking
 
-function get_first_peak_height_and_width(t, x; min_h=-70.0, min_proms=10.0, max_w=Inf)
+function get_first_peak_height_and_width(t, x; min_h=-5.0, min_proms=10.0, max_w=Inf)
 
     peaks = findmaxima(x)
     peaks = peakheights(peaks; min=min_h)

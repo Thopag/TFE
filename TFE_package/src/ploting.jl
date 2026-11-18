@@ -80,14 +80,14 @@ function add_in_out_ratios(plt_in, plt_out, t, VEC_Iion_in, sum_Iion_in, VEC_Iio
     if !isnothing(plt_in)
         add_in = true
         plot!(plt_in, ylabel="% in", grid=:none)
-        plot!(plt_in, legend=:topright, fontfamily="Computer Modern")
+        plot!(plt_in, legend=:topleft, fontfamily="Computer Modern")
     end
 
     add_out = false
     if !isnothing(plt_out)
         add_out = true
         plot!(plt_out, ylabel="% out", grid=:none)
-        plot!(plt_out, legend=:topright, fontfamily="Computer Modern")
+        plot!(plt_out, legend=:topleft, fontfamily="Computer Modern")
     end
 
     sum_in_cumul = zeros(size(VEC_Iion_in[1]))
