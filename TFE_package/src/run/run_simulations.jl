@@ -58,9 +58,13 @@ function plot_simulations(plt, p_model, sol_n, sol_pn, sol_s, i; color = nothing
             ylabel!(plt[current], "Current (µA/cm2)")
 
             plot!(plt[current], t, n_current.ILeak, color = :grey, label="ILeak", alpha=alpha)
-            plot!(plt[current], t, n_current.INaV1p7, color = :red, label="INaV1p7", alpha=alpha)
-            plot!(plt[current], t, n_current.INaV1p8, color = :green, label="INaV1p8", alpha=alpha)
-            #plot!(plt[current], t, n_current.INaV1p3, color = :blue, label="INaV1p3", alpha=alpha)
+            # plot!(plt[current], t, n_current.INaV1p7, color = :red, label="INaV1p7", alpha=alpha)
+            # plot!(plt[current], t, n_current.INaV1p8, color = :green, label="INaV1p8", alpha=alpha)
+            # plot!(plt[current], t, n_current.INaV1p3, color = :blue, label="INaV1p3", alpha=alpha)
+
+            plot!(plt[current], t, n_current.IK_dr, color = :orange, label="IK_dr", alpha=alpha)
+            plot!(plt[current], t, n_current.IK_M, color = :purple, label="IK_M", alpha=alpha)
+            plot!(plt[current], t, n_current.IK_AHP, color = :brown, label="IK_AHP", alpha=alpha)
         end
     end
 

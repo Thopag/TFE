@@ -11,7 +11,7 @@ function make_1D_parameters(u0, duration, DIV, p_stim, nociceptor_parameter, wit
     lidos = [0.0, 100.0, 1000.0]
 
     VEC_inter_parameter = 0.0:0.0
-    VEC_label = ["$k" for k in VEC_inter_parameter]
+    VEC_label = ["" for k in VEC_inter_parameter]
 
     # VEC_inter_parameter_2 = [100.0, 1000.0]
     # VEC_label = ["" for (k,m) in zip(VEC_inter_parameter,VEC_inter_parameter_2)]

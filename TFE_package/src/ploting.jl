@@ -71,6 +71,10 @@ function compute_in_out_Iions(Iion_s)
     sum_Iion_in = sum(VEC_Iion_in) #[µA/cm²] 
     sum_Iion_out = sum(VEC_Iion_out) #[µA/cm²] 
 
+    ## Convert the 0 to avoid NaN in the further ratio computation
+    replace!(sum_Iion_in, 0.0 => 1e-6)
+    replace!(sum_Iion_out, 0.0 => 1e-6)
+
     return VEC_Iion_in, VEC_Iion_out, sum_Iion_in, sum_Iion_out
 end
 
@@ -115,7 +119,6 @@ function add_in_out_ratios(plt_in, plt_out, t, VEC_Iion_in, sum_Iion_in, VEC_Iio
             sum_out_cumul = VEC_Iion_out[i] .+ sum_out_cumul
             ratio_out_cumul = abs.( sum_out_cumul ./ sum_Iion_out )
             ratio_out_i = abs.( VEC_Iion_out[i] ./ sum_Iion_out )
-
             if maximum(ratio_out_i) > 1e-6
                 plot!(plt_out,t,ratio_out_cumul, fillrange=previous_ratio_out_cumul, fillcolor=Iion_colors[i], label=Iion_labels[i], lc=Iion_colors[i], fillalpha=0.95, ylims=(-0.03,1))
             end

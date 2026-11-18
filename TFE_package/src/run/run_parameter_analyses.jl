@@ -137,11 +137,11 @@ function plot_data_analyse(data::AnalyseData, VEC_label, VEC_amp, inter_axe_labe
 
     # --- save --- #
 
-    savefig(p_peaks, "plots/default/$(file_prefix)_peaks-curve.svg")
+    # savefig(p_peaks, "plots/default/$(file_prefix)_peaks-curve.svg")
     savefig(p_init_freqs, "plots/default/$(file_prefix)_init_freq.svg")
     savefig(p_sust_freqs, "plots/default/$(file_prefix)_sust_freq.svg")
-    savefig(p_height, "plots/default/$(file_prefix)_first_height.svg")
-    savefig(p_width, "plots/default/$(file_prefix)_first_width.svg")
+    # savefig(p_height, "plots/default/$(file_prefix)_first_height.svg")
+    # savefig(p_width, "plots/default/$(file_prefix)_first_width.svg")
 
     savefig(p_pattern, "plots/default/$(file_prefix)_pattern.svg")
 

@@ -28,8 +28,10 @@ end
 function main()
 
     files = [
-            "data/DIV0_Nav1p8_2D",
-            "data/DIV7_Nav1p7_2D"
+            # "data/DIV0_Nav1p8_2D",
+            # "data/DIV7_Nav1p7_2D",
+            "data/DIV0",
+            "data/DIV7"
             ]
 
     for file in files

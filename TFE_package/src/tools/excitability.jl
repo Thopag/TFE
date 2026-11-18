@@ -69,7 +69,7 @@ function get_firing_pattern(t_spikes, end_stim)
     2 : Transient
     3 : Spiking
     """
-    t_frontier = 600
+    t_frontier = 450
     freqs = instant_freqs(t_spikes)
     f_init, f_sust = get_init_and_sustaine_freq(t_spikes, freqs, t_frontier)
 
